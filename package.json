@@ -30,9 +30,9 @@
     "styled-components": "^6.0.0"
   },
   "engines": {
-   "node": ">=20.17.0 <22.0.0",
+  "node": "20.17.0",
   "npm": ">=8.0.0"
-  },
+},
   "strapi": {
     "uuid": "c78c204c-1a38-4363-8607-07f28bfc8974",
     "installId": "05198faa0a1e291f7fa361b03e4085eae42699026af2c64f0cb13a49f8ec11d2"
