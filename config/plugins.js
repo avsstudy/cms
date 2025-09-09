@@ -1,1 +1,5 @@
-module.exports = () => ({});
+module.exports = {
+  "media-prefix": {
+    enabled: true,
+  },
+};
