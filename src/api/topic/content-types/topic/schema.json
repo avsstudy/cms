@@ -40,10 +40,10 @@
       "mappedBy": "topics"
     },
     "articles": {
-      "type": "relation",
-      "relation": "manyToMany",
-      "target": "api::article.article",
-      "inversedBy": "topics"
-    }
+  "type": "relation",
+  "relation": "manyToMany",
+  "target": "api::article.article",
+  "mappedBy": "topics"
+}
   }
 }
