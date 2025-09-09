@@ -42,24 +42,6 @@
       "relation": "manyToOne",
       "target": "api::category.category",
       "inversedBy": "articles"
-    },
-    "blocks": {
-      "type": "dynamiczone",
-      "components": [
-        "shared.media",
-        "shared.quote",
-        "shared.rich-text",
-        "shared.slider"
-      ]
-    },
-    "content": {
-      "type": "blocks"
-    },
-   "topics": {
-  "type": "relation",
-  "relation": "manyToMany",
-  "target": "api::topic.topic",
-  "inversedBy": "articles"
-}
+    }
   }
 }
