@@ -18,6 +18,16 @@
       "type": "relation",
       "relation": "oneToMany",
       "target": "api::topic.topic"
+    },
+    "svg_alias": {
+      "type": "media",
+      "multiple": false,
+      "allowedTypes": [
+        "images",
+        "files",
+        "videos",
+        "audios"
+      ]
     }
   }
 }
