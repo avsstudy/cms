@@ -471,7 +471,7 @@ export interface ApiArticleArticle extends Struct.CollectionTypeSchema {
     > &
       Schema.Attribute.Private;
     main: Schema.Attribute.DynamicZone<
-      ['shared.content', 'shared.mark', 'shared.video']
+      ['shared.content', 'shared.mark', 'shared.video', 'shared.related']
     >;
     publishedAt: Schema.Attribute.DateTime;
     slug: Schema.Attribute.UID<'title'>;

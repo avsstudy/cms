@@ -43,6 +43,16 @@ export interface SharedQuote extends Struct.ComponentSchema {
   };
 }
 
+export interface SharedRelated extends Struct.ComponentSchema {
+  collectionName: 'components_shared_relateds';
+  info: {
+    displayName: 'related';
+  };
+  attributes: {
+    article: Schema.Attribute.Relation<'oneToOne', 'api::article.article'>;
+  };
+}
+
 export interface SharedRichText extends Struct.ComponentSchema {
   collectionName: 'components_shared_rich_texts';
   info: {
@@ -99,6 +109,7 @@ declare module '@strapi/strapi' {
       'shared.mark': SharedMark;
       'shared.media': SharedMedia;
       'shared.quote': SharedQuote;
+      'shared.related': SharedRelated;
       'shared.rich-text': SharedRichText;
       'shared.seo': SharedSeo;
       'shared.slider': SharedSlider;
