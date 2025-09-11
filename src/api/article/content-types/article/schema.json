@@ -58,7 +58,8 @@
       "type": "dynamiczone",
       "components": [
         "shared.content",
-        "shared.mark"
+        "shared.mark",
+        "shared.video"
       ]
     }
   }
