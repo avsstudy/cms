@@ -59,7 +59,8 @@
       "components": [
         "shared.content",
         "shared.mark",
-        "shared.video"
+        "shared.video",
+        "shared.related"
       ]
     }
   }
