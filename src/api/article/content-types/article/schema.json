@@ -49,6 +49,10 @@
       "target": "api::topic.topic",
       "mappedBy": "article"
     },
-    "views": { "type": "integer", "default": 0, "min": 0 }
+    "views": {
+      "type": "integer",
+      "default": 0,
+      "min": 0
+    }
   }
 }
