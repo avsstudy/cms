@@ -1,0 +1,13 @@
+{
+  "collectionName": "components_shared_marks",
+  "info": {
+    "displayName": "mark"
+  },
+  "options": {},
+  "attributes": {
+    "mark": {
+      "type": "richtext"
+    }
+  },
+  "config": {}
+}
