@@ -60,7 +60,8 @@
         "shared.content",
         "shared.mark",
         "shared.video",
-        "shared.related"
+        "shared.related",
+        "shared.json"
       ]
     }
   }

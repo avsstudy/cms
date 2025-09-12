@@ -10,6 +10,16 @@ export interface SharedContent extends Struct.ComponentSchema {
   };
 }
 
+export interface SharedJson extends Struct.ComponentSchema {
+  collectionName: 'components_shared_jsons';
+  info: {
+    displayName: 'json';
+  };
+  attributes: {
+    json: Schema.Attribute.JSON;
+  };
+}
+
 export interface SharedMark extends Struct.ComponentSchema {
   collectionName: 'components_shared_marks';
   info: {
@@ -106,6 +116,7 @@ declare module '@strapi/strapi' {
   export module Public {
     export interface ComponentSchemas {
       'shared.content': SharedContent;
+      'shared.json': SharedJson;
       'shared.mark': SharedMark;
       'shared.media': SharedMedia;
       'shared.quote': SharedQuote;
