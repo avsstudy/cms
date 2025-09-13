@@ -14,11 +14,11 @@
     "title": {
       "type": "string"
     },
-    "article": {
+    "articles": {
       "type": "relation",
-      "relation": "manyToOne",
+      "relation": "oneToMany",
       "target": "api::article.article",
-      "inversedBy": "topics"
+      "mappedBy": "topic"
     }
   }
 }

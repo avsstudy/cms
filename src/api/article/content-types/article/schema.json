@@ -43,11 +43,11 @@
       "target": "api::author.author",
       "inversedBy": "articles"
     },
-    "topics": {
+    "topic": {
       "type": "relation",
-      "relation": "oneToMany",
+      "relation": "manyToOne",
       "target": "api::topic.topic",
-      "mappedBy": "article"
+      "inversedBy": "articles"
     },
     "views": {
       "type": "integer",
