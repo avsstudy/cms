@@ -4,10 +4,8 @@ module.exports = ({ env }) => {
   const url = env("DATABASE_URL");
   if (!url) throw new Error("DATABASE_URL is missing at build time.");
 
-  const ca = env("DATABASE_CA"); // багаторядковий вміст CA
-  const wantSSL = env.bool("DATABASE_SSL", true);
-
-  const ssl = wantSSL
+  const ca = env("DATABASE_CA"); // багаторядковий текст сертифікату
+  const ssl = env.bool("DATABASE_SSL", true)
     ? ca
       ? { ca, rejectUnauthorized: true }
       : { rejectUnauthorized: false }
