@@ -1,29 +1,22 @@
-"use strict";
+const parse = require("pg-connection-string").parse;
 
-module.exports = ({ env }) => {
-  const url = env("DATABASE_URL");
-  if (!url) throw new Error("DATABASE_URL is missing at build time.");
+const { host, port, database, user, password } = parse(
+  process.env.DATABASE_URL
+);
 
-  const ca = env("DATABASE_CA"); // багаторядковий текст сертифікату
-  const ssl = env.bool("DATABASE_SSL", true)
-    ? ca
-      ? { ca, rejectUnauthorized: true }
-      : { rejectUnauthorized: false }
-    : false;
-
-  return {
+module.exports = ({ env }) => ({
+  connection: {
+    client: "postgres",
     connection: {
-      client: "postgres",
-      connection: {
-        connectionString: url,
-        ssl,
-        schema: env("DATABASE_SCHEMA", "public"),
+      host,
+      port,
+      database,
+      user,
+      password,
+      ssl: {
+        rejectUnauthorized: false,
       },
-      pool: {
-        min: env.int("DATABASE_POOL_MIN", 2),
-        max: env.int("DATABASE_POOL_MAX", 10),
-      },
-      acquireConnectionTimeout: env.int("DATABASE_CONNECTION_TIMEOUT", 60000),
     },
-  };
-};
+    debug: false,
+  },
+});
