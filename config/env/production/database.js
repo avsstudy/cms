@@ -1,25 +1,24 @@
 "use strict";
 
 module.exports = ({ env }) => {
-  const url = env("DATABASE_URL") || process.env.DATABASE_URL;
-  if (!url) {
-    // Явно впадемо з читабельним меседжем, а не з "charAt"
-    throw new Error(
-      "DATABASE_URL is missing at build time. " +
-        "On DigitalOcean ensure scope = RUN_AND_BUILD_TIME for THIS service and no empty duplicate at service level."
-    );
-  }
+  const url = env("DATABASE_URL");
+  if (!url) throw new Error("DATABASE_URL is missing at build time.");
+
+  const ca = env("DATABASE_CA"); // багаторядковий вміст CA
+  const wantSSL = env.bool("DATABASE_SSL", true);
+
+  const ssl = wantSSL
+    ? ca
+      ? { ca, rejectUnauthorized: true }
+      : { rejectUnauthorized: false }
+    : false;
 
   return {
     connection: {
       client: "postgres",
       connection: {
-        // Knex/pg самі розберуть рядок підключення
         connectionString: url,
-        // DO зазвичай вимагає SSL; залишай false лише якщо точно не треба
-        ssl: env.bool("DATABASE_SSL", true)
-          ? { rejectUnauthorized: false }
-          : false,
+        ssl,
         schema: env("DATABASE_SCHEMA", "public"),
       },
       pool: {
