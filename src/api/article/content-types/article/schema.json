@@ -63,6 +63,9 @@
         "shared.related",
         "shared.json"
       ]
+    },
+    "content": {
+      "type": "blocks"
     }
   }
 }
