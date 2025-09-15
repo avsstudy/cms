@@ -17,7 +17,7 @@ export interface SharedCustomTable extends Struct.ComponentSchema {
     icon: 'apps';
   };
   attributes: {
-    decription: Schema.Attribute.Text;
+    description: Schema.Attribute.Text;
     headers: Schema.Attribute.JSON;
     rows: Schema.Attribute.JSON;
     title: Schema.Attribute.String;
