@@ -10,6 +10,43 @@ export interface SharedContent extends Struct.ComponentSchema {
   };
 }
 
+export interface SharedCustomTable extends Struct.ComponentSchema {
+  collectionName: 'components_shared_custom_tables';
+  info: {
+    displayName: 'custom-table';
+    icon: 'apps';
+  };
+  attributes: {
+    decription: Schema.Attribute.Text;
+    headers: Schema.Attribute.JSON;
+    rows: Schema.Attribute.JSON;
+    title: Schema.Attribute.String;
+  };
+}
+
+export interface SharedCustomVideo extends Struct.ComponentSchema {
+  collectionName: 'components_shared_custom_videos';
+  info: {
+    displayName: 'custom-video';
+  };
+  attributes: {
+    file: Schema.Attribute.Media<'images' | 'files' | 'videos' | 'audios'>;
+    provider: Schema.Attribute.Enumeration<['youtube', 'vimeo']>;
+    url: Schema.Attribute.String;
+  };
+}
+
+export interface SharedImage extends Struct.ComponentSchema {
+  collectionName: 'components_shared_images';
+  info: {
+    displayName: 'Image';
+    icon: 'crop';
+  };
+  attributes: {
+    image: Schema.Attribute.Media<'images' | 'files'>;
+  };
+}
+
 export interface SharedJson extends Struct.ComponentSchema {
   collectionName: 'components_shared_jsons';
   info: {
@@ -102,6 +139,17 @@ export interface SharedSlider extends Struct.ComponentSchema {
   };
 }
 
+export interface SharedText extends Struct.ComponentSchema {
+  collectionName: 'components_shared_texts';
+  info: {
+    displayName: 'Text';
+    icon: 'pencil';
+  };
+  attributes: {
+    content: Schema.Attribute.Blocks;
+  };
+}
+
 export interface SharedVideo extends Struct.ComponentSchema {
   collectionName: 'components_shared_videos';
   info: {
@@ -116,6 +164,9 @@ declare module '@strapi/strapi' {
   export module Public {
     export interface ComponentSchemas {
       'shared.content': SharedContent;
+      'shared.custom-table': SharedCustomTable;
+      'shared.custom-video': SharedCustomVideo;
+      'shared.image': SharedImage;
       'shared.json': SharedJson;
       'shared.mark': SharedMark;
       'shared.media': SharedMedia;
@@ -124,6 +175,7 @@ declare module '@strapi/strapi' {
       'shared.rich-text': SharedRichText;
       'shared.seo': SharedSeo;
       'shared.slider': SharedSlider;
+      'shared.text': SharedText;
       'shared.video': SharedVideo;
     }
   }

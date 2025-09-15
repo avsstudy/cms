@@ -1,0 +1,23 @@
+{
+  "collectionName": "components_shared_custom_tables",
+  "info": {
+    "displayName": "custom-table",
+    "icon": "apps"
+  },
+  "options": {},
+  "attributes": {
+    "headers": {
+      "type": "json"
+    },
+    "rows": {
+      "type": "json"
+    },
+    "title": {
+      "type": "string"
+    },
+    "decription": {
+      "type": "text"
+    }
+  },
+  "config": {}
+}

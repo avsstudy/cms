@@ -54,18 +54,14 @@
       "default": 0,
       "min": 0
     },
-    "main": {
+    "general": {
       "type": "dynamiczone",
       "components": [
-        "shared.content",
-        "shared.mark",
-        "shared.video",
-        "shared.related",
-        "shared.json"
+        "shared.text",
+        "shared.image",
+        "shared.custom-video",
+        "shared.custom-table"
       ]
-    },
-    "content": {
-      "type": "blocks"
     }
   }
 }
