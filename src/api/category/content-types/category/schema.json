@@ -23,6 +23,12 @@
     "slug": {
       "type": "uid",
       "targetField": "title"
+    },
+    "stories": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "api::story.story",
+      "inversedBy": "categories"
     }
   }
 }

@@ -1,0 +1,57 @@
+{
+  "kind": "collectionType",
+  "collectionName": "stories",
+  "info": {
+    "singularName": "story",
+    "pluralName": "stories",
+    "displayName": "Story"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "title": {
+      "type": "string"
+    },
+    "slug": {
+      "type": "uid",
+      "targetField": "title"
+    },
+    "topics": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "api::topic.topic",
+      "inversedBy": "stories"
+    },
+    "categories": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "api::category.category",
+      "mappedBy": "stories"
+    },
+    "subscriptionType": {
+      "type": "enumeration",
+      "enum": [
+        "free",
+        "payed"
+      ]
+    },
+    "commentsEnabled": {
+      "type": "boolean",
+      "default": false
+    },
+    "views": {
+      "type": "integer"
+    },
+    "general": {
+      "type": "dynamiczone",
+      "components": [
+        "shared.text",
+        "shared.image",
+        "shared.custom-video",
+        "shared.custom-table"
+      ]
+    }
+  }
+}

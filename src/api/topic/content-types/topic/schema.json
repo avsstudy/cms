@@ -19,6 +19,12 @@
       "relation": "oneToMany",
       "target": "api::article.article",
       "mappedBy": "topic"
+    },
+    "stories": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "api::story.story",
+      "mappedBy": "topics"
     }
   }
 }
