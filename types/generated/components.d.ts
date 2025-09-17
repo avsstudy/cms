@@ -17,10 +17,15 @@ export interface SharedCustomTable extends Struct.ComponentSchema {
     icon: 'apps';
   };
   attributes: {
+    anchor: Schema.Attribute.String;
     description: Schema.Attribute.Text;
     headers: Schema.Attribute.JSON;
     rows: Schema.Attribute.JSON;
     title: Schema.Attribute.String;
+    tocTitle: Schema.Attribute.String &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 120;
+      }>;
   };
 }
 
@@ -146,7 +151,12 @@ export interface SharedText extends Struct.ComponentSchema {
     icon: 'pencil';
   };
   attributes: {
+    anchor: Schema.Attribute.String;
     content: Schema.Attribute.Blocks;
+    tocTitle: Schema.Attribute.String &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 120;
+      }>;
   };
 }
 
