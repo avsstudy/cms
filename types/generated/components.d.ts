@@ -1,5 +1,25 @@
 import type { Schema, Struct } from '@strapi/strapi';
 
+export interface SharedChapter extends Struct.ComponentSchema {
+  collectionName: 'components_shared_chapters';
+  info: {
+    displayName: 'Chapter';
+    icon: 'bulletList';
+  };
+  attributes: {
+    label: Schema.Attribute.String & Schema.Attribute.Required;
+    note: Schema.Attribute.Text;
+    startSeconds: Schema.Attribute.Integer &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetMinMax<
+        {
+          min: 0;
+        },
+        number
+      >;
+  };
+}
+
 export interface SharedContent extends Struct.ComponentSchema {
   collectionName: 'components_shared_contents';
   info: {
@@ -35,6 +55,7 @@ export interface SharedCustomVideo extends Struct.ComponentSchema {
     displayName: 'custom-video';
   };
   attributes: {
+    chapters: Schema.Attribute.Component<'shared.chapter', true>;
     file: Schema.Attribute.Media<'images' | 'files' | 'videos' | 'audios'>;
     provider: Schema.Attribute.Enumeration<['youtube', 'vimeo']>;
     url: Schema.Attribute.String;
@@ -173,6 +194,7 @@ export interface SharedVideo extends Struct.ComponentSchema {
 declare module '@strapi/strapi' {
   export module Public {
     export interface ComponentSchemas {
+      'shared.chapter': SharedChapter;
       'shared.content': SharedContent;
       'shared.custom-table': SharedCustomTable;
       'shared.custom-video': SharedCustomVideo;

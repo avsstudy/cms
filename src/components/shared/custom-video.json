@@ -24,6 +24,11 @@
         "youtube",
         "vimeo"
       ]
+    },
+    "chapters": {
+      "type": "component",
+      "repeatable": true,
+      "component": "shared.chapter"
     }
   },
   "config": {}
