@@ -29,6 +29,12 @@
       "relation": "manyToMany",
       "target": "api::story.story",
       "inversedBy": "categories"
+    },
+    "video_reviews": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "api::video-review.video-review",
+      "mappedBy": "categories"
     }
   }
 }
