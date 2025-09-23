@@ -59,6 +59,10 @@
         "shared.custom-video",
         "shared.custom-table"
       ]
+    },
+    "pinned": {
+      "type": "boolean",
+      "default": false
     }
   }
 }

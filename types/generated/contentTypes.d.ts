@@ -737,6 +737,7 @@ export interface ApiVideoReviewVideoReview extends Struct.CollectionTypeSchema {
       'api::video-review.video-review'
     > &
       Schema.Attribute.Private;
+    pinned: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<false>;
     publishedAt: Schema.Attribute.DateTime;
     slug: Schema.Attribute.UID<'title'>;
     title: Schema.Attribute.String;
