@@ -615,6 +615,7 @@ export interface ApiStoryStory extends Struct.CollectionTypeSchema {
     >;
     commentsEnabled: Schema.Attribute.Boolean &
       Schema.Attribute.DefaultTo<false>;
+    cover: Schema.Attribute.Media<'images' | 'files'>;
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
