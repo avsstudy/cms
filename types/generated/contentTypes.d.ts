@@ -611,6 +611,7 @@ export interface ApiStoryStory extends Struct.CollectionTypeSchema {
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
+    description: Schema.Attribute.Text;
     general: Schema.Attribute.DynamicZone<
       [
         'shared.text',
