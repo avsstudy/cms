@@ -617,6 +617,7 @@ export interface ApiStoryStory extends Struct.CollectionTypeSchema {
         'shared.image',
         'shared.custom-video',
         'shared.custom-table',
+        'shared.video-review',
       ]
     >;
     locale: Schema.Attribute.String & Schema.Attribute.Private;
