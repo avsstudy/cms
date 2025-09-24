@@ -1,15 +1,17 @@
 {
-  "collectionName": "components_shared_custom_videos",
+  "collectionName": "components_shared_video_reviews",
   "info": {
-    "displayName": "custom-video"
+    "displayName": "video-review"
   },
   "options": {},
   "attributes": {
     "url": {
-      "type": "string"
+      "type": "string",
+      "required": true
     },
     "provider": {
       "type": "enumeration",
+      "required": true,
       "default": "youtube",
       "enum": [
         "youtube",
@@ -19,7 +21,8 @@
     "chapters": {
       "type": "component",
       "component": "shared.chapter",
-      "repeatable": true
+      "repeatable": true,
+      "required": true
     },
     "materials": {
       "type": "media",

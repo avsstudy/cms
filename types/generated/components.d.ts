@@ -57,7 +57,8 @@ export interface SharedCustomVideo extends Struct.ComponentSchema {
   attributes: {
     chapters: Schema.Attribute.Component<'shared.chapter', true>;
     materials: Schema.Attribute.Media<'files', true>;
-    provider: Schema.Attribute.Enumeration<['youtube', 'vimeo']>;
+    provider: Schema.Attribute.Enumeration<['youtube', 'vimeo']> &
+      Schema.Attribute.DefaultTo<'youtube'>;
     url: Schema.Attribute.String;
   };
 }
@@ -191,6 +192,22 @@ export interface SharedVideo extends Struct.ComponentSchema {
   };
 }
 
+export interface SharedVideoReview extends Struct.ComponentSchema {
+  collectionName: 'components_shared_video_reviews';
+  info: {
+    displayName: 'video-review';
+  };
+  attributes: {
+    chapters: Schema.Attribute.Component<'shared.chapter', true> &
+      Schema.Attribute.Required;
+    materials: Schema.Attribute.Media<'files', true>;
+    provider: Schema.Attribute.Enumeration<['youtube', 'vimeo']> &
+      Schema.Attribute.Required &
+      Schema.Attribute.DefaultTo<'youtube'>;
+    url: Schema.Attribute.String & Schema.Attribute.Required;
+  };
+}
+
 declare module '@strapi/strapi' {
   export module Public {
     export interface ComponentSchemas {
@@ -209,6 +226,7 @@ declare module '@strapi/strapi' {
       'shared.slider': SharedSlider;
       'shared.text': SharedText;
       'shared.video': SharedVideo;
+      'shared.video-review': SharedVideoReview;
     }
   }
 }

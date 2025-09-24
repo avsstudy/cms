@@ -49,8 +49,13 @@
       "type": "boolean",
       "default": false
     },
+    "pinned": {
+      "type": "boolean",
+      "default": false
+    },
     "views": {
-      "type": "integer"
+      "type": "integer",
+      "default": 1
     },
     "general": {
       "type": "dynamiczone",

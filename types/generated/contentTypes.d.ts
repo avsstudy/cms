@@ -524,10 +524,6 @@ export interface ApiAuthorAuthor extends Struct.CollectionTypeSchema {
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
-    video_reviews: Schema.Attribute.Relation<
-      'manyToMany',
-      'api::video-review.video-review'
-    >;
   };
 }
 
@@ -559,10 +555,6 @@ export interface ApiCategoryCategory extends Struct.CollectionTypeSchema {
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
-    video_reviews: Schema.Attribute.Relation<
-      'manyToMany',
-      'api::video-review.video-review'
-    >;
   };
 }
 
@@ -630,6 +622,7 @@ export interface ApiStoryStory extends Struct.CollectionTypeSchema {
     locale: Schema.Attribute.String & Schema.Attribute.Private;
     localizations: Schema.Attribute.Relation<'oneToMany', 'api::story.story'> &
       Schema.Attribute.Private;
+    pinned: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<false>;
     publishedAt: Schema.Attribute.DateTime;
     slug: Schema.Attribute.UID<'title'>;
     subscriptionType: Schema.Attribute.Enumeration<['free', 'payed']>;
@@ -638,7 +631,7 @@ export interface ApiStoryStory extends Struct.CollectionTypeSchema {
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
-    views: Schema.Attribute.Integer;
+    views: Schema.Attribute.Integer & Schema.Attribute.DefaultTo<1>;
   };
 }
 
@@ -696,57 +689,6 @@ export interface ApiTopicTopic extends Struct.CollectionTypeSchema {
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
-    video_reviews: Schema.Attribute.Relation<
-      'manyToMany',
-      'api::video-review.video-review'
-    >;
-  };
-}
-
-export interface ApiVideoReviewVideoReview extends Struct.CollectionTypeSchema {
-  collectionName: 'video_reviews';
-  info: {
-    displayName: 'VideoReview';
-    pluralName: 'video-reviews';
-    singularName: 'video-review';
-  };
-  options: {
-    draftAndPublish: true;
-  };
-  attributes: {
-    authors: Schema.Attribute.Relation<'manyToMany', 'api::author.author'>;
-    categories: Schema.Attribute.Relation<
-      'manyToMany',
-      'api::category.category'
-    >;
-    cover: Schema.Attribute.Media<'images' | 'files'>;
-    createdAt: Schema.Attribute.DateTime;
-    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
-      Schema.Attribute.Private;
-    description: Schema.Attribute.Text;
-    general: Schema.Attribute.DynamicZone<
-      [
-        'shared.text',
-        'shared.image',
-        'shared.custom-video',
-        'shared.custom-table',
-      ]
-    >;
-    locale: Schema.Attribute.String & Schema.Attribute.Private;
-    localizations: Schema.Attribute.Relation<
-      'oneToMany',
-      'api::video-review.video-review'
-    > &
-      Schema.Attribute.Private;
-    pinned: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<false>;
-    publishedAt: Schema.Attribute.DateTime;
-    slug: Schema.Attribute.UID<'title'>;
-    title: Schema.Attribute.String;
-    topics: Schema.Attribute.Relation<'manyToMany', 'api::topic.topic'>;
-    updatedAt: Schema.Attribute.DateTime;
-    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
-      Schema.Attribute.Private;
-    views: Schema.Attribute.Integer & Schema.Attribute.DefaultTo<1>;
   };
 }
 
@@ -1268,7 +1210,6 @@ declare module '@strapi/strapi' {
       'api::story.story': ApiStoryStory;
       'api::topic-group.topic-group': ApiTopicGroupTopicGroup;
       'api::topic.topic': ApiTopicTopic;
-      'api::video-review.video-review': ApiVideoReviewVideoReview;
       'plugin::content-releases.release': PluginContentReleasesRelease;
       'plugin::content-releases.release-action': PluginContentReleasesReleaseAction;
       'plugin::i18n.locale': PluginI18NLocale;
