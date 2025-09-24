@@ -56,7 +56,7 @@ export interface SharedCustomVideo extends Struct.ComponentSchema {
   };
   attributes: {
     chapters: Schema.Attribute.Component<'shared.chapter', true>;
-    file: Schema.Attribute.Media<'images' | 'files' | 'videos' | 'audios'>;
+    materials: Schema.Attribute.Media<'files', true>;
     provider: Schema.Attribute.Enumeration<['youtube', 'vimeo']>;
     url: Schema.Attribute.String;
   };
