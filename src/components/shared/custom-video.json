@@ -5,16 +5,6 @@
   },
   "options": {},
   "attributes": {
-    "file": {
-      "type": "media",
-      "multiple": false,
-      "allowedTypes": [
-        "images",
-        "files",
-        "videos",
-        "audios"
-      ]
-    },
     "url": {
       "type": "string"
     },
@@ -27,8 +17,15 @@
     },
     "chapters": {
       "type": "component",
-      "repeatable": true,
-      "component": "shared.chapter"
+      "component": "shared.chapter",
+      "repeatable": true
+    },
+    "materials": {
+      "type": "media",
+      "multiple": true,
+      "allowedTypes": [
+        "files"
+      ]
     }
   },
   "config": {}
