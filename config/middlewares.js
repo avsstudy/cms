@@ -14,8 +14,6 @@ module.exports = [
             "blob:",
             "market-assets.strapi.io",
             "res.cloudinary.com",
-            "https://*.digitaloceanspaces.com",
-            "https://*.cdn.digitaloceanspaces.com",
           ],
           "media-src": [
             "'self'",
@@ -23,8 +21,6 @@ module.exports = [
             "blob:",
             "market-assets.strapi.io",
             "res.cloudinary.com",
-            "https://*.digitaloceanspaces.com",
-            "https://*.cdn.digitaloceanspaces.com",
           ],
           upgradeInsecureRequests: null,
         },
