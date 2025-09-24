@@ -28,10 +28,9 @@ module.exports = ({ env }) => ({
         directory: env("DO_SPACE_DIRECTORY"),
         cdn: env("DO_SPACE_CDN"),
       },
-      actionOptions: {
-        upload: {},
-        delete: {},
-      },
+      sizeOptimization: false,
+      autoOrientation: false,
+      responsiveDimensions: false,
     },
   },
 });
