@@ -601,7 +601,7 @@ export interface ApiGlobalGlobal extends Struct.SingleTypeSchema {
 export interface ApiStoryStory extends Struct.CollectionTypeSchema {
   collectionName: 'stories';
   info: {
-    displayName: 'Story';
+    displayName: 'NewsArticle';
     pluralName: 'stories';
     singularName: 'story';
   };

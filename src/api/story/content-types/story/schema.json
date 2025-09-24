@@ -4,7 +4,7 @@
   "info": {
     "singularName": "story",
     "pluralName": "stories",
-    "displayName": "Story"
+    "displayName": "NewsArticle"
   },
   "options": {
     "draftAndPublish": true
