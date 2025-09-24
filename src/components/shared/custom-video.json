@@ -15,18 +15,6 @@
         "youtube",
         "vimeo"
       ]
-    },
-    "chapters": {
-      "type": "component",
-      "component": "shared.chapter",
-      "repeatable": true
-    },
-    "materials": {
-      "type": "media",
-      "multiple": true,
-      "allowedTypes": [
-        "files"
-      ]
     }
   },
   "config": {}

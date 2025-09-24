@@ -1,9 +1,21 @@
 {
   "collectionName": "components_shared_chapters",
-  "info": { "displayName": "Chapter", "icon": "bulletList" },
+  "info": {
+    "displayName": "Chapter",
+    "icon": "bulletList"
+  },
   "attributes": {
-    "label": { "type": "string", "required": true },
-    "startSeconds": { "type": "integer", "required": true, "min": 0 },
-    "note": { "type": "text" }
+    "label": {
+      "type": "string",
+      "required": true
+    },
+    "startSeconds": {
+      "type": "integer",
+      "required": true,
+      "min": 0
+    },
+    "note": {
+      "type": "text"
+    }
   }
 }
