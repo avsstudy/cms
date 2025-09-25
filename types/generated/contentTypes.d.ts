@@ -470,6 +470,9 @@ export interface ApiArticleArticle extends Struct.CollectionTypeSchema {
         'shared.image',
         'shared.custom-video',
         'shared.custom-table',
+        'shared.zakon',
+        'shared.ipk',
+        'shared.custom-quote',
       ]
     >;
     locale: Schema.Attribute.String & Schema.Attribute.Private;
@@ -619,6 +622,9 @@ export interface ApiStoryStory extends Struct.CollectionTypeSchema {
         'shared.custom-video',
         'shared.custom-table',
         'shared.video-review',
+        'shared.zakon',
+        'shared.custom-quote',
+        'shared.ipk',
       ]
     >;
     locale: Schema.Attribute.String & Schema.Attribute.Private;
