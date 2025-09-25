@@ -1,0 +1,20 @@
+{
+  "collectionName": "components_shared_ipks",
+  "info": {
+    "displayName": "ipk"
+  },
+  "options": {},
+  "attributes": {
+    "content": {
+      "type": "blocks"
+    },
+    "anchor": {
+      "type": "string"
+    },
+    "tocTitle": {
+      "type": "string",
+      "maxLength": 120
+    }
+  },
+  "config": {}
+}

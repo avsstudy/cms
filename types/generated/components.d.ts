@@ -30,6 +30,21 @@ export interface SharedContent extends Struct.ComponentSchema {
   };
 }
 
+export interface SharedCustomQuote extends Struct.ComponentSchema {
+  collectionName: 'components_shared_custom_quotes';
+  info: {
+    displayName: 'custom-quote';
+  };
+  attributes: {
+    anchor: Schema.Attribute.String;
+    content: Schema.Attribute.Blocks;
+    tocTitle: Schema.Attribute.String &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 120;
+      }>;
+  };
+}
+
 export interface SharedCustomTable extends Struct.ComponentSchema {
   collectionName: 'components_shared_custom_tables';
   info: {
@@ -69,6 +84,21 @@ export interface SharedImage extends Struct.ComponentSchema {
   };
   attributes: {
     image: Schema.Attribute.Media<'images' | 'files'>;
+  };
+}
+
+export interface SharedIpk extends Struct.ComponentSchema {
+  collectionName: 'components_shared_ipks';
+  info: {
+    displayName: 'ipk';
+  };
+  attributes: {
+    anchor: Schema.Attribute.String;
+    content: Schema.Attribute.Blocks;
+    tocTitle: Schema.Attribute.String &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 120;
+      }>;
   };
 }
 
@@ -206,14 +236,31 @@ export interface SharedVideoReview extends Struct.ComponentSchema {
   };
 }
 
+export interface SharedZakon extends Struct.ComponentSchema {
+  collectionName: 'components_shared_zakons';
+  info: {
+    displayName: 'zakon';
+  };
+  attributes: {
+    anchor: Schema.Attribute.String;
+    content: Schema.Attribute.Blocks;
+    tocTitle: Schema.Attribute.String &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 120;
+      }>;
+  };
+}
+
 declare module '@strapi/strapi' {
   export module Public {
     export interface ComponentSchemas {
       'shared.chapter': SharedChapter;
       'shared.content': SharedContent;
+      'shared.custom-quote': SharedCustomQuote;
       'shared.custom-table': SharedCustomTable;
       'shared.custom-video': SharedCustomVideo;
       'shared.image': SharedImage;
+      'shared.ipk': SharedIpk;
       'shared.json': SharedJson;
       'shared.mark': SharedMark;
       'shared.media': SharedMedia;
@@ -225,6 +272,7 @@ declare module '@strapi/strapi' {
       'shared.text': SharedText;
       'shared.video': SharedVideo;
       'shared.video-review': SharedVideoReview;
+      'shared.zakon': SharedZakon;
     }
   }
 }

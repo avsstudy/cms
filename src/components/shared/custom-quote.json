@@ -1,0 +1,21 @@
+{
+  "collectionName": "components_shared_custom_quotes",
+  "info": {
+    "displayName": "custom-quote"
+  },
+  "options": {},
+  "attributes": {
+    "content": {
+      "type": "blocks"
+    },
+    "anchor": {
+      "type": "string",
+      "regex": "^[A-Za-z0-9._:-]+$"
+    },
+    "tocTitle": {
+      "type": "string",
+      "maxLength": 120
+    }
+  },
+  "config": {}
+}
