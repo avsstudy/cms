@@ -60,7 +60,10 @@
         "shared.text",
         "shared.image",
         "shared.custom-video",
-        "shared.custom-table"
+        "shared.custom-table",
+        "shared.zakon",
+        "shared.ipk",
+        "shared.custom-quote"
       ]
     }
   }

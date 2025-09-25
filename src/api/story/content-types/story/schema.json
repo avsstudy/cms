@@ -67,7 +67,10 @@
         "shared.image",
         "shared.custom-video",
         "shared.custom-table",
-        "shared.video-review"
+        "shared.video-review",
+        "shared.zakon",
+        "shared.custom-quote",
+        "shared.ipk"
       ]
     }
   }
