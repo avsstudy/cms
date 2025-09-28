@@ -464,7 +464,7 @@ export interface ApiArticleArticle extends Struct.CollectionTypeSchema {
       Schema.Attribute.SetMinMaxLength<{
         maxLength: 80;
       }>;
-    general: Schema.Attribute.DynamicZone<
+    general_content: Schema.Attribute.DynamicZone<
       [
         'shared.text',
         'shared.image',
@@ -481,8 +481,11 @@ export interface ApiArticleArticle extends Struct.CollectionTypeSchema {
       'api::article.article'
     > &
       Schema.Attribute.Private;
+    pinned: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<false>;
     publishedAt: Schema.Attribute.DateTime;
     slug: Schema.Attribute.UID<'title'>;
+    subscription_type: Schema.Attribute.Enumeration<['free', 'paid']> &
+      Schema.Attribute.DefaultTo<'free'>;
     title: Schema.Attribute.String;
     topic: Schema.Attribute.Relation<'manyToOne', 'api::topic.topic'>;
     updatedAt: Schema.Attribute.DateTime;
@@ -555,9 +558,12 @@ export interface ApiCategoryCategory extends Struct.CollectionTypeSchema {
       'api::category.category'
     > &
       Schema.Attribute.Private;
+    news_articles: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::news-article.news-article'
+    >;
     publishedAt: Schema.Attribute.DateTime;
     slug: Schema.Attribute.UID<'title'>;
-    stories: Schema.Attribute.Relation<'manyToMany', 'api::story.story'>;
     title: Schema.Attribute.String;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
@@ -642,53 +648,89 @@ export interface ApiHandbookHandbook extends Struct.CollectionTypeSchema {
   };
 }
 
-export interface ApiStoryStory extends Struct.CollectionTypeSchema {
-  collectionName: 'stories';
+export interface ApiNewsArticleNewsArticle extends Struct.CollectionTypeSchema {
+  collectionName: 'news_articles';
   info: {
-    displayName: 'NewsArticle';
-    pluralName: 'stories';
-    singularName: 'story';
+    displayName: 'News_Article';
+    pluralName: 'news-articles';
+    singularName: 'news-article';
   };
   options: {
     draftAndPublish: true;
   };
   attributes: {
-    categories: Schema.Attribute.Relation<
-      'manyToMany',
-      'api::category.category'
-    >;
-    commentsEnabled: Schema.Attribute.Boolean &
+    category: Schema.Attribute.Relation<'manyToOne', 'api::category.category'>;
+    comments_enabled: Schema.Attribute.Boolean &
       Schema.Attribute.DefaultTo<false>;
-    cover: Schema.Attribute.Media<'images' | 'files'>;
+    cover: Schema.Attribute.Media<'images'>;
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
     description: Schema.Attribute.Text;
-    general: Schema.Attribute.DynamicZone<
+    general_content: Schema.Attribute.DynamicZone<
       [
+        'shared.zakon',
+        'shared.video-review',
         'shared.text',
+        'shared.ipk',
         'shared.image',
         'shared.custom-video',
         'shared.custom-table',
-        'shared.video-review',
-        'shared.zakon',
         'shared.custom-quote',
-        'shared.ipk',
       ]
     >;
     locale: Schema.Attribute.String & Schema.Attribute.Private;
-    localizations: Schema.Attribute.Relation<'oneToMany', 'api::story.story'> &
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::news-article.news-article'
+    > &
       Schema.Attribute.Private;
     pinned: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<false>;
     publishedAt: Schema.Attribute.DateTime;
     slug: Schema.Attribute.UID<'title'>;
-    subscriptionType: Schema.Attribute.Enumeration<['free', 'payed']>;
+    subscription_type: Schema.Attribute.Relation<
+      'manyToOne',
+      'api::subscription-type.subscription-type'
+    >;
     title: Schema.Attribute.String;
-    topics: Schema.Attribute.Relation<'manyToMany', 'api::topic.topic'>;
+    topic: Schema.Attribute.Relation<'manyToOne', 'api::topic.topic'>;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
     views: Schema.Attribute.Integer & Schema.Attribute.DefaultTo<1>;
+  };
+}
+
+export interface ApiSubscriptionTypeSubscriptionType
+  extends Struct.CollectionTypeSchema {
+  collectionName: 'subscription_types';
+  info: {
+    displayName: 'Subscription_Type';
+    pluralName: 'subscription-types';
+    singularName: 'subscription-type';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::subscription-type.subscription-type'
+    > &
+      Schema.Attribute.Private;
+    news_articles: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::news-article.news-article'
+    >;
+    publishedAt: Schema.Attribute.DateTime;
+    title: Schema.Attribute.String;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
   };
 }
 
@@ -744,8 +786,11 @@ export interface ApiTopicTopic extends Struct.CollectionTypeSchema {
     locale: Schema.Attribute.String & Schema.Attribute.Private;
     localizations: Schema.Attribute.Relation<'oneToMany', 'api::topic.topic'> &
       Schema.Attribute.Private;
+    news_articles: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::news-article.news-article'
+    >;
     publishedAt: Schema.Attribute.DateTime;
-    stories: Schema.Attribute.Relation<'manyToMany', 'api::story.story'>;
     title: Schema.Attribute.String;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
@@ -1269,7 +1314,8 @@ declare module '@strapi/strapi' {
       'api::category.category': ApiCategoryCategory;
       'api::global.global': ApiGlobalGlobal;
       'api::handbook.handbook': ApiHandbookHandbook;
-      'api::story.story': ApiStoryStory;
+      'api::news-article.news-article': ApiNewsArticleNewsArticle;
+      'api::subscription-type.subscription-type': ApiSubscriptionTypeSubscriptionType;
       'api::topic-group.topic-group': ApiTopicGroupTopicGroup;
       'api::topic.topic': ApiTopicTopic;
       'plugin::content-releases.release': PluginContentReleasesRelease;

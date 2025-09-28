@@ -6,16 +6,17 @@
   },
   "attributes": {
     "label": {
-      "type": "string",
+      "type": "text",
       "required": true
     },
-    "startSeconds": {
-      "type": "integer",
-      "required": true,
-      "min": 0
+    "hour": {
+      "type": "integer"
     },
-    "note": {
-      "type": "text"
+    "minute": {
+      "type": "integer"
+    },
+    "second": {
+      "type": "integer"
     }
   }
 }

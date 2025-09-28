@@ -7,16 +7,10 @@ export interface SharedChapter extends Struct.ComponentSchema {
     icon: 'bulletList';
   };
   attributes: {
-    label: Schema.Attribute.String & Schema.Attribute.Required;
-    note: Schema.Attribute.Text;
-    startSeconds: Schema.Attribute.Integer &
-      Schema.Attribute.Required &
-      Schema.Attribute.SetMinMax<
-        {
-          min: 0;
-        },
-        number
-      >;
+    hour: Schema.Attribute.Integer;
+    label: Schema.Attribute.Text & Schema.Attribute.Required;
+    minute: Schema.Attribute.Integer;
+    second: Schema.Attribute.Integer;
   };
 }
 
@@ -37,11 +31,11 @@ export interface SharedCustomQuote extends Struct.ComponentSchema {
   };
   attributes: {
     anchor: Schema.Attribute.String;
-    content: Schema.Attribute.Blocks;
-    tocTitle: Schema.Attribute.String &
+    anchor_title: Schema.Attribute.String &
       Schema.Attribute.SetMinMaxLength<{
         maxLength: 120;
       }>;
+    text_content: Schema.Attribute.Blocks;
   };
 }
 
@@ -53,14 +47,14 @@ export interface SharedCustomTable extends Struct.ComponentSchema {
   };
   attributes: {
     anchor: Schema.Attribute.String;
+    anchor_title: Schema.Attribute.String &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 120;
+      }>;
     description: Schema.Attribute.Text;
     headers: Schema.Attribute.JSON;
     rows: Schema.Attribute.JSON;
     title: Schema.Attribute.String;
-    tocTitle: Schema.Attribute.String &
-      Schema.Attribute.SetMinMaxLength<{
-        maxLength: 120;
-      }>;
   };
 }
 
@@ -94,11 +88,11 @@ export interface SharedIpk extends Struct.ComponentSchema {
   };
   attributes: {
     anchor: Schema.Attribute.String;
-    content: Schema.Attribute.Blocks;
-    tocTitle: Schema.Attribute.String &
+    anchor_title: Schema.Attribute.String &
       Schema.Attribute.SetMinMaxLength<{
         maxLength: 120;
       }>;
+    text_content: Schema.Attribute.Blocks;
   };
 }
 
@@ -202,11 +196,11 @@ export interface SharedText extends Struct.ComponentSchema {
   };
   attributes: {
     anchor: Schema.Attribute.String;
-    content: Schema.Attribute.Blocks;
-    tocTitle: Schema.Attribute.String &
+    anchor_title: Schema.Attribute.String &
       Schema.Attribute.SetMinMaxLength<{
         maxLength: 120;
       }>;
+    text_content: Schema.Attribute.Blocks;
   };
 }
 
@@ -243,11 +237,11 @@ export interface SharedZakon extends Struct.ComponentSchema {
   };
   attributes: {
     anchor: Schema.Attribute.String;
-    content: Schema.Attribute.Blocks;
-    tocTitle: Schema.Attribute.String &
+    anchor_title: Schema.Attribute.String &
       Schema.Attribute.SetMinMaxLength<{
         maxLength: 120;
       }>;
+    text_content: Schema.Attribute.Blocks;
   };
 }
 

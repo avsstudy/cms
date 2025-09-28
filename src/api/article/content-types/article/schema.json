@@ -54,7 +54,7 @@
       "default": 0,
       "min": 0
     },
-    "general": {
+    "general_content": {
       "type": "dynamiczone",
       "components": [
         "shared.text",

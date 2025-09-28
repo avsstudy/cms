@@ -5,13 +5,13 @@
   },
   "options": {},
   "attributes": {
-    "content": {
+    "text_content": {
       "type": "blocks"
     },
     "anchor": {
       "type": "string"
     },
-    "tocTitle": {
+    "anchor_title": {
       "type": "string",
       "maxLength": 120
     }

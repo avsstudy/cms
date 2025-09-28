@@ -24,11 +24,11 @@
       "type": "uid",
       "targetField": "title"
     },
-    "stories": {
+    "news_articles": {
       "type": "relation",
-      "relation": "manyToMany",
-      "target": "api::story.story",
-      "inversedBy": "categories"
+      "relation": "oneToMany",
+      "target": "api::news-article.news-article",
+      "mappedBy": "category"
     }
   }
 }
