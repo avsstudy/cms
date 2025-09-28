@@ -29,6 +29,12 @@
       "allowedTypes": [
         "images"
       ]
+    },
+    "handbooks": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "api::handbook.handbook",
+      "mappedBy": "authors"
     }
   }
 }

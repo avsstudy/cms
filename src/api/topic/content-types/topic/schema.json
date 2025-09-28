@@ -25,6 +25,12 @@
       "relation": "manyToMany",
       "target": "api::story.story",
       "mappedBy": "topics"
+    },
+    "handbooks": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "api::handbook.handbook",
+      "mappedBy": "topics"
     }
   }
 }
