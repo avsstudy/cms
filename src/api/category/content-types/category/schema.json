@@ -13,9 +13,9 @@
   "attributes": {
     "articles": {
       "type": "relation",
-      "relation": "manyToMany",
+      "relation": "oneToMany",
       "target": "api::article.article",
-      "inversedBy": "categories"
+      "mappedBy": "category"
     },
     "title": {
       "type": "string"

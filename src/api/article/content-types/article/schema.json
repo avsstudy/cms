@@ -31,11 +31,11 @@
         "images"
       ]
     },
-    "categories": {
+    "category": {
       "type": "relation",
-      "relation": "manyToMany",
+      "relation": "manyToOne",
       "target": "api::category.category",
-      "mappedBy": "articles"
+      "inversedBy": "articles"
     },
     "author": {
       "type": "relation",
