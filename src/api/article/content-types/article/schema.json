@@ -65,6 +65,18 @@
         "shared.ipk",
         "shared.custom-quote"
       ]
+    },
+    "subscription_type": {
+      "type": "enumeration",
+      "default": "free",
+      "enum": [
+        "free",
+        "paid"
+      ]
+    },
+    "pinned": {
+      "type": "boolean",
+      "default": false
     }
   }
 }
