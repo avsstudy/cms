@@ -22,9 +22,9 @@
     },
     "handbooks": {
       "type": "relation",
-      "relation": "manyToMany",
+      "relation": "oneToMany",
       "target": "api::handbook.handbook",
-      "mappedBy": "topics"
+      "mappedBy": "topic"
     },
     "news_articles": {
       "type": "relation",

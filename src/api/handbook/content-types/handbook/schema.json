@@ -21,9 +21,9 @@
     "description": {
       "type": "text"
     },
-    "topics": {
+    "topic": {
       "type": "relation",
-      "relation": "manyToMany",
+      "relation": "manyToOne",
       "target": "api::topic.topic",
       "inversedBy": "handbooks"
     },
