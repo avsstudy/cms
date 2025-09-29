@@ -634,7 +634,7 @@ export interface ApiHandbookHandbook extends Struct.CollectionTypeSchema {
     subscription_type: Schema.Attribute.Enumeration<['free', 'paid']> &
       Schema.Attribute.DefaultTo<'free'>;
     title: Schema.Attribute.String;
-    topics: Schema.Attribute.Relation<'manyToMany', 'api::topic.topic'>;
+    topic: Schema.Attribute.Relation<'manyToOne', 'api::topic.topic'>;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
@@ -773,10 +773,7 @@ export interface ApiTopicTopic extends Struct.CollectionTypeSchema {
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
-    handbooks: Schema.Attribute.Relation<
-      'manyToMany',
-      'api::handbook.handbook'
-    >;
+    handbooks: Schema.Attribute.Relation<'oneToMany', 'api::handbook.handbook'>;
     locale: Schema.Attribute.String & Schema.Attribute.Private;
     localizations: Schema.Attribute.Relation<'oneToMany', 'api::topic.topic'> &
       Schema.Attribute.Private;
