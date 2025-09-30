@@ -19,6 +19,12 @@
       "relation": "oneToMany",
       "target": "api::news-article.news-article",
       "mappedBy": "subscription_type"
+    },
+    "ipks": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::ipk.ipk",
+      "mappedBy": "subscription_type"
     }
   }
 }

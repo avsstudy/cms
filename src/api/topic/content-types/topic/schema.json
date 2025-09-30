@@ -31,6 +31,12 @@
       "relation": "oneToMany",
       "target": "api::news-article.news-article",
       "mappedBy": "topic"
+    },
+    "ipks": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "api::ipk.ipk",
+      "mappedBy": "topic"
     }
   }
 }
