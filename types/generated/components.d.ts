@@ -84,7 +84,7 @@ export interface SharedImage extends Struct.ComponentSchema {
 export interface SharedIpk extends Struct.ComponentSchema {
   collectionName: 'components_shared_ipks';
   info: {
-    displayName: 'ipk';
+    displayName: 'custom-ipk';
   };
   attributes: {
     anchor: Schema.Attribute.String;
