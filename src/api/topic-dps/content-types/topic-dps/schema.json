@@ -11,14 +11,14 @@
   },
   "pluginOptions": {},
   "attributes": {
+    "title": {
+      "type": "text"
+    },
     "ipk": {
       "type": "relation",
       "relation": "oneToMany",
       "target": "api::ipk.ipk",
       "mappedBy": "topic_dps"
-    },
-    "title": {
-      "type": "text"
     }
   }
 }
