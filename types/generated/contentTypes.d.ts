@@ -658,6 +658,7 @@ export interface ApiIpkIpk extends Struct.CollectionTypeSchema {
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
+    description: Schema.Attribute.Text;
     ipk_date: Schema.Attribute.Date;
     ipk_file: Schema.Attribute.Media<'files'>;
     ipk_title: Schema.Attribute.String;

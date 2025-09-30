@@ -14,6 +14,9 @@
     "ipk_title": {
       "type": "string"
     },
+    "description": {
+      "type": "text"
+    },
     "slug": {
       "type": "uid",
       "targetField": "ipk_title"
@@ -55,9 +58,6 @@
       "relation": "manyToOne",
       "target": "api::topic-dps.topic-dps",
       "inversedBy": "ipk"
-    },
-    "description": {
-      "type": "text"
     }
   }
 }
