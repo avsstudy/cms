@@ -517,6 +517,7 @@ export interface ApiAuthorAuthor extends Struct.CollectionTypeSchema {
       'manyToMany',
       'api::handbook.handbook'
     >;
+    ipks: Schema.Attribute.Relation<'oneToMany', 'api::ipk.ipk'>;
     locale: Schema.Attribute.String & Schema.Attribute.Private;
     localizations: Schema.Attribute.Relation<
       'oneToMany',
@@ -642,6 +643,41 @@ export interface ApiHandbookHandbook extends Struct.CollectionTypeSchema {
   };
 }
 
+export interface ApiIpkIpk extends Struct.CollectionTypeSchema {
+  collectionName: 'ipks';
+  info: {
+    displayName: 'IPK';
+    pluralName: 'ipks';
+    singularName: 'ipk';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    author: Schema.Attribute.Relation<'manyToOne', 'api::author.author'>;
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    ipk_date: Schema.Attribute.Date;
+    ipk_file: Schema.Attribute.Media<'files'>;
+    ipk_title: Schema.Attribute.String;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<'oneToMany', 'api::ipk.ipk'> &
+      Schema.Attribute.Private;
+    publishedAt: Schema.Attribute.DateTime;
+    slug: Schema.Attribute.UID<'ipk_title'>;
+    subscription_type: Schema.Attribute.Relation<
+      'manyToOne',
+      'api::subscription-type.subscription-type'
+    >;
+    topic: Schema.Attribute.Relation<'manyToMany', 'api::topic.topic'>;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    views: Schema.Attribute.Integer & Schema.Attribute.DefaultTo<1>;
+  };
+}
+
 export interface ApiNewsArticleNewsArticle extends Struct.CollectionTypeSchema {
   collectionName: 'news_articles';
   info: {
@@ -710,6 +746,7 @@ export interface ApiSubscriptionTypeSubscriptionType
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
+    ipks: Schema.Attribute.Relation<'oneToMany', 'api::ipk.ipk'>;
     locale: Schema.Attribute.String & Schema.Attribute.Private;
     localizations: Schema.Attribute.Relation<
       'oneToMany',
@@ -774,6 +811,7 @@ export interface ApiTopicTopic extends Struct.CollectionTypeSchema {
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
     handbooks: Schema.Attribute.Relation<'oneToMany', 'api::handbook.handbook'>;
+    ipks: Schema.Attribute.Relation<'manyToMany', 'api::ipk.ipk'>;
     locale: Schema.Attribute.String & Schema.Attribute.Private;
     localizations: Schema.Attribute.Relation<'oneToMany', 'api::topic.topic'> &
       Schema.Attribute.Private;
@@ -1305,6 +1343,7 @@ declare module '@strapi/strapi' {
       'api::category.category': ApiCategoryCategory;
       'api::global.global': ApiGlobalGlobal;
       'api::handbook.handbook': ApiHandbookHandbook;
+      'api::ipk.ipk': ApiIpkIpk;
       'api::news-article.news-article': ApiNewsArticleNewsArticle;
       'api::subscription-type.subscription-type': ApiSubscriptionTypeSubscriptionType;
       'api::topic-group.topic-group': ApiTopicGroupTopicGroup;
