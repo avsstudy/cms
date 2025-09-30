@@ -12,7 +12,7 @@
   "pluginOptions": {},
   "attributes": {
     "title": {
-      "type": "text"
+      "type": "string"
     },
     "ipk": {
       "type": "relation",
