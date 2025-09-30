@@ -49,6 +49,12 @@
       "relation": "manyToOne",
       "target": "api::subscription-type.subscription-type",
       "inversedBy": "ipks"
+    },
+    "topic_dp": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::topic-dps.topic-dps",
+      "inversedBy": "ipk"
     }
   }
 }
