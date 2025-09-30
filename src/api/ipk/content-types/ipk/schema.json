@@ -55,6 +55,9 @@
       "relation": "manyToOne",
       "target": "api::topic-dps.topic-dps",
       "inversedBy": "ipk"
+    },
+    "description": {
+      "type": "text"
     }
   }
 }
