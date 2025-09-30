@@ -11,9 +11,6 @@
   },
   "pluginOptions": {},
   "attributes": {
-    "title": {
-      "type": "boolean"
-    },
     "ipk": {
       "type": "relation",
       "relation": "oneToMany",

@@ -671,7 +671,7 @@ export interface ApiIpkIpk extends Struct.CollectionTypeSchema {
       'api::subscription-type.subscription-type'
     >;
     topic: Schema.Attribute.Relation<'manyToMany', 'api::topic.topic'>;
-    topic_dp: Schema.Attribute.Relation<
+    topic_dps: Schema.Attribute.Relation<
       'manyToOne',
       'api::topic-dps.topic-dps'
     >;
