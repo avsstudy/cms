@@ -671,6 +671,10 @@ export interface ApiIpkIpk extends Struct.CollectionTypeSchema {
       'api::subscription-type.subscription-type'
     >;
     topic: Schema.Attribute.Relation<'manyToMany', 'api::topic.topic'>;
+    topic_dp: Schema.Attribute.Relation<
+      'manyToOne',
+      'api::topic-dps.topic-dps'
+    >;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
@@ -759,6 +763,35 @@ export interface ApiSubscriptionTypeSubscriptionType
     >;
     publishedAt: Schema.Attribute.DateTime;
     title: Schema.Attribute.String;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
+export interface ApiTopicDpsTopicDps extends Struct.CollectionTypeSchema {
+  collectionName: 'topics_dps';
+  info: {
+    displayName: 'Topic_DPS';
+    pluralName: 'topics-dps';
+    singularName: 'topic-dps';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    ipk: Schema.Attribute.Relation<'oneToMany', 'api::ipk.ipk'>;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::topic-dps.topic-dps'
+    > &
+      Schema.Attribute.Private;
+    publishedAt: Schema.Attribute.DateTime;
+    title: Schema.Attribute.Boolean;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
@@ -1346,6 +1379,7 @@ declare module '@strapi/strapi' {
       'api::ipk.ipk': ApiIpkIpk;
       'api::news-article.news-article': ApiNewsArticleNewsArticle;
       'api::subscription-type.subscription-type': ApiSubscriptionTypeSubscriptionType;
+      'api::topic-dps.topic-dps': ApiTopicDpsTopicDps;
       'api::topic-group.topic-group': ApiTopicGroupTopicGroup;
       'api::topic.topic': ApiTopicTopic;
       'plugin::content-releases.release': PluginContentReleasesRelease;
