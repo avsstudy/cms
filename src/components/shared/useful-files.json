@@ -1,0 +1,32 @@
+{
+  "collectionName": "components_shared_useful_files",
+  "info": {
+    "displayName": "useful_files"
+  },
+  "options": {},
+  "attributes": {
+    "useful_file_title": {
+      "type": "string",
+      "required": true
+    },
+    "useful_file": {
+      "type": "media",
+      "multiple": false,
+      "allowedTypes": [
+        "files"
+      ]
+    },
+    "useful_video": {
+      "type": "string"
+    },
+    "useful_file_cover": {
+      "type": "media",
+      "multiple": false,
+      "required": true,
+      "allowedTypes": [
+        "images"
+      ]
+    }
+  },
+  "config": {}
+}

@@ -451,11 +451,11 @@ export interface ApiArticleArticle extends Struct.CollectionTypeSchema {
   attributes: {
     author: Schema.Attribute.Relation<'manyToOne', 'api::author.author'>;
     category: Schema.Attribute.Relation<'manyToMany', 'api::category.category'>;
-    cover: Schema.Attribute.Media<'images'>;
+    cover: Schema.Attribute.Media<'images'> & Schema.Attribute.Required;
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
-    description: Schema.Attribute.Text;
+    description: Schema.Attribute.Text & Schema.Attribute.Required;
     general_content: Schema.Attribute.DynamicZone<
       [
         'shared.text',
@@ -466,19 +466,23 @@ export interface ApiArticleArticle extends Struct.CollectionTypeSchema {
         'shared.ipk',
         'shared.custom-quote',
       ]
-    >;
+    > &
+      Schema.Attribute.Required;
     locale: Schema.Attribute.String & Schema.Attribute.Private;
     localizations: Schema.Attribute.Relation<
       'oneToMany',
       'api::article.article'
     > &
       Schema.Attribute.Private;
-    pinned: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<false>;
+    pinned: Schema.Attribute.Boolean &
+      Schema.Attribute.Required &
+      Schema.Attribute.DefaultTo<false>;
     publishedAt: Schema.Attribute.DateTime;
-    slug: Schema.Attribute.UID<'title'>;
+    slug: Schema.Attribute.UID<'title'> & Schema.Attribute.Required;
     subscription_type: Schema.Attribute.Enumeration<['free', 'paid']> &
+      Schema.Attribute.Required &
       Schema.Attribute.DefaultTo<'free'>;
-    title: Schema.Attribute.String;
+    title: Schema.Attribute.String & Schema.Attribute.Required;
     topic: Schema.Attribute.Relation<'manyToMany', 'api::topic.topic'>;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
@@ -507,6 +511,10 @@ export interface ApiAuthorAuthor extends Struct.CollectionTypeSchema {
   attributes: {
     articles: Schema.Attribute.Relation<'oneToMany', 'api::article.article'>;
     avatar: Schema.Attribute.Media<'images'>;
+    avs_documents: Schema.Attribute.Relation<
+      'manyToMany',
+      'api::avs-document.avs-document'
+    >;
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
@@ -527,6 +535,54 @@ export interface ApiAuthorAuthor extends Struct.CollectionTypeSchema {
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
+  };
+}
+
+export interface ApiAvsDocumentAvsDocument extends Struct.CollectionTypeSchema {
+  collectionName: 'avs_documents';
+  info: {
+    displayName: 'AVS_Document';
+    pluralName: 'avs-documents';
+    singularName: 'avs-document';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    author: Schema.Attribute.Relation<'manyToMany', 'api::author.author'>;
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    description: Schema.Attribute.Text & Schema.Attribute.Required;
+    general_content_blank: Schema.Attribute.DynamicZone<['shared.blank']> &
+      Schema.Attribute.Required;
+    general_content_useful_files: Schema.Attribute.DynamicZone<
+      ['shared.useful-files']
+    >;
+    general_content_zrazok: Schema.Attribute.DynamicZone<['shared.zrazok']>;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::avs-document.avs-document'
+    > &
+      Schema.Attribute.Private;
+    pinned: Schema.Attribute.Boolean &
+      Schema.Attribute.Required &
+      Schema.Attribute.DefaultTo<false>;
+    publishedAt: Schema.Attribute.DateTime;
+    slug: Schema.Attribute.UID<'title'> & Schema.Attribute.Required;
+    subscription_type: Schema.Attribute.Relation<
+      'manyToMany',
+      'api::subscription-type.subscription-type'
+    >;
+    title: Schema.Attribute.String & Schema.Attribute.Required;
+    topic: Schema.Attribute.Relation<'manyToMany', 'api::topic.topic'>;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    views: Schema.Attribute.Integer &
+      Schema.Attribute.Required &
+      Schema.Attribute.DefaultTo<1>;
   };
 }
 
@@ -611,7 +667,7 @@ export interface ApiHandbookHandbook extends Struct.CollectionTypeSchema {
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
-    description: Schema.Attribute.Text;
+    description: Schema.Attribute.Text & Schema.Attribute.Required;
     general_content: Schema.Attribute.DynamicZone<
       [
         'shared.zakon',
@@ -620,19 +676,23 @@ export interface ApiHandbookHandbook extends Struct.CollectionTypeSchema {
         'shared.custom-table',
         'shared.custom-quote',
       ]
-    >;
+    > &
+      Schema.Attribute.Required;
     locale: Schema.Attribute.String & Schema.Attribute.Private;
     localizations: Schema.Attribute.Relation<
       'oneToMany',
       'api::handbook.handbook'
     > &
       Schema.Attribute.Private;
-    pinned: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<false>;
+    pinned: Schema.Attribute.Boolean &
+      Schema.Attribute.Required &
+      Schema.Attribute.DefaultTo<false>;
     publishedAt: Schema.Attribute.DateTime;
-    slug: Schema.Attribute.UID<'title'>;
+    slug: Schema.Attribute.UID<'title'> & Schema.Attribute.Required;
     subscription_type: Schema.Attribute.Enumeration<['free', 'paid']> &
+      Schema.Attribute.Required &
       Schema.Attribute.DefaultTo<'free'>;
-    title: Schema.Attribute.String;
+    title: Schema.Attribute.String & Schema.Attribute.Required;
     topic: Schema.Attribute.Relation<'manyToMany', 'api::topic.topic'>;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
@@ -656,15 +716,15 @@ export interface ApiIpkIpk extends Struct.CollectionTypeSchema {
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
-    description: Schema.Attribute.Text;
-    ipk_date: Schema.Attribute.Date;
-    ipk_file: Schema.Attribute.Media<'files'>;
-    ipk_title: Schema.Attribute.String;
+    description: Schema.Attribute.Text & Schema.Attribute.Required;
+    ipk_date: Schema.Attribute.Date & Schema.Attribute.Required;
+    ipk_file: Schema.Attribute.Media<'files'> & Schema.Attribute.Required;
+    ipk_title: Schema.Attribute.String & Schema.Attribute.Required;
     locale: Schema.Attribute.String & Schema.Attribute.Private;
     localizations: Schema.Attribute.Relation<'oneToMany', 'api::ipk.ipk'> &
       Schema.Attribute.Private;
     publishedAt: Schema.Attribute.DateTime;
-    slug: Schema.Attribute.UID<'ipk_title'>;
+    slug: Schema.Attribute.UID<'ipk_title'> & Schema.Attribute.Required;
     subscription_type: Schema.Attribute.Relation<
       'manyToOne',
       'api::subscription-type.subscription-type'
@@ -694,12 +754,13 @@ export interface ApiNewsArticleNewsArticle extends Struct.CollectionTypeSchema {
   attributes: {
     category: Schema.Attribute.Relation<'manyToMany', 'api::category.category'>;
     comments_enabled: Schema.Attribute.Boolean &
+      Schema.Attribute.Required &
       Schema.Attribute.DefaultTo<false>;
-    cover: Schema.Attribute.Media<'images'>;
+    cover: Schema.Attribute.Media<'images'> & Schema.Attribute.Required;
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
-    description: Schema.Attribute.Text;
+    description: Schema.Attribute.Text & Schema.Attribute.Required;
     general_content: Schema.Attribute.DynamicZone<
       [
         'shared.zakon',
@@ -711,21 +772,24 @@ export interface ApiNewsArticleNewsArticle extends Struct.CollectionTypeSchema {
         'shared.custom-table',
         'shared.custom-quote',
       ]
-    >;
+    > &
+      Schema.Attribute.Required;
     locale: Schema.Attribute.String & Schema.Attribute.Private;
     localizations: Schema.Attribute.Relation<
       'oneToMany',
       'api::news-article.news-article'
     > &
       Schema.Attribute.Private;
-    pinned: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<false>;
+    pinned: Schema.Attribute.Boolean &
+      Schema.Attribute.Required &
+      Schema.Attribute.DefaultTo<false>;
     publishedAt: Schema.Attribute.DateTime;
-    slug: Schema.Attribute.UID<'title'>;
+    slug: Schema.Attribute.UID<'title'> & Schema.Attribute.Required;
     subscription_type: Schema.Attribute.Relation<
       'manyToOne',
       'api::subscription-type.subscription-type'
     >;
-    title: Schema.Attribute.String;
+    title: Schema.Attribute.String & Schema.Attribute.Required;
     topic: Schema.Attribute.Relation<'manyToMany', 'api::topic.topic'>;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
@@ -746,6 +810,10 @@ export interface ApiSubscriptionTypeSubscriptionType
     draftAndPublish: true;
   };
   attributes: {
+    avs_documents: Schema.Attribute.Relation<
+      'manyToMany',
+      'api::avs-document.avs-document'
+    >;
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
@@ -790,7 +858,7 @@ export interface ApiTopicDpsTopicDps extends Struct.CollectionTypeSchema {
     > &
       Schema.Attribute.Private;
     publishedAt: Schema.Attribute.DateTime;
-    title: Schema.Attribute.String;
+    title: Schema.Attribute.String & Schema.Attribute.Required;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
@@ -839,6 +907,10 @@ export interface ApiTopicTopic extends Struct.CollectionTypeSchema {
   };
   attributes: {
     articles: Schema.Attribute.Relation<'manyToMany', 'api::article.article'>;
+    avs_documents: Schema.Attribute.Relation<
+      'manyToMany',
+      'api::avs-document.avs-document'
+    >;
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
@@ -1375,6 +1447,7 @@ declare module '@strapi/strapi' {
       'api::about.about': ApiAboutAbout;
       'api::article.article': ApiArticleArticle;
       'api::author.author': ApiAuthorAuthor;
+      'api::avs-document.avs-document': ApiAvsDocumentAvsDocument;
       'api::category.category': ApiCategoryCategory;
       'api::global.global': ApiGlobalGlobal;
       'api::handbook.handbook': ApiHandbookHandbook;

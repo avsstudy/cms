@@ -1,5 +1,16 @@
 import type { Schema, Struct } from '@strapi/strapi';
 
+export interface SharedBlank extends Struct.ComponentSchema {
+  collectionName: 'components_shared_blanks';
+  info: {
+    displayName: 'blank';
+  };
+  attributes: {
+    blank_file: Schema.Attribute.Media<'files'> & Schema.Attribute.Required;
+    blank_title: Schema.Attribute.String & Schema.Attribute.Required;
+  };
+}
+
 export interface SharedChapter extends Struct.ComponentSchema {
   collectionName: 'components_shared_chapters';
   info: {
@@ -117,6 +128,20 @@ export interface SharedText extends Struct.ComponentSchema {
   };
 }
 
+export interface SharedUsefulFiles extends Struct.ComponentSchema {
+  collectionName: 'components_shared_useful_files';
+  info: {
+    displayName: 'useful_files';
+  };
+  attributes: {
+    useful_file: Schema.Attribute.Media<'files'>;
+    useful_file_cover: Schema.Attribute.Media<'images'> &
+      Schema.Attribute.Required;
+    useful_file_title: Schema.Attribute.String & Schema.Attribute.Required;
+    useful_video: Schema.Attribute.String;
+  };
+}
+
 export interface SharedVideoReview extends Struct.ComponentSchema {
   collectionName: 'components_shared_video_reviews';
   info: {
@@ -148,9 +173,21 @@ export interface SharedZakon extends Struct.ComponentSchema {
   };
 }
 
+export interface SharedZrazok extends Struct.ComponentSchema {
+  collectionName: 'components_shared_zrazoks';
+  info: {
+    displayName: 'zrazok';
+  };
+  attributes: {
+    zrazok_file: Schema.Attribute.Media<'files'> & Schema.Attribute.Required;
+    zrazok_title: Schema.Attribute.String & Schema.Attribute.Required;
+  };
+}
+
 declare module '@strapi/strapi' {
   export module Public {
     export interface ComponentSchemas {
+      'shared.blank': SharedBlank;
       'shared.chapter': SharedChapter;
       'shared.custom-quote': SharedCustomQuote;
       'shared.custom-table': SharedCustomTable;
@@ -159,8 +196,10 @@ declare module '@strapi/strapi' {
       'shared.ipk': SharedIpk;
       'shared.seo': SharedSeo;
       'shared.text': SharedText;
+      'shared.useful-files': SharedUsefulFiles;
       'shared.video-review': SharedVideoReview;
       'shared.zakon': SharedZakon;
+      'shared.zrazok': SharedZrazok;
     }
   }
 }

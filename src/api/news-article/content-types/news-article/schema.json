@@ -12,21 +12,25 @@
   "pluginOptions": {},
   "attributes": {
     "title": {
-      "type": "string"
+      "type": "string",
+      "required": true
     },
     "description": {
-      "type": "text"
+      "type": "text",
+      "required": true
     },
     "cover": {
       "type": "media",
       "multiple": false,
+      "required": true,
       "allowedTypes": [
         "images"
       ]
     },
     "slug": {
       "type": "uid",
-      "targetField": "title"
+      "targetField": "title",
+      "required": true
     },
     "topic": {
       "type": "relation",
@@ -48,10 +52,12 @@
     },
     "comments_enabled": {
       "type": "boolean",
+      "required": true,
       "default": false
     },
     "pinned": {
       "type": "boolean",
+      "required": true,
       "default": false
     },
     "views": {
@@ -69,7 +75,8 @@
         "shared.custom-video",
         "shared.custom-table",
         "shared.custom-quote"
-      ]
+      ],
+      "required": true
     }
   }
 }

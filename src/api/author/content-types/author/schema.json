@@ -41,6 +41,12 @@
       "relation": "oneToMany",
       "target": "api::ipk.ipk",
       "mappedBy": "author"
+    },
+    "avs_documents": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "api::avs-document.avs-document",
+      "mappedBy": "author"
     }
   }
 }

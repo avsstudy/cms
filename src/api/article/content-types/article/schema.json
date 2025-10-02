@@ -13,19 +13,22 @@
   "pluginOptions": {},
   "attributes": {
     "title": {
-      "type": "string"
+      "type": "string",
+      "required": true
     },
     "description": {
-      "type": "text"
+      "type": "text",
+      "required": true
     },
     "slug": {
       "type": "uid",
-      "targetField": "title"
+      "targetField": "title",
+      "required": true
     },
     "cover": {
       "type": "media",
       "multiple": false,
-      "required": false,
+      "required": true,
       "allowedTypes": [
         "images"
       ]
@@ -63,10 +66,12 @@
         "shared.zakon",
         "shared.ipk",
         "shared.custom-quote"
-      ]
+      ],
+      "required": true
     },
     "subscription_type": {
       "type": "enumeration",
+      "required": true,
       "default": "free",
       "enum": [
         "free",
@@ -75,6 +80,7 @@
     },
     "pinned": {
       "type": "boolean",
+      "required": true,
       "default": false
     }
   }

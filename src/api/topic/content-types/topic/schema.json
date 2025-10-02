@@ -37,6 +37,12 @@
       "relation": "manyToMany",
       "target": "api::ipk.ipk",
       "mappedBy": "topic"
+    },
+    "avs_documents": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "api::avs-document.avs-document",
+      "mappedBy": "topic"
     }
   }
 }

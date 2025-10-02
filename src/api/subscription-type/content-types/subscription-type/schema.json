@@ -25,6 +25,12 @@
       "relation": "oneToMany",
       "target": "api::ipk.ipk",
       "mappedBy": "subscription_type"
+    },
+    "avs_documents": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "api::avs-document.avs-document",
+      "mappedBy": "subscription_type"
     }
   }
 }

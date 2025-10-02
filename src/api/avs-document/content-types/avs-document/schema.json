@@ -1,10 +1,10 @@
 {
   "kind": "collectionType",
-  "collectionName": "handbooks",
+  "collectionName": "avs_documents",
   "info": {
-    "singularName": "handbook",
-    "pluralName": "handbooks",
-    "displayName": "Handbook"
+    "singularName": "avs-document",
+    "pluralName": "avs-documents",
+    "displayName": "AVS_Document"
   },
   "options": {
     "draftAndPublish": true
@@ -28,42 +28,48 @@
       "type": "relation",
       "relation": "manyToMany",
       "target": "api::topic.topic",
-      "inversedBy": "handbooks"
+      "inversedBy": "avs_documents"
     },
-    "authors": {
+    "author": {
       "type": "relation",
       "relation": "manyToMany",
       "target": "api::author.author",
-      "inversedBy": "handbooks"
+      "inversedBy": "avs_documents"
     },
     "views": {
       "type": "integer",
+      "required": true,
       "default": 1
     },
     "subscription_type": {
-      "type": "enumeration",
-      "required": true,
-      "default": "free",
-      "enum": [
-        "free",
-        "paid"
-      ]
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "api::subscription-type.subscription-type",
+      "inversedBy": "avs_documents"
     },
     "pinned": {
       "type": "boolean",
       "required": true,
       "default": false
     },
-    "general_content": {
+    "general_content_blank": {
       "type": "dynamiczone",
       "components": [
-        "shared.zakon",
-        "shared.text",
-        "shared.image",
-        "shared.custom-table",
-        "shared.custom-quote"
+        "shared.blank"
       ],
       "required": true
+    },
+    "general_content_zrazok": {
+      "type": "dynamiczone",
+      "components": [
+        "shared.zrazok"
+      ]
+    },
+    "general_content_useful_files": {
+      "type": "dynamiczone",
+      "components": [
+        "shared.useful-files"
+      ]
     }
   }
 }

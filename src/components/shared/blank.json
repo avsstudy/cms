@@ -1,0 +1,22 @@
+{
+  "collectionName": "components_shared_blanks",
+  "info": {
+    "displayName": "blank"
+  },
+  "options": {},
+  "attributes": {
+    "blank_title": {
+      "type": "string",
+      "required": true
+    },
+    "blank_file": {
+      "type": "media",
+      "multiple": false,
+      "required": true,
+      "allowedTypes": [
+        "files"
+      ]
+    }
+  },
+  "config": {}
+}

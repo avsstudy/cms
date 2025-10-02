@@ -12,21 +12,26 @@
   "pluginOptions": {},
   "attributes": {
     "ipk_title": {
-      "type": "string"
+      "type": "string",
+      "required": true
     },
     "description": {
-      "type": "text"
+      "type": "text",
+      "required": true
     },
     "slug": {
       "type": "uid",
-      "targetField": "ipk_title"
+      "targetField": "ipk_title",
+      "required": true
     },
     "ipk_date": {
-      "type": "date"
+      "type": "date",
+      "required": true
     },
     "ipk_file": {
       "type": "media",
       "multiple": false,
+      "required": true,
       "allowedTypes": [
         "files"
       ]

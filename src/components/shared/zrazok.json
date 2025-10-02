@@ -1,0 +1,22 @@
+{
+  "collectionName": "components_shared_zrazoks",
+  "info": {
+    "displayName": "zrazok"
+  },
+  "options": {},
+  "attributes": {
+    "zrazok_title": {
+      "type": "string",
+      "required": true
+    },
+    "zrazok_file": {
+      "type": "media",
+      "multiple": false,
+      "required": true,
+      "allowedTypes": [
+        "files"
+      ]
+    }
+  },
+  "config": {}
+}
