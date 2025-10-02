@@ -30,13 +30,13 @@
     },
     "topic": {
       "type": "relation",
-      "relation": "manyToOne",
+      "relation": "manyToMany",
       "target": "api::topic.topic",
       "inversedBy": "news_articles"
     },
     "category": {
       "type": "relation",
-      "relation": "manyToOne",
+      "relation": "manyToMany",
       "target": "api::category.category",
       "inversedBy": "news_articles"
     },

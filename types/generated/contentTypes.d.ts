@@ -452,7 +452,7 @@ export interface ApiArticleArticle extends Struct.CollectionTypeSchema {
   };
   attributes: {
     author: Schema.Attribute.Relation<'manyToOne', 'api::author.author'>;
-    category: Schema.Attribute.Relation<'manyToOne', 'api::category.category'>;
+    category: Schema.Attribute.Relation<'manyToMany', 'api::category.category'>;
     cover: Schema.Attribute.Media<'images'>;
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
@@ -481,7 +481,7 @@ export interface ApiArticleArticle extends Struct.CollectionTypeSchema {
     subscription_type: Schema.Attribute.Enumeration<['free', 'paid']> &
       Schema.Attribute.DefaultTo<'free'>;
     title: Schema.Attribute.String;
-    topic: Schema.Attribute.Relation<'manyToOne', 'api::topic.topic'>;
+    topic: Schema.Attribute.Relation<'manyToMany', 'api::topic.topic'>;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
@@ -543,7 +543,7 @@ export interface ApiCategoryCategory extends Struct.CollectionTypeSchema {
     draftAndPublish: true;
   };
   attributes: {
-    articles: Schema.Attribute.Relation<'oneToMany', 'api::article.article'>;
+    articles: Schema.Attribute.Relation<'manyToMany', 'api::article.article'>;
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
@@ -554,7 +554,7 @@ export interface ApiCategoryCategory extends Struct.CollectionTypeSchema {
     > &
       Schema.Attribute.Private;
     news_articles: Schema.Attribute.Relation<
-      'oneToMany',
+      'manyToMany',
       'api::news-article.news-article'
     >;
     publishedAt: Schema.Attribute.DateTime;
@@ -635,7 +635,7 @@ export interface ApiHandbookHandbook extends Struct.CollectionTypeSchema {
     subscription_type: Schema.Attribute.Enumeration<['free', 'paid']> &
       Schema.Attribute.DefaultTo<'free'>;
     title: Schema.Attribute.String;
-    topic: Schema.Attribute.Relation<'manyToOne', 'api::topic.topic'>;
+    topic: Schema.Attribute.Relation<'manyToMany', 'api::topic.topic'>;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
@@ -694,7 +694,7 @@ export interface ApiNewsArticleNewsArticle extends Struct.CollectionTypeSchema {
     draftAndPublish: true;
   };
   attributes: {
-    category: Schema.Attribute.Relation<'manyToOne', 'api::category.category'>;
+    category: Schema.Attribute.Relation<'manyToMany', 'api::category.category'>;
     comments_enabled: Schema.Attribute.Boolean &
       Schema.Attribute.DefaultTo<false>;
     cover: Schema.Attribute.Media<'images'>;
@@ -728,7 +728,7 @@ export interface ApiNewsArticleNewsArticle extends Struct.CollectionTypeSchema {
       'api::subscription-type.subscription-type'
     >;
     title: Schema.Attribute.String;
-    topic: Schema.Attribute.Relation<'manyToOne', 'api::topic.topic'>;
+    topic: Schema.Attribute.Relation<'manyToMany', 'api::topic.topic'>;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
@@ -840,17 +840,20 @@ export interface ApiTopicTopic extends Struct.CollectionTypeSchema {
     draftAndPublish: true;
   };
   attributes: {
-    articles: Schema.Attribute.Relation<'oneToMany', 'api::article.article'>;
+    articles: Schema.Attribute.Relation<'manyToMany', 'api::article.article'>;
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
-    handbooks: Schema.Attribute.Relation<'oneToMany', 'api::handbook.handbook'>;
+    handbooks: Schema.Attribute.Relation<
+      'manyToMany',
+      'api::handbook.handbook'
+    >;
     ipks: Schema.Attribute.Relation<'manyToMany', 'api::ipk.ipk'>;
     locale: Schema.Attribute.String & Schema.Attribute.Private;
     localizations: Schema.Attribute.Relation<'oneToMany', 'api::topic.topic'> &
       Schema.Attribute.Private;
     news_articles: Schema.Attribute.Relation<
-      'oneToMany',
+      'manyToMany',
       'api::news-article.news-article'
     >;
     publishedAt: Schema.Attribute.DateTime;

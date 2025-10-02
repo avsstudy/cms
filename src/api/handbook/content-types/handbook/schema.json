@@ -23,7 +23,7 @@
     },
     "topic": {
       "type": "relation",
-      "relation": "manyToOne",
+      "relation": "manyToMany",
       "target": "api::topic.topic",
       "inversedBy": "handbooks"
     },

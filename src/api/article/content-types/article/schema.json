@@ -32,7 +32,7 @@
     },
     "category": {
       "type": "relation",
-      "relation": "manyToOne",
+      "relation": "manyToMany",
       "target": "api::category.category",
       "inversedBy": "articles"
     },
@@ -44,7 +44,7 @@
     },
     "topic": {
       "type": "relation",
-      "relation": "manyToOne",
+      "relation": "manyToMany",
       "target": "api::topic.topic",
       "inversedBy": "articles"
     },

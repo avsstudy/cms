@@ -16,19 +16,19 @@
     },
     "articles": {
       "type": "relation",
-      "relation": "oneToMany",
+      "relation": "manyToMany",
       "target": "api::article.article",
       "mappedBy": "topic"
     },
     "handbooks": {
       "type": "relation",
-      "relation": "oneToMany",
+      "relation": "manyToMany",
       "target": "api::handbook.handbook",
       "mappedBy": "topic"
     },
     "news_articles": {
       "type": "relation",
-      "relation": "oneToMany",
+      "relation": "manyToMany",
       "target": "api::news-article.news-article",
       "mappedBy": "topic"
     },
