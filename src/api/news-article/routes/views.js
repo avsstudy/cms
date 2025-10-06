@@ -5,7 +5,7 @@ module.exports = {
     {
       method: "POST",
       path: "/news-articles/:id/views",
-      handler: "news-articles.views",
+      handler: "news-article.views",
       config: {
         auth: false,
         policies: [],

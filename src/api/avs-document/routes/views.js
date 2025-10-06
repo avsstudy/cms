@@ -5,7 +5,7 @@ module.exports = {
     {
       method: "POST",
       path: "/avs-documents/:id/views",
-      handler: "avs-documents.views",
+      handler: "avs-document.views",
       config: {
         auth: false,
         policies: [],

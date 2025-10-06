@@ -5,7 +5,7 @@ module.exports = {
     {
       method: "POST",
       path: "/handbooks/:id/views",
-      handler: "handbooks.views",
+      handler: "handbook.views",
       config: {
         auth: false,
         policies: [],

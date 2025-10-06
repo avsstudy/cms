@@ -3,7 +3,7 @@
 const { createCoreController } = require("@strapi/strapi").factories;
 
 module.exports = createCoreController("api::article.article", ({ strapi }) => ({
-  async view(ctx) {
+  async views(ctx) {
     const id = Number(ctx.params.id);
     if (!id) return ctx.badRequest("Invalid id");
 

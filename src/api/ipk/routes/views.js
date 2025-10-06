@@ -5,7 +5,7 @@ module.exports = {
     {
       method: "POST",
       path: "/ipks/:id/views",
-      handler: "ipks.views",
+      handler: "ipk.views",
       config: {
         auth: false,
         policies: [],
