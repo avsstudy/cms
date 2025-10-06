@@ -53,8 +53,7 @@
     },
     "views": {
       "type": "integer",
-      "default": 0,
-      "min": 0
+      "default": 1
     },
     "general_content": {
       "type": "dynamiczone",
