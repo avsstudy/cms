@@ -4,8 +4,8 @@ module.exports = {
   routes: [
     {
       method: "POST",
-      path: "/articles/:id/view",
-      handler: "article.view",
+      path: "/news-articles/:id/views",
+      handler: "news-articles.views",
       config: {
         auth: false,
         policies: [],
