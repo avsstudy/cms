@@ -25,7 +25,8 @@
     "user": {
       "type": "relation",
       "relation": "manyToOne",
-      "target": "plugin::users-permissions.user"
+      "target": "plugin::users-permissions.user",
+      "inversedBy": "user_questions"
     },
     "status_question": {
       "type": "enumeration",
