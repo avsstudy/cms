@@ -1,0 +1,62 @@
+{
+  "kind": "collectionType",
+  "collectionName": "user_questions",
+  "info": {
+    "singularName": "user-question",
+    "pluralName": "user-questions",
+    "displayName": "User_Question"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "user_question": {
+      "type": "text",
+      "maxLength": 800,
+      "required": true
+    },
+    "user_topic": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "api::topic.topic",
+      "inversedBy": "user_question"
+    },
+    "user": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "plugin::users-permissions.user",
+      "inversedBy": "user_questions"
+    },
+    "status_question": {
+      "type": "enumeration",
+      "required": false,
+      "default": "not_answered",
+      "enum": [
+        "answered",
+        "not_answered"
+      ]
+    },
+    "reviewed_by_user": {
+      "type": "boolean",
+      "default": false
+    },
+    "reviewed_by_expert": {
+      "type": "boolean",
+      "default": false
+    },
+    "user_comment": {
+      "type": "text",
+      "maxLength": 800
+    },
+    "expert_comment": {
+      "type": "text"
+    },
+    "expert_answer": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "api::expert-answer.expert-answer",
+      "mappedBy": "user_question"
+    }
+  }
+}

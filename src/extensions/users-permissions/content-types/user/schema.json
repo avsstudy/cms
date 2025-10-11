@@ -70,6 +70,12 @@
       "type": "string",
       "required": true,
       "regex": "^\\+380[0-9()\\s-]{7,}$"
+    },
+    "user_questions": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::user-question.user-question",
+      "mappedBy": "user"
     }
   }
 }

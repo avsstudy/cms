@@ -31,6 +31,12 @@
       "relation": "manyToMany",
       "target": "api::avs-document.avs-document",
       "mappedBy": "subscription_type"
+    },
+    "expert_answer": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::expert-answer.expert-answer",
+      "mappedBy": "subscription_type"
     }
   }
 }

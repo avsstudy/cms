@@ -43,6 +43,18 @@
       "relation": "manyToMany",
       "target": "api::avs-document.avs-document",
       "mappedBy": "topic"
+    },
+    "user_question": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "api::user-question.user-question",
+      "mappedBy": "user_topic"
+    },
+    "expert_answer": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "api::expert-answer.expert-answer",
+      "mappedBy": "topic"
     }
   }
 }

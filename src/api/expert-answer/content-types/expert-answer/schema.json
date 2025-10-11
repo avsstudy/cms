@@ -1,0 +1,64 @@
+{
+  "kind": "collectionType",
+  "collectionName": "expert_answers",
+  "info": {
+    "singularName": "expert-answer",
+    "pluralName": "expert-answers",
+    "displayName": "Expert_Answer"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "user_question": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "api::user-question.user-question",
+      "inversedBy": "expert_answer"
+    },
+    "question_title": {
+      "type": "text",
+      "required": true
+    },
+    "topic": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "api::topic.topic",
+      "inversedBy": "expert_answer"
+    },
+    "author": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::author.author",
+      "inversedBy": "expert_answer"
+    },
+    "views": {
+      "type": "integer",
+      "default": 1
+    },
+    "subscription_type": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::subscription-type.subscription-type",
+      "inversedBy": "expert_answer"
+    },
+    "pinned": {
+      "type": "boolean",
+      "default": false
+    },
+    "general_content": {
+      "type": "dynamiczone",
+      "components": [
+        "shared.zakon",
+        "shared.text",
+        "shared.custom-table",
+        "shared.custom-quote",
+        "shared.ipk",
+        "shared.image",
+        "shared.custom-video"
+      ],
+      "required": true
+    }
+  }
+}

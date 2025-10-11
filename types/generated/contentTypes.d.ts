@@ -512,6 +512,10 @@ export interface ApiAuthorAuthor extends Struct.CollectionTypeSchema {
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
     description: Schema.Attribute.Text;
+    expert_answer: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::expert-answer.expert-answer'
+    >;
     handbooks: Schema.Attribute.Relation<
       'manyToMany',
       'api::handbook.handbook'
@@ -610,6 +614,59 @@ export interface ApiCategoryCategory extends Struct.CollectionTypeSchema {
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
+  };
+}
+
+export interface ApiExpertAnswerExpertAnswer
+  extends Struct.CollectionTypeSchema {
+  collectionName: 'expert_answers';
+  info: {
+    displayName: 'Expert_Answer';
+    pluralName: 'expert-answers';
+    singularName: 'expert-answer';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    author: Schema.Attribute.Relation<'manyToOne', 'api::author.author'>;
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    general_content: Schema.Attribute.DynamicZone<
+      [
+        'shared.zakon',
+        'shared.text',
+        'shared.custom-table',
+        'shared.custom-quote',
+        'shared.ipk',
+        'shared.image',
+        'shared.custom-video',
+      ]
+    > &
+      Schema.Attribute.Required;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::expert-answer.expert-answer'
+    > &
+      Schema.Attribute.Private;
+    pinned: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<false>;
+    publishedAt: Schema.Attribute.DateTime;
+    question_title: Schema.Attribute.Text & Schema.Attribute.Required;
+    subscription_type: Schema.Attribute.Relation<
+      'manyToOne',
+      'api::subscription-type.subscription-type'
+    >;
+    topic: Schema.Attribute.Relation<'manyToMany', 'api::topic.topic'>;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    user_question: Schema.Attribute.Relation<
+      'oneToOne',
+      'api::user-question.user-question'
+    >;
+    views: Schema.Attribute.Integer & Schema.Attribute.DefaultTo<1>;
   };
 }
 
@@ -810,6 +867,10 @@ export interface ApiSubscriptionTypeSubscriptionType
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
+    expert_answer: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::expert-answer.expert-answer'
+    >;
     ipks: Schema.Attribute.Relation<'oneToMany', 'api::ipk.ipk'>;
     locale: Schema.Attribute.String & Schema.Attribute.Private;
     localizations: Schema.Attribute.Relation<
@@ -907,6 +968,10 @@ export interface ApiTopicTopic extends Struct.CollectionTypeSchema {
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
+    expert_answer: Schema.Attribute.Relation<
+      'manyToMany',
+      'api::expert-answer.expert-answer'
+    >;
     handbooks: Schema.Attribute.Relation<
       'manyToMany',
       'api::handbook.handbook'
@@ -924,6 +989,65 @@ export interface ApiTopicTopic extends Struct.CollectionTypeSchema {
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
+    user_question: Schema.Attribute.Relation<
+      'manyToMany',
+      'api::user-question.user-question'
+    >;
+  };
+}
+
+export interface ApiUserQuestionUserQuestion
+  extends Struct.CollectionTypeSchema {
+  collectionName: 'user_questions';
+  info: {
+    displayName: 'User_Question';
+    pluralName: 'user-questions';
+    singularName: 'user-question';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    expert_answer: Schema.Attribute.Relation<
+      'oneToOne',
+      'api::expert-answer.expert-answer'
+    >;
+    expert_comment: Schema.Attribute.Text;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::user-question.user-question'
+    > &
+      Schema.Attribute.Private;
+    publishedAt: Schema.Attribute.DateTime;
+    reviewed_by_expert: Schema.Attribute.Boolean &
+      Schema.Attribute.DefaultTo<false>;
+    reviewed_by_user: Schema.Attribute.Boolean &
+      Schema.Attribute.DefaultTo<false>;
+    status_question: Schema.Attribute.Enumeration<
+      ['answered', 'not_answered']
+    > &
+      Schema.Attribute.DefaultTo<'not_answered'>;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    user: Schema.Attribute.Relation<
+      'manyToOne',
+      'plugin::users-permissions.user'
+    >;
+    user_comment: Schema.Attribute.Text &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 800;
+      }>;
+    user_question: Schema.Attribute.Text &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 800;
+      }>;
+    user_topic: Schema.Attribute.Relation<'manyToMany', 'api::topic.topic'>;
   };
 }
 
@@ -1417,6 +1541,10 @@ export interface PluginUsersPermissionsUser
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
+    user_questions: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::user-question.user-question'
+    >;
     username: Schema.Attribute.String &
       Schema.Attribute.Required &
       Schema.Attribute.Unique &
@@ -1442,6 +1570,7 @@ declare module '@strapi/strapi' {
       'api::author.author': ApiAuthorAuthor;
       'api::avs-document.avs-document': ApiAvsDocumentAvsDocument;
       'api::category.category': ApiCategoryCategory;
+      'api::expert-answer.expert-answer': ApiExpertAnswerExpertAnswer;
       'api::global.global': ApiGlobalGlobal;
       'api::handbook.handbook': ApiHandbookHandbook;
       'api::ipk.ipk': ApiIpkIpk;
@@ -1450,6 +1579,7 @@ declare module '@strapi/strapi' {
       'api::topic-dps.topic-dps': ApiTopicDpsTopicDps;
       'api::topic-group.topic-group': ApiTopicGroupTopicGroup;
       'api::topic.topic': ApiTopicTopic;
+      'api::user-question.user-question': ApiUserQuestionUserQuestion;
       'plugin::content-releases.release': PluginContentReleasesRelease;
       'plugin::content-releases.release-action': PluginContentReleasesReleaseAction;
       'plugin::i18n.locale': PluginI18NLocale;
