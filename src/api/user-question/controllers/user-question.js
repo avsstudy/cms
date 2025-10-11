@@ -13,7 +13,6 @@ module.exports = createCoreController(
       const d = (ctx.request.body && ctx.request.body.data) || {};
       const user_question = d.user_question;
 
-      // приймаємо: topicDocumentId (string|string[]) або user_topic (number|number[])
       const rawDoc = d.topicDocumentId;
       const docIds = Array.isArray(rawDoc)
         ? rawDoc.map(String).filter(Boolean)
@@ -32,13 +31,12 @@ module.exports = createCoreController(
         return ctx.badRequest("user_question is required");
       }
 
-      // якщо прийшли documentId — резолвимо у локальні id
       if (docIds.length) {
         const rows = await strapi.entityService.findMany("api::topic.topic", {
           filters: { documentId: { $in: docIds } },
           fields: ["id", "documentId"],
           locale: "all",
-          // publicationState: 'live', // постав, якщо хочеш тільки опубліковані
+          // publicationState: 'live',
           limit: docIds.length * 10,
         });
         const byDoc = new Map(
@@ -47,7 +45,6 @@ module.exports = createCoreController(
         topicIds.push(...docIds.map((doc) => byDoc.get(doc)).filter(Boolean));
       }
 
-      // унікалізуємо
       topicIds = Array.from(new Set(topicIds)).filter(Boolean);
 
       if (!topicIds.length) {
@@ -60,8 +57,8 @@ module.exports = createCoreController(
           {
             data: {
               user_question,
-              user: { connect: authUser.id }, // M2O (v5)
-              user_topic: { connect: topicIds }, // M2M (v5)
+              user: { connect: authUser.id },
+              user_topic: { connect: topicIds },
             },
             populate: ["user", "user_topic"],
           }
