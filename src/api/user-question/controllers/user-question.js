@@ -4,9 +4,9 @@ const { createCoreController } = require("@strapi/strapi").factories;
 module.exports = createCoreController(
   "api::user-question.user-question",
   ({ strapi }) => ({
+    // === ВЖЕ БУВШИЙ create (без змін) ===
     async create(ctx) {
       strapi.log.info("[user-question] >>> custom create HIT");
-
       const authUser = ctx.state.user;
       if (!authUser) return ctx.unauthorized("Authentication required");
 
@@ -36,7 +36,6 @@ module.exports = createCoreController(
           filters: { documentId: { $in: docIds } },
           fields: ["id", "documentId"],
           locale: "all",
-          // publicationState: 'live',
           limit: docIds.length * 10,
         });
         const byDoc = new Map(
@@ -46,7 +45,6 @@ module.exports = createCoreController(
       }
 
       topicIds = Array.from(new Set(topicIds)).filter(Boolean);
-
       if (!topicIds.length) {
         return ctx.badRequest("Provide topicDocumentId or valid user_topic");
       }
@@ -70,6 +68,121 @@ module.exports = createCoreController(
         strapi.log.error("[user-question] create failed:", err);
         return ctx.badRequest(err?.message || "Validation error");
       }
+    },
+
+    // === НОВЕ: список моїх питань ===
+    async my(ctx) {
+      const user = ctx.state.user;
+      if (!user?.email) return ctx.unauthorized("No email in token");
+
+      const page = Math.max(1, Number(ctx.query.page ?? 1));
+      const pageSize = Math.min(
+        100,
+        Math.max(1, Number(ctx.query.pageSize ?? 20))
+      );
+      const start = (page - 1) * pageSize;
+      const status = ctx.query.status;
+
+      const filters = {
+        user: { email: { $eq: user.email } },
+        ...(status ? { status_question: { $eq: status } } : {}),
+      };
+
+      const [data, total] = await Promise.all([
+        strapi.entityService.findMany("api::user-question.user-question", {
+          filters,
+          sort: [{ publishedAt: "desc" }, { createdAt: "desc" }],
+          fields: [
+            "id",
+            "documentId",
+            "user_question",
+            "status_question",
+            "reviewed_by_user",
+            "reviewed_by_expert",
+            "createdAt",
+            "updatedAt",
+            "publishedAt",
+          ],
+          populate: {
+            user_topic: { fields: ["id", "title"] },
+            expert_answer: {
+              fields: [
+                "id",
+                "documentId",
+                "slug",
+                "question_title",
+                "publishedAt",
+              ],
+              populate: { author: { fields: ["name"] } },
+            },
+          },
+          start,
+          limit: pageSize,
+        }),
+        strapi
+          .query("api::user-question.user-question")
+          .count({ where: filters }),
+      ]);
+
+      const pageCount = Math.max(1, Math.ceil(total / pageSize));
+
+      ctx.body = {
+        data,
+        meta: { pagination: { page, pageSize, pageCount, total } },
+      };
+    },
+
+    // === НОВЕ: конкретне питання за documentId (тільки своє) ===
+    async myByDocumentId(ctx) {
+      const user = ctx.state.user;
+      if (!user?.email) return ctx.unauthorized("No email in token");
+
+      const { documentId } = ctx.params;
+
+      const rows = await strapi.entityService.findMany(
+        "api::user-question.user-question",
+        {
+          filters: {
+            documentId: { $eq: documentId },
+            user: { email: { $eq: user.email } },
+          },
+          fields: [
+            "id",
+            "documentId",
+            "user_question",
+            "status_question",
+            "reviewed_by_user",
+            "reviewed_by_expert",
+            "user_comment",
+            "expert_comment",
+            "createdAt",
+            "updatedAt",
+            "publishedAt",
+          ],
+          populate: {
+            user_topic: { fields: ["id", "title"] },
+            expert_answer: {
+              fields: [
+                "id",
+                "documentId",
+                "slug",
+                "question_title",
+                "publishedAt",
+                "views",
+              ],
+              populate: {
+                author: { fields: ["name"] },
+                topic: { fields: ["id", "title"] },
+                general_content: { populate: "*" },
+              },
+            },
+          },
+          limit: 1,
+        }
+      );
+
+      if (!rows?.length) return ctx.notFound("Question not found");
+      ctx.body = rows[0];
     },
   })
 );
