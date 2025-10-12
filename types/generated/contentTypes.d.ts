@@ -654,6 +654,7 @@ export interface ApiExpertAnswerExpertAnswer
     pinned: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<false>;
     publishedAt: Schema.Attribute.DateTime;
     question_title: Schema.Attribute.Text & Schema.Attribute.Required;
+    slug: Schema.Attribute.UID<'question_title'>;
     subscription_type: Schema.Attribute.Relation<
       'manyToOne',
       'api::subscription-type.subscription-type'

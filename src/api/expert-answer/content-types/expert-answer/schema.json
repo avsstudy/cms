@@ -11,15 +11,19 @@
   },
   "pluginOptions": {},
   "attributes": {
+    "question_title": {
+      "type": "text",
+      "required": true
+    },
     "user_question": {
       "type": "relation",
       "relation": "oneToOne",
       "target": "api::user-question.user-question",
       "inversedBy": "expert_answer"
     },
-    "question_title": {
-      "type": "text",
-      "required": true
+    "slug": {
+      "type": "uid",
+      "targetField": "question_title"
     },
     "topic": {
       "type": "relation",
