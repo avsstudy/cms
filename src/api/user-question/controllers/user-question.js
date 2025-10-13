@@ -4,7 +4,6 @@ const { createCoreController } = require("@strapi/strapi").factories;
 module.exports = createCoreController(
   "api::user-question.user-question",
   ({ strapi }) => ({
-    // === ВЖЕ БУВШИЙ create (без змін) ===
     async create(ctx) {
       strapi.log.info("[user-question] >>> custom create HIT");
       const authUser = ctx.state.user;
@@ -70,7 +69,6 @@ module.exports = createCoreController(
       }
     },
 
-    // === НОВЕ: список моїх питань ===
     async my(ctx) {
       const user = ctx.state.user;
       if (!user?.email) return ctx.unauthorized("No email in token");
@@ -132,7 +130,6 @@ module.exports = createCoreController(
       };
     },
 
-    // === НОВЕ: конкретне питання за documentId (тільки своє) ===
     async myByDocumentId(ctx) {
       const user = ctx.state.user;
       if (!user?.email) return ctx.unauthorized("No email in token");
@@ -191,7 +188,6 @@ module.exports = createCoreController(
 
       const { documentId } = ctx.params;
       const body = ctx.request.body || {};
-      // допускаємо як {"data": { user_comment }} так і { user_comment }
       const user_comment = body?.data?.user_comment ?? body?.user_comment ?? "";
 
       if (typeof user_comment !== "string")
@@ -199,39 +195,55 @@ module.exports = createCoreController(
       if (user_comment.length > 800)
         return ctx.badRequest("user_comment must be <= 800 chars");
 
-      // знайти саме моє питання
-      const rows = await strapi.entityService.findMany(
+      const [row] = await strapi.entityService.findMany(
         "api::user-question.user-question",
         {
           filters: {
             documentId: { $eq: documentId },
             user: { email: { $eq: user.email } },
           },
-          fields: ["id"],
+          fields: ["id", "publishedAt"],
           limit: 1,
         }
       );
-      if (!rows?.length) return ctx.notFound("Question not found");
-      const qid = rows[0].id;
+      if (!row) return ctx.notFound("Question not found");
 
-      // оновити коментар (і за бажанням позначити reviewed_by_user = true)
       const updated = await strapi.entityService.update(
         "api::user-question.user-question",
-        qid,
+        row.id,
         {
           data: {
             user_comment,
             reviewed_by_user: true,
             reviewed_by_expert: false,
           },
-          populate: {
-            user_topic: { fields: ["id", "title"] },
-          },
         }
       );
 
-      // віддай у звичному REST-форматі
-      const sanitized = await this.sanitizeOutput(updated, ctx);
+      if (updated.publishedAt) {
+        await strapi.entityService.update(
+          "api::user-question.user-question",
+          row.id,
+          {
+            data: { publishedAt: new Date() },
+          }
+        );
+      }
+      // якщо публікувати завжди (навіть якщо запис ще не був опублікований):
+      // await strapi.entityService.update("api::user-question.user-question", row.id, {
+      //   data: { publishedAt: new Date() },
+      // });
+
+      const sanitized = await this.sanitizeOutput(
+        await strapi.entityService.findOne(
+          "api::user-question.user-question",
+          row.id,
+          {
+            populate: { user_topic: { fields: ["id", "title"] } },
+          }
+        ),
+        ctx
+      );
       return this.transformResponse(sanitized);
     },
   })
