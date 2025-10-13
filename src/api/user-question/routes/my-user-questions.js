@@ -20,5 +20,11 @@ module.exports = {
         middlewares: [],
       },
     },
+    {
+      method: "PATCH",
+      path: "/user-questions/my/:documentId/comment",
+      handler: "user-question.updateUserComment",
+      config: { policies: ["global::is-authenticated"], middlewares: [] },
+    },
   ],
 };

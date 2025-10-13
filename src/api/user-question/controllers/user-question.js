@@ -184,5 +184,55 @@ module.exports = createCoreController(
       if (!rows?.length) return ctx.notFound("Question not found");
       ctx.body = rows[0];
     },
+
+    async updateUserComment(ctx) {
+      const user = ctx.state.user;
+      if (!user?.email) return ctx.unauthorized("No email in token");
+
+      const { documentId } = ctx.params;
+      const body = ctx.request.body || {};
+      // допускаємо як {"data": { user_comment }} так і { user_comment }
+      const user_comment = body?.data?.user_comment ?? body?.user_comment ?? "";
+
+      if (typeof user_comment !== "string")
+        return ctx.badRequest("user_comment must be a string");
+      if (user_comment.length > 800)
+        return ctx.badRequest("user_comment must be <= 800 chars");
+
+      // знайти саме моє питання
+      const rows = await strapi.entityService.findMany(
+        "api::user-question.user-question",
+        {
+          filters: {
+            documentId: { $eq: documentId },
+            user: { email: { $eq: user.email } },
+          },
+          fields: ["id"],
+          limit: 1,
+        }
+      );
+      if (!rows?.length) return ctx.notFound("Question not found");
+      const qid = rows[0].id;
+
+      // оновити коментар (і за бажанням позначити reviewed_by_user = true)
+      const updated = await strapi.entityService.update(
+        "api::user-question.user-question",
+        qid,
+        {
+          data: {
+            user_comment,
+            reviewed_by_user: true,
+            reviewed_by_expert: false,
+          },
+          populate: {
+            user_topic: { fields: ["id", "title"] },
+          },
+        }
+      );
+
+      // віддай у звичному REST-форматі
+      const sanitized = await this.sanitizeOutput(updated, ctx);
+      return this.transformResponse(sanitized);
+    },
   })
 );
