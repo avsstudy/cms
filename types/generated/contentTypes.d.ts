@@ -1027,7 +1027,7 @@ export interface ApiUserQuestionUserQuestion
     reviewed_by_expert: Schema.Attribute.Boolean &
       Schema.Attribute.DefaultTo<false>;
     reviewed_by_user: Schema.Attribute.Boolean &
-      Schema.Attribute.DefaultTo<false>;
+      Schema.Attribute.DefaultTo<true>;
     status_question: Schema.Attribute.Enumeration<
       ['answered', 'new_question', 'new_comment', 'declined']
     > &
