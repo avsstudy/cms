@@ -41,7 +41,7 @@
     },
     "reviewed_by_user": {
       "type": "boolean",
-      "default": false
+      "default": true
     },
     "reviewed_by_expert": {
       "type": "boolean",
