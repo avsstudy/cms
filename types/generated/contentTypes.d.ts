@@ -1029,9 +1029,9 @@ export interface ApiUserQuestionUserQuestion
     reviewed_by_user: Schema.Attribute.Boolean &
       Schema.Attribute.DefaultTo<false>;
     status_question: Schema.Attribute.Enumeration<
-      ['answered', 'not_answered']
+      ['answered', 'new_question', 'new_comment', 'declined']
     > &
-      Schema.Attribute.DefaultTo<'not_answered'>;
+      Schema.Attribute.DefaultTo<'new_question'>;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;

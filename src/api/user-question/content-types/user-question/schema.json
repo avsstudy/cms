@@ -31,10 +31,12 @@
     "status_question": {
       "type": "enumeration",
       "required": false,
-      "default": "not_answered",
+      "default": "new_question",
       "enum": [
         "answered",
-        "not_answered"
+        "new_question",
+        "new_comment",
+        "declined"
       ]
     },
     "reviewed_by_user": {
