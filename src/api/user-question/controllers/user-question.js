@@ -246,5 +246,40 @@ module.exports = createCoreController(
       );
       return this.transformResponse(sanitized);
     },
+
+    async markReviewedByUser(ctx) {
+      const user = ctx.state.user;
+      const { documentId } = ctx.params;
+      if (!user) return ctx.badRequest("Unauthorized");
+      if (!documentId) return ctx.badRequest("documentId is required");
+
+      // знаходимо питання, яке належить користувачу
+      const [entry] = await strapi.entityService.findMany(
+        "api::user-question.user-question",
+        {
+          filters: { documentId, user: user.id },
+          limit: 1,
+        }
+      );
+
+      if (!entry) return ctx.notFound("Question not found");
+
+      // якщо вже позначено — повертаємо як є
+      if (entry.reviewed_by_user === true) {
+        const sanitizedExisting = await this.sanitizeOutput(entry, ctx);
+        return this.transformResponse(sanitizedExisting);
+      }
+
+      const updated = await strapi.entityService.update(
+        "api::user-question.user-question",
+        entry.id,
+        {
+          data: { reviewed_by_user: true },
+        }
+      );
+
+      const sanitized = await this.sanitizeOutput(updated, ctx);
+      return this.transformResponse(sanitized);
+    },
   })
 );

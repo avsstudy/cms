@@ -26,5 +26,11 @@ module.exports = {
       handler: "user-question.updateUserComment",
       config: { policies: ["global::is-authenticated"], middlewares: [] },
     },
+    {
+      method: "PATCH",
+      path: "/user-questions/my/:documentId/review",
+      handler: "user-question.markReviewedByUser",
+      config: { policies: ["global::is-authenticated"], middlewares: [] },
+    },
   ],
 };
