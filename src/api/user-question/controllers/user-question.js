@@ -195,7 +195,6 @@ module.exports = createCoreController(
       if (user_comment.length > 800)
         return ctx.badRequest("user_comment must be <= 800 chars");
 
-      // 1) знаходимо документ
       const [row] = await strapi.entityService.findMany(
         "api::user-question.user-question",
         {
@@ -209,31 +208,19 @@ module.exports = createCoreController(
       );
       if (!row) return ctx.notFound("Question not found");
 
-      // 2) оновлюємо і ОДРАЗУ публікуємо через Document Service
       const updated = await strapi
         .documents("api::user-question.user-question")
         .update({
           documentId: row.documentId,
-          locale: row.locale, // якщо локалізація ввімкнена
+          locale: row.locale,
           data: {
             user_comment,
             reviewed_by_user: true,
             reviewed_by_expert: false,
             status_question: "new_comment",
           },
-          status: "published", // <- головне
+          status: "published",
         });
-
-      // (Альтернатива у 2 кроки)
-      // await strapi.documents("api::user-question.user-question").update({
-      //   documentId: row.documentId,
-      //   locale: row.locale,
-      //   data: { user_comment, reviewed_by_user: true, reviewed_by_expert: false },
-      // });
-      // await strapi.documents("api::user-question.user-question").publish({
-      //   documentId: row.documentId,
-      //   locale: row.locale,
-      // });
 
       const sanitized = await this.sanitizeOutput(
         await strapi.entityService.findOne(
@@ -262,7 +249,6 @@ module.exports = createCoreController(
       );
       if (!entry) return ctx.notFound("Question not found");
 
-      // якщо вже позначено — все одно гарантуємо published-статус
       const updated = await strapi
         .documents("api::user-question.user-question")
         .update({
@@ -271,12 +257,6 @@ module.exports = createCoreController(
           data: { reviewed_by_user: true },
           status: "published",
         });
-
-      // або:
-      // await strapi.documents("api::user-question.user-question").publish({
-      //   documentId: entry.documentId,
-      //   locale: entry.locale,
-      // });
 
       const sanitized = await this.sanitizeOutput(updated, ctx);
       return this.transformResponse(sanitized);
