@@ -11,6 +11,9 @@
   },
   "pluginOptions": {},
   "attributes": {
+    "short_title": {
+      "type": "string"
+    },
     "user_question": {
       "type": "text",
       "maxLength": 800,

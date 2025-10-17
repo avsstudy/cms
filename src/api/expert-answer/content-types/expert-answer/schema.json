@@ -11,6 +11,9 @@
   },
   "pluginOptions": {},
   "attributes": {
+    "short_title": {
+      "type": "string"
+    },
     "question_title": {
       "type": "text",
       "required": true

@@ -654,6 +654,7 @@ export interface ApiExpertAnswerExpertAnswer
     pinned: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<false>;
     publishedAt: Schema.Attribute.DateTime;
     question_title: Schema.Attribute.Text & Schema.Attribute.Required;
+    short_title: Schema.Attribute.String;
     slug: Schema.Attribute.UID<'question_title'>;
     subscription_type: Schema.Attribute.Relation<
       'manyToOne',
@@ -1028,6 +1029,7 @@ export interface ApiUserQuestionUserQuestion
       Schema.Attribute.DefaultTo<false>;
     reviewed_by_user: Schema.Attribute.Boolean &
       Schema.Attribute.DefaultTo<true>;
+    short_title: Schema.Attribute.String;
     status_question: Schema.Attribute.Enumeration<
       ['answered', 'new_question', 'new_comment', 'declined']
     > &
