@@ -195,6 +195,7 @@ module.exports = createCoreController(
       if (user_comment.length > 800)
         return ctx.badRequest("user_comment must be <= 800 chars");
 
+      // 1) знаходимо документ
       const [row] = await strapi.entityService.findMany(
         "api::user-question.user-question",
         {
@@ -202,45 +203,43 @@ module.exports = createCoreController(
             documentId: { $eq: documentId },
             user: { email: { $eq: user.email } },
           },
-          fields: ["id", "publishedAt"],
+          fields: ["id", "documentId", "locale"],
           limit: 1,
         }
       );
       if (!row) return ctx.notFound("Question not found");
 
-      const updated = await strapi.entityService.update(
-        "api::user-question.user-question",
-        row.id,
-        {
+      // 2) оновлюємо і ОДРАЗУ публікуємо через Document Service
+      const updated = await strapi
+        .documents("api::user-question.user-question")
+        .update({
+          documentId: row.documentId,
+          locale: row.locale, // якщо локалізація ввімкнена
           data: {
             user_comment,
             reviewed_by_user: true,
             reviewed_by_expert: false,
+            status_question: "new_comment",
           },
-        }
-      );
+          status: "published", // <- головне
+        });
 
-      if (updated.publishedAt) {
-        await strapi.entityService.update(
-          "api::user-question.user-question",
-          row.id,
-          {
-            data: { publishedAt: new Date() },
-          }
-        );
-      }
-      // якщо публікувати завжди (навіть якщо запис ще не був опублікований):
-      // await strapi.entityService.update("api::user-question.user-question", row.id, {
-      //   data: { publishedAt: new Date() },
+      // (Альтернатива у 2 кроки)
+      // await strapi.documents("api::user-question.user-question").update({
+      //   documentId: row.documentId,
+      //   locale: row.locale,
+      //   data: { user_comment, reviewed_by_user: true, reviewed_by_expert: false },
+      // });
+      // await strapi.documents("api::user-question.user-question").publish({
+      //   documentId: row.documentId,
+      //   locale: row.locale,
       // });
 
       const sanitized = await this.sanitizeOutput(
         await strapi.entityService.findOne(
           "api::user-question.user-question",
           row.id,
-          {
-            populate: { user_topic: { fields: ["id", "title"] } },
-          }
+          { populate: { user_topic: { fields: ["id", "title"] } } }
         ),
         ctx
       );
@@ -253,30 +252,31 @@ module.exports = createCoreController(
       if (!user) return ctx.badRequest("Unauthorized");
       if (!documentId) return ctx.badRequest("documentId is required");
 
-      // знаходимо питання, яке належить користувачу
       const [entry] = await strapi.entityService.findMany(
         "api::user-question.user-question",
         {
           filters: { documentId, user: user.id },
+          fields: ["id", "documentId", "locale", "reviewed_by_user"],
           limit: 1,
         }
       );
-
       if (!entry) return ctx.notFound("Question not found");
 
-      // якщо вже позначено — повертаємо як є
-      if (entry.reviewed_by_user === true) {
-        const sanitizedExisting = await this.sanitizeOutput(entry, ctx);
-        return this.transformResponse(sanitizedExisting);
-      }
-
-      const updated = await strapi.entityService.update(
-        "api::user-question.user-question",
-        entry.id,
-        {
+      // якщо вже позначено — все одно гарантуємо published-статус
+      const updated = await strapi
+        .documents("api::user-question.user-question")
+        .update({
+          documentId: entry.documentId,
+          locale: entry.locale,
           data: { reviewed_by_user: true },
-        }
-      );
+          status: "published",
+        });
+
+      // або:
+      // await strapi.documents("api::user-question.user-question").publish({
+      //   documentId: entry.documentId,
+      //   locale: entry.locale,
+      // });
 
       const sanitized = await this.sanitizeOutput(updated, ctx);
       return this.transformResponse(sanitized);
