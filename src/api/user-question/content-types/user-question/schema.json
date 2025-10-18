@@ -59,9 +59,9 @@
     },
     "expert_answer": {
       "type": "relation",
-      "relation": "oneToOne",
+      "relation": "manyToOne",
       "target": "api::expert-answer.expert-answer",
-      "mappedBy": "user_question"
+      "inversedBy": "user_question"
     }
   }
 }

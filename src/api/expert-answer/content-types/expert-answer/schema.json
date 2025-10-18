@@ -20,9 +20,9 @@
     },
     "user_question": {
       "type": "relation",
-      "relation": "oneToOne",
+      "relation": "oneToMany",
       "target": "api::user-question.user-question",
-      "inversedBy": "expert_answer"
+      "mappedBy": "expert_answer"
     },
     "slug": {
       "type": "uid",
