@@ -665,7 +665,7 @@ export interface ApiExpertAnswerExpertAnswer
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
     user_question: Schema.Attribute.Relation<
-      'oneToMany',
+      'oneToOne',
       'api::user-question.user-question'
     >;
     views: Schema.Attribute.Integer & Schema.Attribute.DefaultTo<1>;
@@ -1014,7 +1014,7 @@ export interface ApiUserQuestionUserQuestion
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
     expert_answer: Schema.Attribute.Relation<
-      'manyToOne',
+      'oneToOne',
       'api::expert-answer.expert-answer'
     >;
     expert_comment: Schema.Attribute.Text;
