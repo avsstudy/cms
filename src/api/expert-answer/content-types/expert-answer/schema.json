@@ -20,7 +20,7 @@
     },
     "user_question": {
       "type": "relation",
-      "relation": "oneToMany",
+      "relation": "oneToOne",
       "target": "api::user-question.user-question",
       "mappedBy": "expert_answer"
     },

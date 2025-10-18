@@ -59,7 +59,7 @@
     },
     "expert_answer": {
       "type": "relation",
-      "relation": "manyToOne",
+      "relation": "oneToOne",
       "target": "api::expert-answer.expert-answer",
       "inversedBy": "user_question"
     }
