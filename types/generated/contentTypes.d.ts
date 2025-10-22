@@ -672,6 +672,48 @@ export interface ApiExpertAnswerExpertAnswer
   };
 }
 
+export interface ApiFreeWebinarFreeWebinar extends Struct.CollectionTypeSchema {
+  collectionName: 'free_webinars';
+  info: {
+    displayName: 'Free_webinar';
+    pluralName: 'free-webinars';
+    singularName: 'free-webinar';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    card_cover: Schema.Attribute.Media<'images'> & Schema.Attribute.Required;
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    date_1: Schema.Attribute.Date;
+    date_2: Schema.Attribute.Date;
+    date_3: Schema.Attribute.Date;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::free-webinar.free-webinar'
+    > &
+      Schema.Attribute.Private;
+    pinned: Schema.Attribute.Boolean &
+      Schema.Attribute.Required &
+      Schema.Attribute.DefaultTo<false>;
+    publishedAt: Schema.Attribute.DateTime;
+    slug: Schema.Attribute.UID<'title'> & Schema.Attribute.Required;
+    speaker: Schema.Attribute.Relation<'manyToMany', 'api::speaker.speaker'>;
+    stream_url: Schema.Attribute.String & Schema.Attribute.Required;
+    time: Schema.Attribute.Time & Schema.Attribute.Required;
+    title: Schema.Attribute.String & Schema.Attribute.Required;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    webinar_type: Schema.Attribute.Enumeration<['single', 'series']> &
+      Schema.Attribute.Required &
+      Schema.Attribute.DefaultTo<'single'>;
+  };
+}
+
 export interface ApiGlobalGlobal extends Struct.SingleTypeSchema {
   collectionName: 'globals';
   info: {
@@ -847,6 +889,40 @@ export interface ApiNewsArticleNewsArticle extends Struct.CollectionTypeSchema {
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
     views: Schema.Attribute.Integer & Schema.Attribute.DefaultTo<1>;
+  };
+}
+
+export interface ApiSpeakerSpeaker extends Struct.CollectionTypeSchema {
+  collectionName: 'speakers';
+  info: {
+    displayName: 'Speaker';
+    pluralName: 'speakers';
+    singularName: 'speaker';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    first_name: Schema.Attribute.String & Schema.Attribute.Required;
+    free_webinar: Schema.Attribute.Relation<
+      'manyToMany',
+      'api::free-webinar.free-webinar'
+    >;
+    last_name: Schema.Attribute.String & Schema.Attribute.Required;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::speaker.speaker'
+    > &
+      Schema.Attribute.Private;
+    photo: Schema.Attribute.Media<'images'>;
+    publishedAt: Schema.Attribute.DateTime;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
   };
 }
 
@@ -1574,10 +1650,12 @@ declare module '@strapi/strapi' {
       'api::avs-document.avs-document': ApiAvsDocumentAvsDocument;
       'api::category.category': ApiCategoryCategory;
       'api::expert-answer.expert-answer': ApiExpertAnswerExpertAnswer;
+      'api::free-webinar.free-webinar': ApiFreeWebinarFreeWebinar;
       'api::global.global': ApiGlobalGlobal;
       'api::handbook.handbook': ApiHandbookHandbook;
       'api::ipk.ipk': ApiIpkIpk;
       'api::news-article.news-article': ApiNewsArticleNewsArticle;
+      'api::speaker.speaker': ApiSpeakerSpeaker;
       'api::subscription-type.subscription-type': ApiSubscriptionTypeSubscriptionType;
       'api::topic-dps.topic-dps': ApiTopicDpsTopicDps;
       'api::topic-group.topic-group': ApiTopicGroupTopicGroup;

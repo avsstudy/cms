@@ -1,0 +1,37 @@
+{
+  "kind": "collectionType",
+  "collectionName": "speakers",
+  "info": {
+    "singularName": "speaker",
+    "pluralName": "speakers",
+    "displayName": "Speaker"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "first_name": {
+      "type": "string",
+      "required": true
+    },
+    "last_name": {
+      "type": "string",
+      "required": true
+    },
+    "photo": {
+      "type": "media",
+      "multiple": false,
+      "required": false,
+      "allowedTypes": [
+        "images"
+      ]
+    },
+    "free_webinar": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "api::free-webinar.free-webinar",
+      "mappedBy": "speaker"
+    }
+  }
+}
