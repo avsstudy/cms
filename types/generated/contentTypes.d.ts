@@ -702,8 +702,10 @@ export interface ApiFreeWebinarFreeWebinar extends Struct.CollectionTypeSchema {
       Schema.Attribute.DefaultTo<false>;
     program_content_1: Schema.Attribute.Component<'shared.text', false> &
       Schema.Attribute.Required;
-    program_content_2: Schema.Attribute.Component<'shared.text', false>;
-    program_content_3: Schema.Attribute.Component<'shared.text', false>;
+    program_content_2: Schema.Attribute.Component<'shared.text', false> &
+      Schema.Attribute.Required;
+    program_content_3: Schema.Attribute.Component<'shared.text', false> &
+      Schema.Attribute.Required;
     publishedAt: Schema.Attribute.DateTime;
     slug: Schema.Attribute.UID<'title'> & Schema.Attribute.Required;
     speaker: Schema.Attribute.Relation<'manyToMany', 'api::speaker.speaker'>;

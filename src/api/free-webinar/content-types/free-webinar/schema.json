@@ -78,12 +78,14 @@
     "program_content_2": {
       "type": "component",
       "component": "shared.text",
-      "repeatable": false
+      "repeatable": false,
+      "required": true
     },
     "program_content_3": {
       "type": "component",
       "component": "shared.text",
-      "repeatable": false
+      "repeatable": false,
+      "required": true
     }
   }
 }
