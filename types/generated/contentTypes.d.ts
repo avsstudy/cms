@@ -672,6 +672,40 @@ export interface ApiExpertAnswerExpertAnswer
   };
 }
 
+export interface ApiFreeWebinarReasonFreeWebinarReason
+  extends Struct.CollectionTypeSchema {
+  collectionName: 'free_webinar_reasons';
+  info: {
+    displayName: 'Free_webinar_reason';
+    pluralName: 'free-webinar-reasons';
+    singularName: 'free-webinar-reason';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    free_webinar: Schema.Attribute.Relation<
+      'manyToMany',
+      'api::free-webinar.free-webinar'
+    >;
+    icon: Schema.Attribute.Media<'images' | 'files' | 'videos' | 'audios'>;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::free-webinar-reason.free-webinar-reason'
+    > &
+      Schema.Attribute.Private;
+    publishedAt: Schema.Attribute.DateTime;
+    title: Schema.Attribute.String;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
 export interface ApiFreeWebinarFreeWebinar extends Struct.CollectionTypeSchema {
   collectionName: 'free_webinars';
   info: {
@@ -691,6 +725,10 @@ export interface ApiFreeWebinarFreeWebinar extends Struct.CollectionTypeSchema {
     date_2: Schema.Attribute.Date;
     date_3: Schema.Attribute.Date;
     description: Schema.Attribute.Text & Schema.Attribute.Required;
+    free_webinar_reason: Schema.Attribute.Relation<
+      'manyToMany',
+      'api::free-webinar-reason.free-webinar-reason'
+    >;
     locale: Schema.Attribute.String & Schema.Attribute.Private;
     localizations: Schema.Attribute.Relation<
       'oneToMany',
@@ -715,6 +753,7 @@ export interface ApiFreeWebinarFreeWebinar extends Struct.CollectionTypeSchema {
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
+    webinar_reason_title: Schema.Attribute.String;
     webinar_type: Schema.Attribute.Enumeration<['single', 'series']> &
       Schema.Attribute.Required &
       Schema.Attribute.DefaultTo<'single'>;
@@ -1658,6 +1697,7 @@ declare module '@strapi/strapi' {
       'api::avs-document.avs-document': ApiAvsDocumentAvsDocument;
       'api::category.category': ApiCategoryCategory;
       'api::expert-answer.expert-answer': ApiExpertAnswerExpertAnswer;
+      'api::free-webinar-reason.free-webinar-reason': ApiFreeWebinarReasonFreeWebinarReason;
       'api::free-webinar.free-webinar': ApiFreeWebinarFreeWebinar;
       'api::global.global': ApiGlobalGlobal;
       'api::handbook.handbook': ApiHandbookHandbook;

@@ -86,6 +86,15 @@
       "component": "shared.text",
       "repeatable": false,
       "required": true
+    },
+    "webinar_reason_title": {
+      "type": "string"
+    },
+    "free_webinar_reason": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "api::free-webinar-reason.free-webinar-reason",
+      "mappedBy": "free_webinar"
     }
   }
 }
