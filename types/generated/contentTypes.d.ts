@@ -690,6 +690,7 @@ export interface ApiFreeWebinarFreeWebinar extends Struct.CollectionTypeSchema {
     date_1: Schema.Attribute.Date;
     date_2: Schema.Attribute.Date;
     date_3: Schema.Attribute.Date;
+    description: Schema.Attribute.Text & Schema.Attribute.Required;
     locale: Schema.Attribute.String & Schema.Attribute.Private;
     localizations: Schema.Attribute.Relation<
       'oneToMany',
@@ -699,6 +700,10 @@ export interface ApiFreeWebinarFreeWebinar extends Struct.CollectionTypeSchema {
     pinned: Schema.Attribute.Boolean &
       Schema.Attribute.Required &
       Schema.Attribute.DefaultTo<false>;
+    program_content_1: Schema.Attribute.Component<'shared.text', false> &
+      Schema.Attribute.Required;
+    program_content_2: Schema.Attribute.Component<'shared.text', false>;
+    program_content_3: Schema.Attribute.Component<'shared.text', false>;
     publishedAt: Schema.Attribute.DateTime;
     slug: Schema.Attribute.UID<'title'> & Schema.Attribute.Required;
     speaker: Schema.Attribute.Relation<'manyToMany', 'api::speaker.speaker'>;
@@ -906,6 +911,7 @@ export interface ApiSpeakerSpeaker extends Struct.CollectionTypeSchema {
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
+    description: Schema.Attribute.Blocks & Schema.Attribute.Required;
     first_name: Schema.Attribute.String & Schema.Attribute.Required;
     free_webinar: Schema.Attribute.Relation<
       'manyToMany',

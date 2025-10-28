@@ -27,6 +27,10 @@
         "images"
       ]
     },
+    "description": {
+      "type": "blocks",
+      "required": true
+    },
     "free_webinar": {
       "type": "relation",
       "relation": "manyToMany",

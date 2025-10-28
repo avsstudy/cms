@@ -15,6 +15,10 @@
       "type": "string",
       "required": true
     },
+    "description": {
+      "type": "text",
+      "required": true
+    },
     "slug": {
       "type": "uid",
       "targetField": "title",
@@ -64,6 +68,22 @@
       "type": "boolean",
       "required": true,
       "default": false
+    },
+    "program_content_1": {
+      "type": "component",
+      "component": "shared.text",
+      "repeatable": false,
+      "required": true
+    },
+    "program_content_2": {
+      "type": "component",
+      "component": "shared.text",
+      "repeatable": false
+    },
+    "program_content_3": {
+      "type": "component",
+      "component": "shared.text",
+      "repeatable": false
     }
   }
 }
