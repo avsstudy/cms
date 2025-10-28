@@ -952,7 +952,7 @@ export interface ApiSpeakerSpeaker extends Struct.CollectionTypeSchema {
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
-    description: Schema.Attribute.Blocks & Schema.Attribute.Required;
+    description: Schema.Attribute.RichText;
     first_name: Schema.Attribute.String & Schema.Attribute.Required;
     free_webinar: Schema.Attribute.Relation<
       'manyToMany',

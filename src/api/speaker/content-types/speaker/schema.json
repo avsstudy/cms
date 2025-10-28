@@ -28,8 +28,7 @@
       ]
     },
     "description": {
-      "type": "blocks",
-      "required": true
+      "type": "richtext"
     },
     "free_webinar": {
       "type": "relation",
