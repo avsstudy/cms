@@ -6,6 +6,7 @@ module.exports = createCoreController(
   ({ strapi }) => ({
     async create(ctx) {
       strapi.log.info("[user-question] >>> custom create HIT");
+
       const authUser = ctx.state.user;
       if (!authUser) return ctx.unauthorized("Authentication required");
 
@@ -29,6 +30,11 @@ module.exports = createCoreController(
       if (!user_question || typeof user_question !== "string") {
         return ctx.badRequest("user_question is required");
       }
+
+      const short_title =
+        user_question.length > 150
+          ? user_question.slice(0, 150).trimEnd() + "..."
+          : user_question.trim();
 
       if (docIds.length) {
         const rows = await strapi.entityService.findMany("api::topic.topic", {
@@ -54,6 +60,7 @@ module.exports = createCoreController(
           {
             data: {
               user_question,
+              short_title,
               user: { connect: authUser.id },
               user_topic: { connect: topicIds },
             },
