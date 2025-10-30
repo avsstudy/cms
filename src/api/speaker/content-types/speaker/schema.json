@@ -35,6 +35,12 @@
       "relation": "manyToMany",
       "target": "api::free-webinar.free-webinar",
       "mappedBy": "speaker"
+    },
+    "video_recording": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "api::video-recording.video-recording",
+      "mappedBy": "speaker"
     }
   }
 }

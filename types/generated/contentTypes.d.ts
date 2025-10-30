@@ -970,6 +970,10 @@ export interface ApiSpeakerSpeaker extends Struct.CollectionTypeSchema {
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
+    video_recording: Schema.Attribute.Relation<
+      'manyToMany',
+      'api::video-recording.video-recording'
+    >;
   };
 }
 
@@ -1174,6 +1178,53 @@ export interface ApiUserQuestionUserQuestion
         maxLength: 800;
       }>;
     user_topic: Schema.Attribute.Relation<'manyToMany', 'api::topic.topic'>;
+  };
+}
+
+export interface ApiVideoRecordingVideoRecording
+  extends Struct.CollectionTypeSchema {
+  collectionName: 'video_recordings';
+  info: {
+    displayName: 'Video_Recording';
+    pluralName: 'video-recordings';
+    singularName: 'video-recording';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    card_cover: Schema.Attribute.Media<'images'> & Schema.Attribute.Required;
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::video-recording.video-recording'
+    > &
+      Schema.Attribute.Private;
+    publishedAt: Schema.Attribute.DateTime;
+    slug: Schema.Attribute.UID<'title'>;
+    speaker: Schema.Attribute.Relation<'manyToMany', 'api::speaker.speaker'>;
+    stream_date: Schema.Attribute.Date;
+    stream_time: Schema.Attribute.Time;
+    stream_url: Schema.Attribute.String;
+    title: Schema.Attribute.String & Schema.Attribute.Required;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    video_type: Schema.Attribute.Enumeration<
+      [
+        'webinar_recording',
+        'session_recording',
+        'mini_course_recording',
+        'upcoming_session',
+        'upcoming_mini_course',
+        'news_video_review',
+      ]
+    > &
+      Schema.Attribute.Required &
+      Schema.Attribute.DefaultTo<'webinar_recording'>;
   };
 }
 
@@ -1709,6 +1760,7 @@ declare module '@strapi/strapi' {
       'api::topic-group.topic-group': ApiTopicGroupTopicGroup;
       'api::topic.topic': ApiTopicTopic;
       'api::user-question.user-question': ApiUserQuestionUserQuestion;
+      'api::video-recording.video-recording': ApiVideoRecordingVideoRecording;
       'plugin::content-releases.release': PluginContentReleasesRelease;
       'plugin::content-releases.release-action': PluginContentReleasesReleaseAction;
       'plugin::i18n.locale': PluginI18NLocale;
