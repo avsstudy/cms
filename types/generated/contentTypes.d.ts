@@ -949,6 +949,7 @@ export interface ApiSpeakerSpeaker extends Struct.CollectionTypeSchema {
     draftAndPublish: true;
   };
   attributes: {
+    banner_photo: Schema.Attribute.Media<'images'>;
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
@@ -958,6 +959,7 @@ export interface ApiSpeakerSpeaker extends Struct.CollectionTypeSchema {
       'manyToMany',
       'api::free-webinar.free-webinar'
     >;
+    job_title: Schema.Attribute.String;
     last_name: Schema.Attribute.String & Schema.Attribute.Required;
     locale: Schema.Attribute.String & Schema.Attribute.Private;
     localizations: Schema.Attribute.Relation<
@@ -1016,6 +1018,10 @@ export interface ApiSubscriptionTypeSubscriptionType
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
+    video_recording: Schema.Attribute.Relation<
+      'manyToMany',
+      'api::video-recording.video-recording'
+    >;
   };
 }
 
@@ -1217,7 +1223,12 @@ export interface ApiVideoRecordingVideoRecording
     slug: Schema.Attribute.UID<'title'>;
     speaker: Schema.Attribute.Relation<'manyToMany', 'api::speaker.speaker'>;
     stream_date: Schema.Attribute.Date;
+    subscription_type: Schema.Attribute.Relation<
+      'manyToMany',
+      'api::subscription-type.subscription-type'
+    >;
     title: Schema.Attribute.String & Schema.Attribute.Required;
+    top: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<false>;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;

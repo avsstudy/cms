@@ -37,6 +37,12 @@
       "relation": "oneToMany",
       "target": "api::expert-answer.expert-answer",
       "mappedBy": "subscription_type"
+    },
+    "video_recording": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "api::video-recording.video-recording",
+      "inversedBy": "subscription_type"
     }
   }
 }

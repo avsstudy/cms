@@ -19,6 +19,12 @@
       "type": "string",
       "required": true
     },
+    "job_title": {
+      "type": "string"
+    },
+    "description": {
+      "type": "richtext"
+    },
     "photo": {
       "type": "media",
       "multiple": false,
@@ -27,8 +33,12 @@
         "images"
       ]
     },
-    "description": {
-      "type": "richtext"
+    "banner_photo": {
+      "type": "media",
+      "multiple": false,
+      "allowedTypes": [
+        "images"
+      ]
     },
     "free_webinar": {
       "type": "relation",

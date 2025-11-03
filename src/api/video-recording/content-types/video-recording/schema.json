@@ -53,6 +53,17 @@
       "target": "api::speaker.speaker",
       "inversedBy": "video_recording"
     },
+    "top": {
+      "type": "boolean",
+      "required": false,
+      "default": false
+    },
+    "subscription_type": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "api::subscription-type.subscription-type",
+      "mappedBy": "video_recording"
+    },
     "general_content": {
       "type": "dynamiczone",
       "components": [
