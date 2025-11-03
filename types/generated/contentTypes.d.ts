@@ -1239,7 +1239,7 @@ export interface ApiVideoRecordingVideoRecording
         'mini_course_recording',
         'upcoming_session',
         'upcoming_mini_course',
-        'news_video_review',
+        'video_review',
       ]
     > &
       Schema.Attribute.Required &
