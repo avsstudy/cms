@@ -44,6 +44,9 @@
         "news_video_review"
       ]
     },
+    "stream_date": {
+      "type": "date"
+    },
     "speaker": {
       "type": "relation",
       "relation": "manyToMany",
