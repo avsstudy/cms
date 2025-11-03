@@ -1,0 +1,19 @@
+{
+  "collectionName": "components_shared_mini_course_landings",
+  "info": {
+    "displayName": "mini_course_landing"
+  },
+  "options": {},
+  "attributes": {
+    "banner_description": {
+      "type": "string",
+      "required": true
+    },
+    "program_content": {
+      "type": "component",
+      "component": "shared.program-content",
+      "repeatable": false
+    }
+  },
+  "config": {}
+}

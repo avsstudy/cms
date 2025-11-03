@@ -15,6 +15,10 @@
       "type": "string",
       "required": true
     },
+    "description": {
+      "type": "text",
+      "required": true
+    },
     "slug": {
       "type": "uid",
       "targetField": "title"
@@ -46,14 +50,15 @@
       "target": "api::speaker.speaker",
       "inversedBy": "video_recording"
     },
-    "stream_url": {
-      "type": "string"
-    },
-    "stream_date": {
-      "type": "date"
-    },
-    "stream_time": {
-      "type": "time"
+    "general_content": {
+      "type": "dynamiczone",
+      "components": [
+        "shared.video-review",
+        "shared.mini-course-lesson",
+        "shared.mini-course-landing",
+        "shared.custom-video-recording",
+        "shared.upcoming-session"
+      ]
     }
   }
 }

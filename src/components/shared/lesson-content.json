@@ -1,0 +1,27 @@
+{
+  "collectionName": "components_shared_lesson_contents",
+  "info": {
+    "displayName": "lesson_content"
+  },
+  "options": {},
+  "attributes": {
+    "content_title": {
+      "type": "string",
+      "required": true
+    },
+    "url": {
+      "type": "string",
+      "required": true
+    },
+    "hours": {
+      "type": "integer"
+    },
+    "minutes": {
+      "type": "integer"
+    },
+    "seconds": {
+      "type": "integer"
+    }
+  },
+  "config": {}
+}

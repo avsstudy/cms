@@ -1,0 +1,20 @@
+{
+  "collectionName": "components_shared_custom_video_recordings",
+  "info": {
+    "displayName": "custom_video_recording"
+  },
+  "options": {},
+  "attributes": {
+    "video_content": {
+      "type": "component",
+      "component": "shared.video-content",
+      "repeatable": true
+    },
+    "materials": {
+      "type": "component",
+      "component": "shared.materials",
+      "repeatable": true
+    }
+  },
+  "config": {}
+}

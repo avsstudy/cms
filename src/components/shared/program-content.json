@@ -1,0 +1,18 @@
+{
+  "collectionName": "components_shared_program_contents",
+  "info": {
+    "displayName": "program_content"
+  },
+  "options": {},
+  "attributes": {
+    "content_title": {
+      "type": "string",
+      "required": true
+    },
+    "content_description": {
+      "type": "richtext",
+      "required": true
+    }
+  },
+  "config": {}
+}

@@ -1,0 +1,24 @@
+{
+  "collectionName": "components_shared_mini_course_lessons",
+  "info": {
+    "displayName": "mini_course_lesson"
+  },
+  "options": {},
+  "attributes": {
+    "lesson_tite": {
+      "type": "string",
+      "required": true
+    },
+    "lesson_content": {
+      "type": "component",
+      "component": "shared.lesson-content",
+      "repeatable": true
+    },
+    "materials": {
+      "type": "component",
+      "component": "shared.materials",
+      "repeatable": true
+    }
+  },
+  "config": {}
+}

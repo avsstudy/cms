@@ -71,6 +71,17 @@ export interface SharedCustomVideo extends Struct.ComponentSchema {
   };
 }
 
+export interface SharedCustomVideoRecording extends Struct.ComponentSchema {
+  collectionName: 'components_shared_custom_video_recordings';
+  info: {
+    displayName: 'custom_video_recording';
+  };
+  attributes: {
+    materials: Schema.Attribute.Component<'shared.materials', true>;
+    video_content: Schema.Attribute.Component<'shared.video-content', true>;
+  };
+}
+
 export interface SharedImage extends Struct.ComponentSchema {
   collectionName: 'components_shared_images';
   info: {
@@ -94,6 +105,70 @@ export interface SharedIpk extends Struct.ComponentSchema {
         maxLength: 120;
       }>;
     text_content: Schema.Attribute.Blocks;
+  };
+}
+
+export interface SharedLessonContent extends Struct.ComponentSchema {
+  collectionName: 'components_shared_lesson_contents';
+  info: {
+    displayName: 'lesson_content';
+  };
+  attributes: {
+    content_title: Schema.Attribute.String & Schema.Attribute.Required;
+    hours: Schema.Attribute.Integer;
+    minutes: Schema.Attribute.Integer;
+    seconds: Schema.Attribute.Integer;
+    url: Schema.Attribute.String & Schema.Attribute.Required;
+  };
+}
+
+export interface SharedMaterials extends Struct.ComponentSchema {
+  collectionName: 'components_shared_materials';
+  info: {
+    displayName: 'materials';
+  };
+  attributes: {
+    materials: Schema.Attribute.Media<
+      'images' | 'files' | 'videos' | 'audios',
+      true
+    >;
+  };
+}
+
+export interface SharedMiniCourseLanding extends Struct.ComponentSchema {
+  collectionName: 'components_shared_mini_course_landings';
+  info: {
+    displayName: 'mini_course_landing';
+  };
+  attributes: {
+    banner_description: Schema.Attribute.String & Schema.Attribute.Required;
+    program_content: Schema.Attribute.Component<
+      'shared.program-content',
+      false
+    >;
+  };
+}
+
+export interface SharedMiniCourseLesson extends Struct.ComponentSchema {
+  collectionName: 'components_shared_mini_course_lessons';
+  info: {
+    displayName: 'mini_course_lesson';
+  };
+  attributes: {
+    lesson_content: Schema.Attribute.Component<'shared.lesson-content', true>;
+    lesson_tite: Schema.Attribute.String & Schema.Attribute.Required;
+    materials: Schema.Attribute.Component<'shared.materials', true>;
+  };
+}
+
+export interface SharedProgramContent extends Struct.ComponentSchema {
+  collectionName: 'components_shared_program_contents';
+  info: {
+    displayName: 'program_content';
+  };
+  attributes: {
+    content_description: Schema.Attribute.RichText & Schema.Attribute.Required;
+    content_title: Schema.Attribute.String & Schema.Attribute.Required;
   };
 }
 
@@ -128,6 +203,18 @@ export interface SharedText extends Struct.ComponentSchema {
   };
 }
 
+export interface SharedUpcomingSession extends Struct.ComponentSchema {
+  collectionName: 'components_shared_upcoming_sessions';
+  info: {
+    displayName: 'upcoming_session';
+  };
+  attributes: {
+    stream_date: Schema.Attribute.Date & Schema.Attribute.Required;
+    stream_time: Schema.Attribute.Time & Schema.Attribute.Required;
+    stream_url: Schema.Attribute.String & Schema.Attribute.Required;
+  };
+}
+
 export interface SharedUsefulFiles extends Struct.ComponentSchema {
   collectionName: 'components_shared_useful_files';
   info: {
@@ -139,6 +226,20 @@ export interface SharedUsefulFiles extends Struct.ComponentSchema {
       Schema.Attribute.Required;
     useful_file_title: Schema.Attribute.String & Schema.Attribute.Required;
     useful_video: Schema.Attribute.String;
+  };
+}
+
+export interface SharedVideoContent extends Struct.ComponentSchema {
+  collectionName: 'components_shared_video_contents';
+  info: {
+    displayName: 'video_content';
+  };
+  attributes: {
+    content_tite: Schema.Attribute.String & Schema.Attribute.Required;
+    hours: Schema.Attribute.Integer;
+    minutes: Schema.Attribute.Integer;
+    seconds: Schema.Attribute.Integer;
+    url: Schema.Attribute.String & Schema.Attribute.Required;
   };
 }
 
@@ -192,11 +293,19 @@ declare module '@strapi/strapi' {
       'shared.custom-quote': SharedCustomQuote;
       'shared.custom-table': SharedCustomTable;
       'shared.custom-video': SharedCustomVideo;
+      'shared.custom-video-recording': SharedCustomVideoRecording;
       'shared.image': SharedImage;
       'shared.ipk': SharedIpk;
+      'shared.lesson-content': SharedLessonContent;
+      'shared.materials': SharedMaterials;
+      'shared.mini-course-landing': SharedMiniCourseLanding;
+      'shared.mini-course-lesson': SharedMiniCourseLesson;
+      'shared.program-content': SharedProgramContent;
       'shared.seo': SharedSeo;
       'shared.text': SharedText;
+      'shared.upcoming-session': SharedUpcomingSession;
       'shared.useful-files': SharedUsefulFiles;
+      'shared.video-content': SharedVideoContent;
       'shared.video-review': SharedVideoReview;
       'shared.zakon': SharedZakon;
       'shared.zrazok': SharedZrazok;

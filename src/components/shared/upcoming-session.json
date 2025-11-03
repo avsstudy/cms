@@ -1,0 +1,22 @@
+{
+  "collectionName": "components_shared_upcoming_sessions",
+  "info": {
+    "displayName": "upcoming_session"
+  },
+  "options": {},
+  "attributes": {
+    "stream_url": {
+      "type": "string",
+      "required": true
+    },
+    "stream_date": {
+      "type": "date",
+      "required": true
+    },
+    "stream_time": {
+      "type": "time",
+      "required": true
+    }
+  },
+  "config": {}
+}

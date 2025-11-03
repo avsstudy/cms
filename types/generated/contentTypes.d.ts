@@ -1197,6 +1197,16 @@ export interface ApiVideoRecordingVideoRecording
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
+    description: Schema.Attribute.Text & Schema.Attribute.Required;
+    general_content: Schema.Attribute.DynamicZone<
+      [
+        'shared.video-review',
+        'shared.mini-course-lesson',
+        'shared.mini-course-landing',
+        'shared.custom-video-recording',
+        'shared.upcoming-session',
+      ]
+    >;
     locale: Schema.Attribute.String & Schema.Attribute.Private;
     localizations: Schema.Attribute.Relation<
       'oneToMany',
@@ -1206,9 +1216,6 @@ export interface ApiVideoRecordingVideoRecording
     publishedAt: Schema.Attribute.DateTime;
     slug: Schema.Attribute.UID<'title'>;
     speaker: Schema.Attribute.Relation<'manyToMany', 'api::speaker.speaker'>;
-    stream_date: Schema.Attribute.Date;
-    stream_time: Schema.Attribute.Time;
-    stream_url: Schema.Attribute.String;
     title: Schema.Attribute.String & Schema.Attribute.Required;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
