@@ -77,7 +77,10 @@ export interface SharedCustomVideoRecording extends Struct.ComponentSchema {
     displayName: 'custom_video_recording';
   };
   attributes: {
-    materials: Schema.Attribute.Component<'shared.materials', true>;
+    materials: Schema.Attribute.Media<
+      'images' | 'files' | 'videos' | 'audios',
+      true
+    >;
     video_content: Schema.Attribute.Component<'shared.video-content', true>;
   };
 }
@@ -235,7 +238,7 @@ export interface SharedVideoContent extends Struct.ComponentSchema {
     displayName: 'video_content';
   };
   attributes: {
-    content_tite: Schema.Attribute.String & Schema.Attribute.Required;
+    content_title: Schema.Attribute.String & Schema.Attribute.Required;
     hours: Schema.Attribute.Integer;
     minutes: Schema.Attribute.Integer;
     seconds: Schema.Attribute.Integer;

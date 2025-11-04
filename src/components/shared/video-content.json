@@ -5,7 +5,7 @@
   },
   "options": {},
   "attributes": {
-    "content_tite": {
+    "content_title": {
       "type": "string",
       "required": true
     },
