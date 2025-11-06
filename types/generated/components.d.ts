@@ -159,7 +159,7 @@ export interface SharedMiniCourseLesson extends Struct.ComponentSchema {
   };
   attributes: {
     lesson_content: Schema.Attribute.Component<'shared.lesson-content', true>;
-    lesson_tite: Schema.Attribute.String & Schema.Attribute.Required;
+    lesson_title: Schema.Attribute.String & Schema.Attribute.Required;
     materials: Schema.Attribute.Component<'shared.materials', true>;
   };
 }
