@@ -5,7 +5,7 @@
   },
   "options": {},
   "attributes": {
-    "lesson_tite": {
+    "lesson_title": {
       "type": "string",
       "required": true
     },
