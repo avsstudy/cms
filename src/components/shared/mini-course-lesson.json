@@ -15,9 +15,14 @@
       "repeatable": true
     },
     "materials": {
-      "type": "component",
-      "component": "shared.materials",
-      "repeatable": true
+      "type": "media",
+      "multiple": true,
+      "allowedTypes": [
+        "images",
+        "files",
+        "videos",
+        "audios"
+      ]
     }
   },
   "config": {}
