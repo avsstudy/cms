@@ -145,10 +145,8 @@ export interface SharedMiniCourseLanding extends Struct.ComponentSchema {
   };
   attributes: {
     banner_description: Schema.Attribute.String & Schema.Attribute.Required;
-    program_content: Schema.Attribute.Component<
-      'shared.program-content',
-      false
-    >;
+    program_content: Schema.Attribute.Component<'shared.program-content', true>;
+    target_banner: Schema.Attribute.Component<'shared.target-banner', true>;
   };
 }
 
@@ -190,6 +188,16 @@ export interface SharedSeo extends Struct.ComponentSchema {
     metaDescription: Schema.Attribute.Text & Schema.Attribute.Required;
     metaTitle: Schema.Attribute.String & Schema.Attribute.Required;
     shareImage: Schema.Attribute.Media<'images'>;
+  };
+}
+
+export interface SharedTargetBanner extends Struct.ComponentSchema {
+  collectionName: 'components_shared_target_banners';
+  info: {
+    displayName: 'target_banner';
+  };
+  attributes: {
+    title: Schema.Attribute.String;
   };
 }
 
@@ -308,6 +316,7 @@ declare module '@strapi/strapi' {
       'shared.mini-course-lesson': SharedMiniCourseLesson;
       'shared.program-content': SharedProgramContent;
       'shared.seo': SharedSeo;
+      'shared.target-banner': SharedTargetBanner;
       'shared.text': SharedText;
       'shared.upcoming-session': SharedUpcomingSession;
       'shared.useful-files': SharedUsefulFiles;

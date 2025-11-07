@@ -1,0 +1,13 @@
+{
+  "collectionName": "components_shared_target_banners",
+  "info": {
+    "displayName": "target_banner"
+  },
+  "options": {},
+  "attributes": {
+    "title": {
+      "type": "string"
+    }
+  },
+  "config": {}
+}

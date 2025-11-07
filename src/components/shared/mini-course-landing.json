@@ -9,10 +9,15 @@
       "type": "string",
       "required": true
     },
+    "target_banner": {
+      "type": "component",
+      "component": "shared.target-banner",
+      "repeatable": true
+    },
     "program_content": {
       "type": "component",
       "component": "shared.program-content",
-      "repeatable": false
+      "repeatable": true
     }
   },
   "config": {}
