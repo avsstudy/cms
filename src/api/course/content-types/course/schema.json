@@ -66,6 +66,14 @@
       "relation": "manyToMany",
       "target": "api::topic.topic",
       "inversedBy": "courses"
+    },
+    "general_content": {
+      "type": "dynamiczone",
+      "components": [
+        "shared.course-online-landing",
+        "shared.course-recording-landing",
+        "shared.course-subscription-landing"
+      ]
     }
   }
 }

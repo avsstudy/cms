@@ -25,6 +25,25 @@ export interface SharedChapter extends Struct.ComponentSchema {
   };
 }
 
+export interface SharedCourseOnlineLanding extends Struct.ComponentSchema {
+  collectionName: 'components_shared_course_online_landings';
+  info: {
+    displayName: 'course_online_landing';
+  };
+  attributes: {
+    banner_description: Schema.Attribute.Text & Schema.Attribute.Required;
+    course_finish: Schema.Attribute.Date;
+    course_price: Schema.Attribute.Decimal & Schema.Attribute.Required;
+    course_start: Schema.Attribute.Date;
+    for_you_content: Schema.Attribute.Component<
+      'shared.for-you-content',
+      false
+    >;
+    program_content: Schema.Attribute.Component<'shared.program-content', true>;
+    reviews: Schema.Attribute.Relation<'oneToMany', 'api::review.review'>;
+  };
+}
+
 export interface SharedCourseRecordingLanding extends Struct.ComponentSchema {
   collectionName: 'components_shared_course_recording_landings';
   info: {
@@ -34,7 +53,32 @@ export interface SharedCourseRecordingLanding extends Struct.ComponentSchema {
     banner_description: Schema.Attribute.Text & Schema.Attribute.Required;
     course_finish: Schema.Attribute.Date & Schema.Attribute.Required;
     course_start: Schema.Attribute.Date & Schema.Attribute.Required;
-    reviews: Schema.Attribute.Integer & Schema.Attribute.DefaultTo<1>;
+    for_you_content: Schema.Attribute.Component<
+      'shared.for-you-content',
+      false
+    >;
+    program_content: Schema.Attribute.Component<'shared.program-content', true>;
+    reviews: Schema.Attribute.Relation<'oneToMany', 'api::review.review'>;
+  };
+}
+
+export interface SharedCourseSubscriptionLanding
+  extends Struct.ComponentSchema {
+  collectionName: 'components_shared_course_subscription_landings';
+  info: {
+    displayName: 'course_subscription_landing';
+  };
+  attributes: {
+    banner_description: Schema.Attribute.Text & Schema.Attribute.Required;
+    course_finish: Schema.Attribute.Date;
+    course_price: Schema.Attribute.Decimal;
+    course_start: Schema.Attribute.Date;
+    for_you_content: Schema.Attribute.Component<
+      'shared.for-you-content',
+      false
+    >;
+    program_content: Schema.Attribute.Component<'shared.program-content', true>;
+    reviews: Schema.Attribute.Relation<'oneToMany', 'api::review.review'>;
   };
 }
 
@@ -329,7 +373,9 @@ declare module '@strapi/strapi' {
     export interface ComponentSchemas {
       'shared.blank': SharedBlank;
       'shared.chapter': SharedChapter;
+      'shared.course-online-landing': SharedCourseOnlineLanding;
       'shared.course-recording-landing': SharedCourseRecordingLanding;
+      'shared.course-subscription-landing': SharedCourseSubscriptionLanding;
       'shared.custom-quote': SharedCustomQuote;
       'shared.custom-table': SharedCustomTable;
       'shared.custom-video': SharedCustomVideo;

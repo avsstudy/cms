@@ -1,7 +1,7 @@
 {
-  "collectionName": "components_shared_course_recording_landings",
+  "collectionName": "components_shared_course_subscription_landings",
   "info": {
-    "displayName": "course_recording_landing"
+    "displayName": "course_subscription_landing"
   },
   "options": {},
   "attributes": {
@@ -10,22 +10,23 @@
       "required": true
     },
     "course_start": {
-      "type": "date",
-      "required": true
+      "type": "date"
     },
     "course_finish": {
-      "type": "date",
-      "required": true
+      "type": "date"
     },
-    "program_content": {
-      "type": "component",
-      "component": "shared.program-content",
-      "repeatable": true
+    "course_price": {
+      "type": "decimal"
     },
     "for_you_content": {
       "type": "component",
       "component": "shared.for-you-content",
       "repeatable": false
+    },
+    "program_content": {
+      "type": "component",
+      "component": "shared.program-content",
+      "repeatable": true
     },
     "reviews": {
       "type": "relation",
