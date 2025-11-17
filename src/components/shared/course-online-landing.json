@@ -10,7 +10,7 @@
       "required": true
     },
     "course_start": {
-      "type": "date"
+      "type": "datetime"
     },
     "course_finish": {
       "type": "date"

@@ -34,7 +34,7 @@ export interface SharedCourseOnlineLanding extends Struct.ComponentSchema {
     banner_description: Schema.Attribute.Text & Schema.Attribute.Required;
     course_finish: Schema.Attribute.Date;
     course_price: Schema.Attribute.Decimal & Schema.Attribute.Required;
-    course_start: Schema.Attribute.Date;
+    course_start: Schema.Attribute.DateTime;
     for_you_content: Schema.Attribute.Component<
       'shared.for-you-content',
       false
