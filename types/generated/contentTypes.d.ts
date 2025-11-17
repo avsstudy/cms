@@ -686,9 +686,11 @@ export interface ApiCourseCourse extends Struct.CollectionTypeSchema {
   };
   attributes: {
     card_cover: Schema.Attribute.Media<'images'> & Schema.Attribute.Required;
-    category: Schema.Attribute.Enumeration<['business', 'finance']> &
+    category: Schema.Attribute.Enumeration<
+      ['industry', 'basics', 'automation', 'career']
+    > &
       Schema.Attribute.Required &
-      Schema.Attribute.DefaultTo<'business'>;
+      Schema.Attribute.DefaultTo<'industry'>;
     course_type: Schema.Attribute.Enumeration<
       ['course_recording', 'course_online']
     > &

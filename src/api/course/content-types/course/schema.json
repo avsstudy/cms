@@ -55,10 +55,12 @@
     "category": {
       "type": "enumeration",
       "required": true,
-      "default": "business",
+      "default": "industry",
       "enum": [
-        "business",
-        "finance"
+        "industry",
+        "basics",
+        "automation",
+        "career"
       ]
     },
     "topic": {
