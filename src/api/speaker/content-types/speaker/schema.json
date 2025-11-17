@@ -51,6 +51,12 @@
       "relation": "manyToMany",
       "target": "api::video-recording.video-recording",
       "mappedBy": "speaker"
+    },
+    "courses": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "api::course.course",
+      "mappedBy": "speaker"
     }
   }
 }

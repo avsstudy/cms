@@ -1,0 +1,27 @@
+{
+  "collectionName": "components_shared_course_recording_landings",
+  "info": {
+    "displayName": "course_recording_landing"
+  },
+  "options": {},
+  "attributes": {
+    "banner_description": {
+      "type": "text",
+      "required": true
+    },
+    "course_start": {
+      "type": "date",
+      "required": true
+    },
+    "course_finish": {
+      "type": "date",
+      "required": true
+    },
+    "reviews": {
+      "type": "integer",
+      "required": false,
+      "default": 1
+    }
+  },
+  "config": {}
+}

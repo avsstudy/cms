@@ -1,0 +1,22 @@
+{
+  "collectionName": "components_shared_for_you_contents",
+  "info": {
+    "displayName": "for_you_content"
+  },
+  "options": {},
+  "attributes": {
+    "point_1": {
+      "type": "string",
+      "required": true
+    },
+    "point_2": {
+      "type": "string",
+      "required": true
+    },
+    "point_3": {
+      "type": "string",
+      "required": true
+    }
+  },
+  "config": {}
+}

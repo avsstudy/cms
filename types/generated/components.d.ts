@@ -25,6 +25,19 @@ export interface SharedChapter extends Struct.ComponentSchema {
   };
 }
 
+export interface SharedCourseRecordingLanding extends Struct.ComponentSchema {
+  collectionName: 'components_shared_course_recording_landings';
+  info: {
+    displayName: 'course_recording_landing';
+  };
+  attributes: {
+    banner_description: Schema.Attribute.Text & Schema.Attribute.Required;
+    course_finish: Schema.Attribute.Date & Schema.Attribute.Required;
+    course_start: Schema.Attribute.Date & Schema.Attribute.Required;
+    reviews: Schema.Attribute.Integer & Schema.Attribute.DefaultTo<1>;
+  };
+}
+
 export interface SharedCustomQuote extends Struct.ComponentSchema {
   collectionName: 'components_shared_custom_quotes';
   info: {
@@ -82,6 +95,18 @@ export interface SharedCustomVideoRecording extends Struct.ComponentSchema {
       true
     >;
     video_content: Schema.Attribute.Component<'shared.video-content', true>;
+  };
+}
+
+export interface SharedForYouContent extends Struct.ComponentSchema {
+  collectionName: 'components_shared_for_you_contents';
+  info: {
+    displayName: 'for_you_content';
+  };
+  attributes: {
+    point_1: Schema.Attribute.String & Schema.Attribute.Required;
+    point_2: Schema.Attribute.String & Schema.Attribute.Required;
+    point_3: Schema.Attribute.String & Schema.Attribute.Required;
   };
 }
 
@@ -304,10 +329,12 @@ declare module '@strapi/strapi' {
     export interface ComponentSchemas {
       'shared.blank': SharedBlank;
       'shared.chapter': SharedChapter;
+      'shared.course-recording-landing': SharedCourseRecordingLanding;
       'shared.custom-quote': SharedCustomQuote;
       'shared.custom-table': SharedCustomTable;
       'shared.custom-video': SharedCustomVideo;
       'shared.custom-video-recording': SharedCustomVideoRecording;
+      'shared.for-you-content': SharedForYouContent;
       'shared.image': SharedImage;
       'shared.ipk': SharedIpk;
       'shared.lesson-content': SharedLessonContent;

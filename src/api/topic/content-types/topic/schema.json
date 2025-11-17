@@ -55,6 +55,12 @@
       "relation": "manyToMany",
       "target": "api::expert-answer.expert-answer",
       "mappedBy": "topic"
+    },
+    "courses": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "api::course.course",
+      "mappedBy": "topic"
     }
   }
 }
