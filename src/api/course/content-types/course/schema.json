@@ -76,6 +76,12 @@
         "shared.course-recording-landing",
         "shared.course-subscription-landing"
       ]
+    },
+    "reviews": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "api::review.review",
+      "inversedBy": "courses"
     }
   }
 }

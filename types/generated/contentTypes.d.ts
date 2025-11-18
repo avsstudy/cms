@@ -714,6 +714,7 @@ export interface ApiCourseCourse extends Struct.CollectionTypeSchema {
     > &
       Schema.Attribute.Private;
     publishedAt: Schema.Attribute.DateTime;
+    reviews: Schema.Attribute.Relation<'manyToMany', 'api::review.review'>;
     slug: Schema.Attribute.UID<'title'>;
     speaker: Schema.Attribute.Relation<'manyToMany', 'api::speaker.speaker'>;
     subscription_type: Schema.Attribute.Relation<
@@ -1062,6 +1063,7 @@ export interface ApiReviewReview extends Struct.CollectionTypeSchema {
   attributes: {
     client_name: Schema.Attribute.String & Schema.Attribute.Required;
     client_photo: Schema.Attribute.Media<'images'> & Schema.Attribute.Required;
+    courses: Schema.Attribute.Relation<'manyToMany', 'api::course.course'>;
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;

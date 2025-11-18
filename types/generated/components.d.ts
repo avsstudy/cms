@@ -40,7 +40,6 @@ export interface SharedCourseOnlineLanding extends Struct.ComponentSchema {
       false
     >;
     program_content: Schema.Attribute.Component<'shared.program-content', true>;
-    reviews: Schema.Attribute.Relation<'oneToMany', 'api::review.review'>;
   };
 }
 
@@ -58,7 +57,6 @@ export interface SharedCourseRecordingLanding extends Struct.ComponentSchema {
       false
     >;
     program_content: Schema.Attribute.Component<'shared.program-content', true>;
-    reviews: Schema.Attribute.Relation<'oneToMany', 'api::review.review'>;
   };
 }
 
@@ -78,7 +76,6 @@ export interface SharedCourseSubscriptionLanding
       false
     >;
     program_content: Schema.Attribute.Component<'shared.program-content', true>;
-    reviews: Schema.Attribute.Relation<'oneToMany', 'api::review.review'>;
   };
 }
 

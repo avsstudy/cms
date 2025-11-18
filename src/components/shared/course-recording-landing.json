@@ -26,11 +26,6 @@
       "type": "component",
       "component": "shared.for-you-content",
       "repeatable": false
-    },
-    "reviews": {
-      "type": "relation",
-      "relation": "oneToMany",
-      "target": "api::review.review"
     }
   },
   "config": {}

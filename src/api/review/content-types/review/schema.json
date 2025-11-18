@@ -26,6 +26,12 @@
     "review_content": {
       "type": "text",
       "required": true
+    },
+    "courses": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "api::course.course",
+      "mappedBy": "reviews"
     }
   }
 }

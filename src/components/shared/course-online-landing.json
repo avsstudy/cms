@@ -28,11 +28,6 @@
       "type": "component",
       "component": "shared.program-content",
       "repeatable": true
-    },
-    "reviews": {
-      "type": "relation",
-      "relation": "oneToMany",
-      "target": "api::review.review"
     }
   },
   "config": {}
