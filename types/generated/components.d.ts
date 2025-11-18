@@ -39,6 +39,7 @@ export interface SharedCourseOnlineLanding extends Struct.ComponentSchema {
       'shared.for-you-content',
       false
     >;
+    free_slots: Schema.Attribute.Integer;
     program_content: Schema.Attribute.Component<'shared.program-content', true>;
   };
 }
@@ -237,6 +238,7 @@ export interface SharedProgramContent extends Struct.ComponentSchema {
     displayName: 'program_content';
   };
   attributes: {
+    content_date_time: Schema.Attribute.DateTime;
     content_description: Schema.Attribute.RichText & Schema.Attribute.Required;
     content_title: Schema.Attribute.String & Schema.Attribute.Required;
   };

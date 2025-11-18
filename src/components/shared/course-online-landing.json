@@ -19,6 +19,9 @@
       "type": "decimal",
       "required": true
     },
+    "free_slots": {
+      "type": "integer"
+    },
     "for_you_content": {
       "type": "component",
       "component": "shared.for-you-content",

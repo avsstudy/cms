@@ -12,6 +12,9 @@
     "content_description": {
       "type": "richtext",
       "required": true
+    },
+    "content_date_time": {
+      "type": "datetime"
     }
   },
   "config": {}
