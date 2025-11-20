@@ -1,0 +1,45 @@
+{
+  "kind": "collectionType",
+  "collectionName": "study_sessions",
+  "info": {
+    "singularName": "study-session",
+    "pluralName": "study-sessions",
+    "displayName": "Study_Session"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "title": {
+      "type": "string",
+      "required": true
+    },
+    "slug": {
+      "type": "uid",
+      "targetField": "title"
+    },
+    "session_number": {
+      "type": "integer",
+      "required": true,
+      "default": 1
+    },
+    "course": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "api::course.course",
+      "mappedBy": "study_session"
+    },
+    "session_content": {
+      "type": "component",
+      "component": "shared.custom-video-recording",
+      "repeatable": false
+    },
+    "homework_content": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "api::homework.homework",
+      "mappedBy": "study_session"
+    }
+  }
+}

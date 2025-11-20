@@ -1,0 +1,37 @@
+{
+  "kind": "collectionType",
+  "collectionName": "homeworks",
+  "info": {
+    "singularName": "homework",
+    "pluralName": "homeworks",
+    "displayName": "Homework"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "title": {
+      "type": "string",
+      "required": true
+    },
+    "homework_description": {
+      "type": "richtext",
+      "required": true
+    },
+    "homework_materials": {
+      "type": "component",
+      "component": "shared.materials",
+      "repeatable": false
+    },
+    "homework_solution": {
+      "type": "richtext"
+    },
+    "study_session": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "api::study-session.study-session",
+      "inversedBy": "homework_content"
+    }
+  }
+}

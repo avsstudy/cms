@@ -82,6 +82,18 @@
       "relation": "manyToMany",
       "target": "api::review.review",
       "inversedBy": "courses"
+    },
+    "study_session": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "api::study-session.study-session",
+      "inversedBy": "course"
+    },
+    "users": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "plugin::users-permissions.user",
+      "mappedBy": "courses"
     }
   }
 }

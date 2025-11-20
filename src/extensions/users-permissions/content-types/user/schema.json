@@ -76,6 +76,12 @@
       "relation": "oneToMany",
       "target": "api::user-question.user-question",
       "mappedBy": "user"
+    },
+    "courses": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "api::course.course",
+      "inversedBy": "users"
     }
   }
 }

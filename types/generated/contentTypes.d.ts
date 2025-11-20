@@ -717,6 +717,10 @@ export interface ApiCourseCourse extends Struct.CollectionTypeSchema {
     reviews: Schema.Attribute.Relation<'manyToMany', 'api::review.review'>;
     slug: Schema.Attribute.UID<'title'>;
     speaker: Schema.Attribute.Relation<'manyToMany', 'api::speaker.speaker'>;
+    study_session: Schema.Attribute.Relation<
+      'manyToMany',
+      'api::study-session.study-session'
+    >;
     subscription_type: Schema.Attribute.Relation<
       'manyToMany',
       'api::subscription-type.subscription-type'
@@ -726,6 +730,10 @@ export interface ApiCourseCourse extends Struct.CollectionTypeSchema {
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
+    users: Schema.Attribute.Relation<
+      'manyToMany',
+      'plugin::users-permissions.user'
+    >;
   };
 }
 
@@ -953,6 +961,41 @@ export interface ApiHandbookHandbook extends Struct.CollectionTypeSchema {
   };
 }
 
+export interface ApiHomeworkHomework extends Struct.CollectionTypeSchema {
+  collectionName: 'homeworks';
+  info: {
+    displayName: 'Homework';
+    pluralName: 'homeworks';
+    singularName: 'homework';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    homework_description: Schema.Attribute.RichText & Schema.Attribute.Required;
+    homework_materials: Schema.Attribute.Component<'shared.materials', false>;
+    homework_solution: Schema.Attribute.RichText;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::homework.homework'
+    > &
+      Schema.Attribute.Private;
+    publishedAt: Schema.Attribute.DateTime;
+    study_session: Schema.Attribute.Relation<
+      'manyToMany',
+      'api::study-session.study-session'
+    >;
+    title: Schema.Attribute.String & Schema.Attribute.Required;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
 export interface ApiIpkIpk extends Struct.CollectionTypeSchema {
   collectionName: 'ipks';
   info: {
@@ -1120,6 +1163,48 @@ export interface ApiSpeakerSpeaker extends Struct.CollectionTypeSchema {
       'manyToMany',
       'api::video-recording.video-recording'
     >;
+  };
+}
+
+export interface ApiStudySessionStudySession
+  extends Struct.CollectionTypeSchema {
+  collectionName: 'study_sessions';
+  info: {
+    displayName: 'Study_Session';
+    pluralName: 'study-sessions';
+    singularName: 'study-session';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    course: Schema.Attribute.Relation<'manyToMany', 'api::course.course'>;
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    homework_content: Schema.Attribute.Relation<
+      'manyToMany',
+      'api::homework.homework'
+    >;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::study-session.study-session'
+    > &
+      Schema.Attribute.Private;
+    publishedAt: Schema.Attribute.DateTime;
+    session_content: Schema.Attribute.Component<
+      'shared.custom-video-recording',
+      false
+    >;
+    session_number: Schema.Attribute.Integer &
+      Schema.Attribute.Required &
+      Schema.Attribute.DefaultTo<1>;
+    slug: Schema.Attribute.UID<'title'>;
+    title: Schema.Attribute.String & Schema.Attribute.Required;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
   };
 }
 
@@ -1853,6 +1938,7 @@ export interface PluginUsersPermissionsUser
     blocked: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<false>;
     confirmationToken: Schema.Attribute.String & Schema.Attribute.Private;
     confirmed: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<false>;
+    courses: Schema.Attribute.Relation<'manyToMany', 'api::course.course'>;
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
@@ -1919,10 +2005,12 @@ declare module '@strapi/strapi' {
       'api::free-webinar.free-webinar': ApiFreeWebinarFreeWebinar;
       'api::global.global': ApiGlobalGlobal;
       'api::handbook.handbook': ApiHandbookHandbook;
+      'api::homework.homework': ApiHomeworkHomework;
       'api::ipk.ipk': ApiIpkIpk;
       'api::news-article.news-article': ApiNewsArticleNewsArticle;
       'api::review.review': ApiReviewReview;
       'api::speaker.speaker': ApiSpeakerSpeaker;
+      'api::study-session.study-session': ApiStudySessionStudySession;
       'api::subscription-type.subscription-type': ApiSubscriptionTypeSubscriptionType;
       'api::topic-dps.topic-dps': ApiTopicDpsTopicDps;
       'api::topic-group.topic-group': ApiTopicGroupTopicGroup;
