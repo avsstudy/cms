@@ -89,7 +89,7 @@
       "target": "api::study-session.study-session",
       "inversedBy": "course"
     },
-    "users": {
+    "subscribed_users": {
       "type": "relation",
       "relation": "manyToMany",
       "target": "plugin::users-permissions.user",

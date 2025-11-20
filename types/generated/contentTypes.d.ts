@@ -721,6 +721,10 @@ export interface ApiCourseCourse extends Struct.CollectionTypeSchema {
       'manyToMany',
       'api::study-session.study-session'
     >;
+    subscribed_users: Schema.Attribute.Relation<
+      'manyToMany',
+      'plugin::users-permissions.user'
+    >;
     subscription_type: Schema.Attribute.Relation<
       'manyToMany',
       'api::subscription-type.subscription-type'
@@ -730,10 +734,6 @@ export interface ApiCourseCourse extends Struct.CollectionTypeSchema {
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
-    users: Schema.Attribute.Relation<
-      'manyToMany',
-      'plugin::users-permissions.user'
-    >;
   };
 }
 
