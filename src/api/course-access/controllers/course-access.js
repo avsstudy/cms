@@ -60,6 +60,7 @@ module.exports = createCoreController(
             user: userId,
             course: courseId,
             has_accepted_rules: false,
+            publishedAt: new Date().toISOString(),
           },
         }
       );
@@ -123,6 +124,7 @@ module.exports = createCoreController(
                 user: userId,
                 course: course.id,
                 has_accepted_rules: false,
+                publishedAt: new Date().toISOString(),
               },
             }
           );
@@ -187,6 +189,7 @@ module.exports = createCoreController(
         {
           data: {
             has_accepted_rules: true,
+            publishedAt: new Date().toISOString(),
           },
         }
       );
