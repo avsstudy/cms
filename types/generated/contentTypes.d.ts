@@ -686,7 +686,6 @@ export interface ApiCourseAccessCourseAccess
     draftAndPublish: true;
   };
   attributes: {
-    accepted_at: Schema.Attribute.DateTime;
     course: Schema.Attribute.Relation<'manyToOne', 'api::course.course'>;
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &

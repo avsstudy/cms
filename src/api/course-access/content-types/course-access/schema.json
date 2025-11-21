@@ -26,9 +26,6 @@
     "has_accepted_rules": {
       "type": "boolean",
       "default": false
-    },
-    "accepted_at": {
-      "type": "datetime"
     }
   }
 }

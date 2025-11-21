@@ -11,21 +11,21 @@ module.exports = createCoreController(
   ({ strapi }) => ({
     async grantForCourse(ctx) {
       const userId = ctx.state.user?.id;
-      const { courseId } = ctx.request.body;
+      const { documentId } = ctx.request.body;
 
       if (!userId) {
         return ctx.unauthorized("User not authenticated");
       }
 
-      if (!courseId) {
-        return ctx.badRequest("courseId is required");
+      if (!documentId) {
+        return ctx.badRequest("documentId is required");
       }
 
-      const course = await strapi.entityService.findOne(
+      const [course] = await strapi.entityService.findMany(
         "api::course.course",
-        courseId,
         {
-          fields: ["id", "title"],
+          filters: { documentId },
+          fields: ["id", "title", "documentId"],
           populate: {
             subscription_type: true,
           },
@@ -33,8 +33,10 @@ module.exports = createCoreController(
       );
 
       if (!course) {
-        return ctx.notFound("Course not found");
+        return ctx.notFound("Course not found by documentId");
       }
+
+      const courseId = course.id;
 
       const existing = await strapi.entityService.findMany(
         "api::course-access.course-access",
@@ -84,10 +86,10 @@ module.exports = createCoreController(
         {
           filters: {
             subscription_type: {
-              id: subscriptionTypeId,
+              documentId: subscriptionTypeId,
             },
           },
-          fields: ["id", "title"],
+          fields: ["id", "title", "documentId"],
         }
       );
 
@@ -137,14 +139,32 @@ module.exports = createCoreController(
 
     async acceptRules(ctx) {
       const userId = ctx.state.user?.id;
-      const { courseId } = ctx.request.body;
+      const { documentId, courseId } = ctx.request.body;
 
       if (!userId) {
         return ctx.unauthorized("User not authenticated");
       }
 
-      if (!courseId) {
-        return ctx.badRequest("courseId is required");
+      if (!documentId && !courseId) {
+        return ctx.badRequest("documentId (or courseId) is required");
+      }
+
+      let courseInternalId = courseId;
+
+      if (documentId) {
+        const [course] = await strapi.entityService.findMany(
+          "api::course.course",
+          {
+            filters: { documentId },
+            fields: ["id", "title", "documentId"],
+          }
+        );
+
+        if (!course) {
+          return ctx.notFound("Course not found by documentId");
+        }
+
+        courseInternalId = course.id;
       }
 
       const [access] = await strapi.entityService.findMany(
@@ -152,7 +172,7 @@ module.exports = createCoreController(
         {
           filters: {
             user: userId,
-            course: courseId,
+            course: courseInternalId,
           },
         }
       );
