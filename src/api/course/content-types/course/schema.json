@@ -94,20 +94,6 @@
       "relation": "manyToMany",
       "target": "plugin::users-permissions.user",
       "mappedBy": "courses"
-    },
-    "table": {
-      "type": "customField",
-      "customField": "plugin::ckeditor5.CKEditor",
-      "options": {
-        "preset": "defaultMarkdown"
-      }
-    },
-    "table_html": {
-      "type": "customField",
-      "customField": "plugin::ckeditor5.CKEditor",
-      "options": {
-        "preset": "defaultHtml"
-      }
     }
   }
 }
