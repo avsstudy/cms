@@ -1,0 +1,35 @@
+{
+  "kind": "collectionType",
+  "collectionName": "session_progresses",
+  "info": {
+    "singularName": "session-progress",
+    "pluralName": "session-progresses",
+    "displayName": "session-progress"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "user": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "plugin::users-permissions.user",
+      "inversedBy": "session_progresses"
+    },
+    "study_session": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::study-session.study-session",
+      "inversedBy": "session_progresses"
+    },
+    "session_status": {
+      "type": "enumeration",
+      "default": "in_progress",
+      "enum": [
+        "in_progress",
+        "completed"
+      ]
+    }
+  }
+}

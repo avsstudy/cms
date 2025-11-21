@@ -674,6 +674,42 @@ export interface ApiCategoryCategory extends Struct.CollectionTypeSchema {
   };
 }
 
+export interface ApiCourseAccessCourseAccess
+  extends Struct.CollectionTypeSchema {
+  collectionName: 'course_accesses';
+  info: {
+    displayName: 'course-access';
+    pluralName: 'course-accesses';
+    singularName: 'course-access';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    accepted_at: Schema.Attribute.DateTime;
+    course: Schema.Attribute.Relation<'manyToOne', 'api::course.course'>;
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    has_accepted_rules: Schema.Attribute.Boolean &
+      Schema.Attribute.DefaultTo<false>;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::course-access.course-access'
+    > &
+      Schema.Attribute.Private;
+    publishedAt: Schema.Attribute.DateTime;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    user: Schema.Attribute.Relation<
+      'manyToOne',
+      'plugin::users-permissions.user'
+    >;
+  };
+}
+
 export interface ApiCourseCourse extends Struct.CollectionTypeSchema {
   collectionName: 'courses';
   info: {
@@ -691,6 +727,10 @@ export interface ApiCourseCourse extends Struct.CollectionTypeSchema {
     > &
       Schema.Attribute.Required &
       Schema.Attribute.DefaultTo<'industry'>;
+    course_accesses: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::course-access.course-access'
+    >;
     course_type: Schema.Attribute.Enumeration<
       ['course_recording', 'course_online']
     > &
@@ -720,10 +760,6 @@ export interface ApiCourseCourse extends Struct.CollectionTypeSchema {
     study_session: Schema.Attribute.Relation<
       'manyToMany',
       'api::study-session.study-session'
-    >;
-    subscribed_users: Schema.Attribute.Relation<
-      'manyToMany',
-      'plugin::users-permissions.user'
     >;
     subscription_type: Schema.Attribute.Relation<
       'manyToMany',
@@ -1124,6 +1160,44 @@ export interface ApiReviewReview extends Struct.CollectionTypeSchema {
   };
 }
 
+export interface ApiSessionProgressSessionProgress
+  extends Struct.CollectionTypeSchema {
+  collectionName: 'session_progresses';
+  info: {
+    displayName: 'session-progress';
+    pluralName: 'session-progresses';
+    singularName: 'session-progress';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::session-progress.session-progress'
+    > &
+      Schema.Attribute.Private;
+    publishedAt: Schema.Attribute.DateTime;
+    session_status: Schema.Attribute.Enumeration<['in_progress', 'completed']> &
+      Schema.Attribute.DefaultTo<'in_progress'>;
+    study_session: Schema.Attribute.Relation<
+      'manyToOne',
+      'api::study-session.study-session'
+    >;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    user: Schema.Attribute.Relation<
+      'manyToOne',
+      'plugin::users-permissions.user'
+    >;
+  };
+}
+
 export interface ApiSpeakerSpeaker extends Struct.CollectionTypeSchema {
   collectionName: 'speakers';
   info: {
@@ -1200,6 +1274,10 @@ export interface ApiStudySessionStudySession
     session_number: Schema.Attribute.Integer &
       Schema.Attribute.Required &
       Schema.Attribute.DefaultTo<1>;
+    session_progresses: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::session-progress.session-progress'
+    >;
     slug: Schema.Attribute.UID<'title'>;
     title: Schema.Attribute.String & Schema.Attribute.Required;
     updatedAt: Schema.Attribute.DateTime;
@@ -1938,7 +2016,10 @@ export interface PluginUsersPermissionsUser
     blocked: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<false>;
     confirmationToken: Schema.Attribute.String & Schema.Attribute.Private;
     confirmed: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<false>;
-    courses: Schema.Attribute.Relation<'manyToMany', 'api::course.course'>;
+    course_accesses: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::course-access.course-access'
+    >;
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
@@ -1965,6 +2046,10 @@ export interface PluginUsersPermissionsUser
     role: Schema.Attribute.Relation<
       'manyToOne',
       'plugin::users-permissions.role'
+    >;
+    session_progresses: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::session-progress.session-progress'
     >;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
@@ -1999,6 +2084,7 @@ declare module '@strapi/strapi' {
       'api::author.author': ApiAuthorAuthor;
       'api::avs-document.avs-document': ApiAvsDocumentAvsDocument;
       'api::category.category': ApiCategoryCategory;
+      'api::course-access.course-access': ApiCourseAccessCourseAccess;
       'api::course.course': ApiCourseCourse;
       'api::expert-answer.expert-answer': ApiExpertAnswerExpertAnswer;
       'api::free-webinar-reason.free-webinar-reason': ApiFreeWebinarReasonFreeWebinarReason;
@@ -2009,6 +2095,7 @@ declare module '@strapi/strapi' {
       'api::ipk.ipk': ApiIpkIpk;
       'api::news-article.news-article': ApiNewsArticleNewsArticle;
       'api::review.review': ApiReviewReview;
+      'api::session-progress.session-progress': ApiSessionProgressSessionProgress;
       'api::speaker.speaker': ApiSpeakerSpeaker;
       'api::study-session.study-session': ApiStudySessionStudySession;
       'api::subscription-type.subscription-type': ApiSubscriptionTypeSubscriptionType;

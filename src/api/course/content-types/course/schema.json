@@ -89,11 +89,11 @@
       "target": "api::study-session.study-session",
       "inversedBy": "course"
     },
-    "subscribed_users": {
+    "course_accesses": {
       "type": "relation",
-      "relation": "manyToMany",
-      "target": "plugin::users-permissions.user",
-      "mappedBy": "courses"
+      "relation": "oneToMany",
+      "target": "api::course-access.course-access",
+      "mappedBy": "course"
     }
   }
 }

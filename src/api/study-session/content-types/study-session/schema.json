@@ -40,6 +40,12 @@
       "relation": "manyToMany",
       "target": "api::homework.homework",
       "mappedBy": "study_session"
+    },
+    "session_progresses": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::session-progress.session-progress",
+      "mappedBy": "study_session"
     }
   }
 }

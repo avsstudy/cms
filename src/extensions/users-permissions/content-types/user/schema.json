@@ -77,11 +77,17 @@
       "target": "api::user-question.user-question",
       "mappedBy": "user"
     },
-    "courses": {
+    "course_accesses": {
       "type": "relation",
-      "relation": "manyToMany",
-      "target": "api::course.course",
-      "inversedBy": "subscribed_users"
+      "relation": "oneToMany",
+      "target": "api::course-access.course-access",
+      "mappedBy": "user"
+    },
+    "session_progresses": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::session-progress.session-progress",
+      "mappedBy": "user"
     }
   }
 }
