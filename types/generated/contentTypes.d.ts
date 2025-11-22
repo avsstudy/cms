@@ -687,6 +687,10 @@ export interface ApiCourseAccessCourseAccess
   };
   attributes: {
     course: Schema.Attribute.Relation<'manyToOne', 'api::course.course'>;
+    course_status: Schema.Attribute.Enumeration<
+      ['open', 'progress', 'finished']
+    > &
+      Schema.Attribute.DefaultTo<'open'>;
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;

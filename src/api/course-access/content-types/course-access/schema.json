@@ -26,6 +26,15 @@
     "has_accepted_rules": {
       "type": "boolean",
       "default": false
+    },
+    "course_status": {
+      "type": "enumeration",
+      "default": "open",
+      "enum": [
+        "open",
+        "progress",
+        "finished"
+      ]
     }
   }
 }
