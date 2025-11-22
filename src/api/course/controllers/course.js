@@ -87,7 +87,31 @@ module.exports = createCoreController("api::course.course", ({ strapi }) => ({
 
     const [course] = await strapi.entityService.findMany("api::course.course", {
       filters: { slug },
+      fields: [
+        "id",
+        "title",
+        "description",
+        "publishedAt",
+        "documentId",
+        "slug",
+        "course_type",
+        "category",
+      ],
       populate: {
+        card_cover: { fields: ["url", "alternativeText"] },
+        speaker: {
+          fields: ["id", "first_name", "last_name", "job_title", "description"],
+          populate: {
+            banner_photo: { fields: ["url", "alternativeText"] },
+            photo: { fields: ["url", "alternativeText"] },
+          },
+        },
+        subscription_type: {
+          fields: ["title", "documentId"],
+        },
+        topic: { fields: ["title", "documentId"] },
+        general_content: { populate: "*" },
+        reviews: { populate: "*" },
         study_session: {
           fields: ["id", "title", "slug", "session_number", "documentId"],
           sort: ["session_number:asc"],
@@ -99,16 +123,49 @@ module.exports = createCoreController("api::course.course", ({ strapi }) => ({
       return ctx.notFound("Course not found");
     }
 
-    const [courseAccess] = await strapi.entityService.findMany(
+    const [courseAccessRaw] = await strapi.entityService.findMany(
       "api::course-access.course-access",
       {
         filters: {
           user: userId,
           course: course.id,
         },
-        fields: ["id", "course_status", "has_accepted_rules", "publishedAt"],
+        fields: [
+          "id",
+          "has_accepted_rules",
+          "course_status",
+          "publishedAt",
+          "documentId",
+        ],
       }
     );
+
+    let courseAccess = courseAccessRaw || null;
+
+    if (courseAccess) {
+      if (courseAccess.course_status === "open") {
+        courseAccess = await strapi.entityService.update(
+          "api::course-access.course-access",
+          courseAccess.id,
+          {
+            data: {
+              course_status: "progress",
+              publishedAt: courseAccess.publishedAt || new Date().toISOString(),
+            },
+          }
+        );
+      } else if (!courseAccess.publishedAt) {
+        courseAccess = await strapi.entityService.update(
+          "api::course-access.course-access",
+          courseAccess.id,
+          {
+            data: {
+              publishedAt: new Date().toISOString(),
+            },
+          }
+        );
+      }
+    }
 
     const sessionIds = (course.study_session || []).map((s) => s.id);
 
@@ -136,7 +193,7 @@ module.exports = createCoreController("api::course.course", ({ strapi }) => ({
 
     ctx.body = {
       course,
-      courseAccess: courseAccess || null,
+      courseAccess,
       sessionProgresses,
     };
   },
