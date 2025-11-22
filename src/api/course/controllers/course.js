@@ -43,7 +43,7 @@ module.exports = createCoreController("api::course.course", ({ strapi }) => ({
               id: { $in: courseIds },
             },
           },
-          fields: ["id", "course_status", "has_accepted_rules", "publishedAt"],
+          fields: ["id", "course_status", "has_accepted_rules"],
           populate: {
             course: {
               fields: ["id", "documentId", "slug"],
@@ -130,13 +130,7 @@ module.exports = createCoreController("api::course.course", ({ strapi }) => ({
           user: userId,
           course: course.id,
         },
-        fields: [
-          "id",
-          "has_accepted_rules",
-          "course_status",
-          "publishedAt",
-          "documentId",
-        ],
+        fields: ["id", "has_accepted_rules", "course_status", "documentId"],
       }
     );
 
@@ -150,17 +144,6 @@ module.exports = createCoreController("api::course.course", ({ strapi }) => ({
           {
             data: {
               course_status: "progress",
-              publishedAt: courseAccess.publishedAt || new Date().toISOString(),
-            },
-          }
-        );
-      } else if (!courseAccess.publishedAt) {
-        courseAccess = await strapi.entityService.update(
-          "api::course-access.course-access",
-          courseAccess.id,
-          {
-            data: {
-              publishedAt: new Date().toISOString(),
             },
           }
         );

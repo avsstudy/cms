@@ -683,7 +683,7 @@ export interface ApiCourseAccessCourseAccess
     singularName: 'course-access';
   };
   options: {
-    draftAndPublish: true;
+    draftAndPublish: false;
   };
   attributes: {
     course: Schema.Attribute.Relation<'manyToOne', 'api::course.course'>;
