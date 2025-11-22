@@ -12,7 +12,7 @@ module.exports = createCoreController("api::course.course", ({ strapi }) => ({
 
     const rawPagination = ctx.query.pagination || {};
     const page = Number(rawPagination.page) || 1;
-    const pageSize = Number(rawPagination.pageSize) || 20;
+    const pageSize = Number(rawPagination.pageSize) || 10;
 
     const coursesResult = await strapi.entityService.findMany(
       "api::course.course",
@@ -43,7 +43,7 @@ module.exports = createCoreController("api::course.course", ({ strapi }) => ({
               id: { $in: courseIds },
             },
           },
-          fields: ["id", "has_accepted_rules", "publishedAt"],
+          fields: ["id", "course_status", "has_accepted_rules", "publishedAt"],
           populate: {
             course: {
               fields: ["id", "documentId", "slug"],
@@ -106,7 +106,7 @@ module.exports = createCoreController("api::course.course", ({ strapi }) => ({
           user: userId,
           course: course.id,
         },
-        fields: ["id", "has_accepted_rules", "publishedAt"],
+        fields: ["id", "course_status", "has_accepted_rules", "publishedAt"],
       }
     );
 

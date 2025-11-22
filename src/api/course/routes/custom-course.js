@@ -4,7 +4,7 @@ module.exports = {
   routes: [
     {
       method: "GET",
-      path: "/courses/me",
+      path: "/custom-courses/me",
       handler: "course.getCoursesForCurrentUser",
       config: {
         policies: ["global::is-authenticated"],
@@ -12,7 +12,7 @@ module.exports = {
     },
     {
       method: "GET",
-      path: "/courses/me/:slug",
+      path: "/custom-courses/me/:slug",
       handler: "course.getCourseForCurrentUser",
       config: {
         policies: ["global::is-authenticated"],
