@@ -25,10 +25,9 @@ module.exports = async (policyContext, config, { strapi }) => {
       return policyContext.unauthorized("User not found");
     }
 
-    // зберігаємо юзера, як робить плагін
     state.user = user;
 
-    return true; // пропускаємо далі
+    return true;
   } catch (err) {
     return policyContext.unauthorized("Invalid token");
   }
