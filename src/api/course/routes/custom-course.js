@@ -18,5 +18,13 @@ module.exports = {
         policies: ["global::is-authenticated"],
       },
     },
+    {
+      method: "GET",
+      path: "/custom-courses/me/:slug/session/:sessionSlug",
+      handler: "course.getSessionForCurrentUser",
+      config: {
+        policies: ["global::is-authenticated"],
+      },
+    },
   ],
 };
