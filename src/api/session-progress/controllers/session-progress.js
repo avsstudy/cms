@@ -34,7 +34,7 @@ module.exports = createCoreController(
         {
           filters: {
             user: userId,
-            session: session.id,
+            study_session: session.id,
           },
         }
       );
@@ -45,7 +45,7 @@ module.exports = createCoreController(
           existing.id,
           {
             data: {
-              status: "in_progress",
+              session_status: "in_progress",
               publishedAt: existing.publishedAt || new Date().toISOString(),
             },
           }
@@ -60,8 +60,8 @@ module.exports = createCoreController(
         {
           data: {
             user: userId,
-            session: session.id,
-            status: "in_progress",
+            study_session: session.id,
+            session_status: "in_progress",
             publishedAt: new Date().toISOString(),
           },
         }
@@ -99,7 +99,7 @@ module.exports = createCoreController(
         {
           filters: {
             user: userId,
-            session: session.id,
+            study_session: session.id,
           },
         }
       );
@@ -110,7 +110,7 @@ module.exports = createCoreController(
           existing.id,
           {
             data: {
-              status: "completed",
+              session_status: "completed",
               publishedAt: existing.publishedAt || new Date().toISOString(),
             },
           }
@@ -125,8 +125,8 @@ module.exports = createCoreController(
         {
           data: {
             user: userId,
-            session: session.id,
-            status: "completed",
+            study_session: session.id,
+            session_status: "completed",
             publishedAt: new Date().toISOString(),
           },
         }

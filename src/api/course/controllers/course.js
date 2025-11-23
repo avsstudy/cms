@@ -160,13 +160,13 @@ module.exports = createCoreController("api::course.course", ({ strapi }) => ({
         {
           filters: {
             user: userId,
-            session: {
+            study_session: {
               id: { $in: sessionIds },
             },
           },
-          fields: ["id", "status", "publishedAt"],
+          fields: ["id", "session_status", "publishedAt"],
           populate: {
-            session: {
+            study_session: {
               fields: ["id", "documentId", "title", "slug", "session_number"],
             },
           },
