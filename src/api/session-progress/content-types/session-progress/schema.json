@@ -7,7 +7,7 @@
     "displayName": "session-progress"
   },
   "options": {
-    "draftAndPublish": true
+    "draftAndPublish": false
   },
   "pluginOptions": {},
   "attributes": {

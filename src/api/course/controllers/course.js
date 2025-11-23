@@ -164,7 +164,7 @@ module.exports = createCoreController("api::course.course", ({ strapi }) => ({
               id: { $in: sessionIds },
             },
           },
-          fields: ["id", "session_status", "publishedAt"],
+          fields: ["id", "session_status"],
           populate: {
             study_session: {
               fields: ["id", "documentId", "title", "slug", "session_number"],
@@ -193,7 +193,6 @@ module.exports = createCoreController("api::course.course", ({ strapi }) => ({
       return ctx.badRequest("slug and sessionSlug are required");
     }
 
-    // 1) Знаходимо курс по slug
     const [course] = await strapi.entityService.findMany("api::course.course", {
       filters: { slug },
       fields: ["id", "title", "slug", "documentId", "course_type", "category"],
@@ -209,7 +208,6 @@ module.exports = createCoreController("api::course.course", ({ strapi }) => ({
       return ctx.notFound("Course not found");
     }
 
-    // 2) Перевіряємо доступ юзера до курсу
     const [courseAccess] = await strapi.entityService.findMany(
       "api::course-access.course-access",
       {
@@ -237,19 +235,16 @@ module.exports = createCoreController("api::course.course", ({ strapi }) => ({
       return ctx.notFound("No sessions for this course");
     }
 
-    // 3) Знаходимо поточну сесію по sessionSlug
     const currentSession = sessions.find((s) => s.slug === sessionSlug);
 
     if (!currentSession) {
       return ctx.notFound("Session not found for this course");
     }
 
-    // 4) Prev / Next
     const idx = sessions.findIndex((s) => s.id === currentSession.id);
     const prevSession = idx > 0 ? sessions[idx - 1] : null;
     const nextSession = idx < sessions.length - 1 ? sessions[idx + 1] : null;
 
-    // 5) Session-progress: шукаємо
     const [existingProgress] = await strapi.entityService.findMany(
       "api::session-progress.session-progress",
       {
@@ -257,13 +252,12 @@ module.exports = createCoreController("api::course.course", ({ strapi }) => ({
           user: userId,
           study_session: currentSession.id,
         },
-        fields: ["id", "session_status", "publishedAt"],
+        fields: ["id", "session_status"],
       }
     );
 
     let progress = existingProgress;
 
-    // 6) Якщо немає прогресу – створюємо in_progress
     if (!progress) {
       progress = await strapi.entityService.create(
         "api::session-progress.session-progress",
@@ -272,21 +266,6 @@ module.exports = createCoreController("api::course.course", ({ strapi }) => ({
             user: userId,
             study_session: currentSession.id,
             session_status: "in_progress",
-            publishedAt: new Date().toISOString(),
-          },
-        }
-      );
-    } else if (
-      progress.session_status !== "completed" &&
-      !progress.publishedAt
-    ) {
-      // Якщо є, але ще не опублікований – ставимо publishedAt
-      progress = await strapi.entityService.update(
-        "api::session-progress.session-progress",
-        progress.id,
-        {
-          data: {
-            publishedAt: new Date().toISOString(),
           },
         }
       );
@@ -297,7 +276,7 @@ module.exports = createCoreController("api::course.course", ({ strapi }) => ({
       courseAccess,
       session: currentSession,
       progress,
-      sessions, // весь список для побудови "наступна/попередня"
+      sessions,
     };
   },
 }));

@@ -46,7 +46,6 @@ module.exports = createCoreController(
           {
             data: {
               session_status: "in_progress",
-              publishedAt: existing.publishedAt || new Date().toISOString(),
             },
           }
         );
@@ -62,7 +61,6 @@ module.exports = createCoreController(
             user: userId,
             study_session: session.id,
             session_status: "in_progress",
-            publishedAt: new Date().toISOString(),
           },
         }
       );
@@ -111,7 +109,6 @@ module.exports = createCoreController(
           {
             data: {
               session_status: "completed",
-              publishedAt: existing.publishedAt || new Date().toISOString(),
             },
           }
         );
@@ -127,7 +124,6 @@ module.exports = createCoreController(
             user: userId,
             study_session: session.id,
             session_status: "completed",
-            publishedAt: new Date().toISOString(),
           },
         }
       );
