@@ -1172,7 +1172,7 @@ export interface ApiSessionProgressSessionProgress
     singularName: 'session-progress';
   };
   options: {
-    draftAndPublish: true;
+    draftAndPublish: false;
   };
   attributes: {
     createdAt: Schema.Attribute.DateTime;

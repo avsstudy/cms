@@ -245,6 +245,22 @@ module.exports = createCoreController("api::course.course", ({ strapi }) => ({
     const prevSession = idx > 0 ? sessions[idx - 1] : null;
     const nextSession = idx < sessions.length - 1 ? sessions[idx + 1] : null;
 
+    const fullSession = await strapi.entityService.findOne(
+      "api::study-session.study-session",
+      currentSession.id,
+      {
+        fields: ["id", "documentId", "title", "slug", "session_number"],
+        populate: {
+          session_content: {
+            populate: "*",
+          },
+          homework_content: {
+            populate: "*",
+          },
+        },
+      }
+    );
+
     const [existingProgress] = await strapi.entityService.findMany(
       "api::session-progress.session-progress",
       {
@@ -252,7 +268,7 @@ module.exports = createCoreController("api::course.course", ({ strapi }) => ({
           user: userId,
           study_session: currentSession.id,
         },
-        fields: ["id", "session_status"],
+        fields: ["id", "session_status", "publishedAt"],
       }
     );
 
@@ -274,7 +290,9 @@ module.exports = createCoreController("api::course.course", ({ strapi }) => ({
     ctx.body = {
       course,
       courseAccess,
-      session: currentSession,
+      session: fullSession,
+      prevSession,
+      nextSession,
       progress,
       sessions,
     };
