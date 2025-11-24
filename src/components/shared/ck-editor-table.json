@@ -1,0 +1,17 @@
+{
+  "collectionName": "components_shared_ck_editor_tables",
+  "info": {
+    "displayName": "CKEditor-table"
+  },
+  "options": {},
+  "attributes": {
+    "table": {
+      "type": "customField",
+      "customField": "plugin::ckeditor5.CKEditor",
+      "options": {
+        "preset": "defaultHtml"
+      }
+    }
+  },
+  "config": {}
+}

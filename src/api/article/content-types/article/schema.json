@@ -64,7 +64,8 @@
         "shared.custom-table",
         "shared.zakon",
         "shared.ipk",
-        "shared.custom-quote"
+        "shared.custom-quote",
+        "shared.ck-editor-table"
       ],
       "required": true
     },
