@@ -36,7 +36,21 @@ module.exports = createCoreController(
                     "homework_guide",
                   ],
                   populate: {
-                    homework_materials: true,
+                    homework_materials: {
+                      fields: ["id"],
+                      populate: {
+                        materials: {
+                          fields: [
+                            "id",
+                            "url",
+                            "name",
+                            "mime",
+                            "size",
+                            "publishedAt",
+                          ],
+                        },
+                      },
+                    },
                   },
                 },
               },

@@ -522,6 +522,7 @@ export interface ApiArticleArticle extends Struct.CollectionTypeSchema {
         'shared.zakon',
         'shared.ipk',
         'shared.custom-quote',
+        'shared.ck-editor-table',
       ]
     > &
       Schema.Attribute.Required;
@@ -1147,6 +1148,7 @@ export interface ApiNewsArticleNewsArticle extends Struct.CollectionTypeSchema {
         'shared.custom-video',
         'shared.custom-table',
         'shared.custom-quote',
+        'shared.ck-editor-table',
       ]
     > &
       Schema.Attribute.Required;
