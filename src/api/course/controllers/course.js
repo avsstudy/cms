@@ -200,6 +200,27 @@ module.exports = createCoreController("api::course.course", ({ strapi }) => ({
         study_session: {
           fields: ["id", "documentId", "title", "slug", "session_number"],
           sort: ["session_number:asc"],
+          populate: {
+            session_content: {
+              populate: {
+                materials: true,
+                video_content: true,
+              },
+            },
+            homework_content: {
+              fields: [
+                "id",
+                "documentId",
+                "title",
+                "homework_description",
+                "homework_solution",
+                "homework_guide",
+              ],
+              populate: {
+                homework_materials: true,
+              },
+            },
+          },
         },
       },
     });
@@ -245,22 +266,6 @@ module.exports = createCoreController("api::course.course", ({ strapi }) => ({
     const prevSession = idx > 0 ? sessions[idx - 1] : null;
     const nextSession = idx < sessions.length - 1 ? sessions[idx + 1] : null;
 
-    const fullSession = await strapi.entityService.findOne(
-      "api::study-session.study-session",
-      currentSession.id,
-      {
-        fields: ["id", "documentId", "title", "slug", "session_number"],
-        populate: {
-          session_content: {
-            populate: "*",
-          },
-          homework_content: {
-            populate: "*",
-          },
-        },
-      }
-    );
-
     const [existingProgress] = await strapi.entityService.findMany(
       "api::session-progress.session-progress",
       {
@@ -268,7 +273,7 @@ module.exports = createCoreController("api::course.course", ({ strapi }) => ({
           user: userId,
           study_session: currentSession.id,
         },
-        fields: ["id", "session_status", "publishedAt"],
+        fields: ["id", "session_status"],
       }
     );
 
@@ -287,14 +292,40 @@ module.exports = createCoreController("api::course.course", ({ strapi }) => ({
       );
     }
 
+    const homeworkIds = (currentSession.homework_content || []).map(
+      (h) => h.id
+    );
+    let homeworkProgresses = [];
+
+    if (homeworkIds.length > 0) {
+      homeworkProgresses = await strapi.entityService.findMany(
+        "api::homework-progress.homework-progress",
+        {
+          filters: {
+            user: userId,
+            homework: {
+              id: { $in: homeworkIds },
+            },
+          },
+          fields: ["id", "homework_status"],
+          populate: {
+            homework: {
+              fields: ["id", "documentId", "title"],
+            },
+          },
+        }
+      );
+    }
+
     ctx.body = {
       course,
       courseAccess,
-      session: fullSession,
-      prevSession,
-      nextSession,
+      session: currentSession,
       progress,
       sessions,
+      homeworkProgresses,
+      prevSession,
+      nextSession,
     };
   },
 }));

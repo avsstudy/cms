@@ -1000,6 +1000,43 @@ export interface ApiHandbookHandbook extends Struct.CollectionTypeSchema {
   };
 }
 
+export interface ApiHomeworkProgressHomeworkProgress
+  extends Struct.CollectionTypeSchema {
+  collectionName: 'homework_progresses';
+  info: {
+    displayName: 'homework-progress';
+    pluralName: 'homework-progresses';
+    singularName: 'homework-progress';
+  };
+  options: {
+    draftAndPublish: false;
+  };
+  attributes: {
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    homework: Schema.Attribute.Relation<'manyToOne', 'api::homework.homework'>;
+    homework_status: Schema.Attribute.Enumeration<
+      ['in_progress', 'completed']
+    > &
+      Schema.Attribute.DefaultTo<'in_progress'>;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::homework-progress.homework-progress'
+    > &
+      Schema.Attribute.Private;
+    publishedAt: Schema.Attribute.DateTime;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    user: Schema.Attribute.Relation<
+      'manyToOne',
+      'plugin::users-permissions.user'
+    >;
+  };
+}
+
 export interface ApiHomeworkHomework extends Struct.CollectionTypeSchema {
   collectionName: 'homeworks';
   info: {
@@ -1015,8 +1052,13 @@ export interface ApiHomeworkHomework extends Struct.CollectionTypeSchema {
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
     homework_description: Schema.Attribute.RichText & Schema.Attribute.Required;
+    homework_guide: Schema.Attribute.RichText;
     homework_materials: Schema.Attribute.Component<'shared.materials', false>;
-    homework_solution: Schema.Attribute.RichText;
+    homework_progresses: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::homework-progress.homework-progress'
+    >;
+    homework_solution: Schema.Attribute.Text;
     locale: Schema.Attribute.String & Schema.Attribute.Private;
     localizations: Schema.Attribute.Relation<
       'oneToMany',
@@ -2031,6 +2073,10 @@ export interface PluginUsersPermissionsUser
       Schema.Attribute.SetMinMaxLength<{
         minLength: 6;
       }>;
+    homework_progresses: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::homework-progress.homework-progress'
+    >;
     locale: Schema.Attribute.String & Schema.Attribute.Private;
     localizations: Schema.Attribute.Relation<
       'oneToMany',
@@ -2094,6 +2140,7 @@ declare module '@strapi/strapi' {
       'api::free-webinar.free-webinar': ApiFreeWebinarFreeWebinar;
       'api::global.global': ApiGlobalGlobal;
       'api::handbook.handbook': ApiHandbookHandbook;
+      'api::homework-progress.homework-progress': ApiHomeworkProgressHomeworkProgress;
       'api::homework.homework': ApiHomeworkHomework;
       'api::ipk.ipk': ApiIpkIpk;
       'api::news-article.news-article': ApiNewsArticleNewsArticle;

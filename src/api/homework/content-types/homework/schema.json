@@ -24,14 +24,23 @@
       "component": "shared.materials",
       "repeatable": false
     },
-    "homework_solution": {
+    "homework_guide": {
       "type": "richtext"
+    },
+    "homework_solution": {
+      "type": "text"
     },
     "study_session": {
       "type": "relation",
       "relation": "manyToMany",
       "target": "api::study-session.study-session",
       "inversedBy": "homework_content"
+    },
+    "homework_progresses": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::homework-progress.homework-progress",
+      "mappedBy": "homework"
     }
   }
 }

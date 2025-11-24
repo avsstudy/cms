@@ -1,0 +1,35 @@
+{
+  "kind": "collectionType",
+  "collectionName": "homework_progresses",
+  "info": {
+    "singularName": "homework-progress",
+    "pluralName": "homework-progresses",
+    "displayName": "homework-progress"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "homework_status": {
+      "type": "enumeration",
+      "default": "in_progress",
+      "enum": [
+        "in_progress",
+        "completed"
+      ]
+    },
+    "homework": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::homework.homework",
+      "inversedBy": "homework_progresses"
+    },
+    "user": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "plugin::users-permissions.user",
+      "inversedBy": "homework_progresses"
+    }
+  }
+}
