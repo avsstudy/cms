@@ -506,6 +506,7 @@ export interface ApiArticleArticle extends Struct.CollectionTypeSchema {
     draftAndPublish: true;
   };
   attributes: {
+    article_date: Schema.Attribute.Date & Schema.Attribute.Required;
     author: Schema.Attribute.Relation<'manyToOne', 'api::author.author'>;
     category: Schema.Attribute.Relation<'manyToMany', 'api::category.category'>;
     cover: Schema.Attribute.Media<'images'> & Schema.Attribute.Required;

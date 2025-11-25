@@ -16,6 +16,10 @@
       "type": "string",
       "required": true
     },
+    "article_date": {
+      "type": "date",
+      "required": true
+    },
     "description": {
       "type": "text",
       "required": true
