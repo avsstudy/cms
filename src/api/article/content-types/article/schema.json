@@ -17,8 +17,8 @@
       "required": true
     },
     "article_date": {
-      "type": "date",
-      "required": true
+      "type": "datetime",
+      "required": false
     },
     "description": {
       "type": "text",
@@ -71,7 +71,7 @@
         "shared.custom-quote",
         "shared.ck-editor-table"
       ],
-      "required": true
+      "required": false
     },
     "subscription_type": {
       "type": "enumeration",

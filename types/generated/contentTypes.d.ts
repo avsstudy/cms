@@ -506,7 +506,7 @@ export interface ApiArticleArticle extends Struct.CollectionTypeSchema {
     draftAndPublish: true;
   };
   attributes: {
-    article_date: Schema.Attribute.Date & Schema.Attribute.Required;
+    article_date: Schema.Attribute.DateTime;
     author: Schema.Attribute.Relation<'manyToOne', 'api::author.author'>;
     category: Schema.Attribute.Relation<'manyToMany', 'api::category.category'>;
     cover: Schema.Attribute.Media<'images'> & Schema.Attribute.Required;
@@ -525,8 +525,7 @@ export interface ApiArticleArticle extends Struct.CollectionTypeSchema {
         'shared.custom-quote',
         'shared.ck-editor-table',
       ]
-    > &
-      Schema.Attribute.Required;
+    >;
     locale: Schema.Attribute.String & Schema.Attribute.Private;
     localizations: Schema.Attribute.Relation<
       'oneToMany',
