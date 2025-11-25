@@ -285,6 +285,38 @@ export interface SharedTargetBanner extends Struct.ComponentSchema {
   };
 }
 
+export interface SharedTestAnswer extends Struct.ComponentSchema {
+  collectionName: 'components_shared_test_answers';
+  info: {
+    displayName: 'test-answer';
+  };
+  attributes: {
+    isCorrect: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<false>;
+    order: Schema.Attribute.Integer & Schema.Attribute.DefaultTo<1>;
+    text: Schema.Attribute.Text & Schema.Attribute.Required;
+  };
+}
+
+export interface SharedTestQuestion extends Struct.ComponentSchema {
+  collectionName: 'components_shared_test_questions';
+  info: {
+    displayName: 'test-question';
+  };
+  attributes: {
+    answers: Schema.Attribute.Component<'shared.test-answer', true> &
+      Schema.Attribute.SetMinMax<
+        {
+          max: 4;
+          min: 4;
+        },
+        number
+      >;
+    explanation: Schema.Attribute.RichText;
+    order: Schema.Attribute.Integer & Schema.Attribute.DefaultTo<1>;
+    title: Schema.Attribute.String & Schema.Attribute.Required;
+  };
+}
+
 export interface SharedText extends Struct.ComponentSchema {
   collectionName: 'components_shared_texts';
   info: {
@@ -406,6 +438,8 @@ declare module '@strapi/strapi' {
       'shared.program-content': SharedProgramContent;
       'shared.seo': SharedSeo;
       'shared.target-banner': SharedTargetBanner;
+      'shared.test-answer': SharedTestAnswer;
+      'shared.test-question': SharedTestQuestion;
       'shared.text': SharedText;
       'shared.upcoming-session': SharedUpcomingSession;
       'shared.useful-files': SharedUsefulFiles;

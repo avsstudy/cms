@@ -1,0 +1,54 @@
+{
+  "kind": "collectionType",
+  "collectionName": "test_attempts",
+  "info": {
+    "singularName": "test-attempt",
+    "pluralName": "test-attempts",
+    "displayName": "Test attempt"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "user": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "plugin::users-permissions.user",
+      "inversedBy": "test_attempts"
+    },
+    "session_test": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::session-test.session-test",
+      "inversedBy": "test_attempts"
+    },
+    "attempt_status": {
+      "type": "enumeration",
+      "enum": [
+        "in_progress",
+        "passed",
+        "failed",
+        "timeout"
+      ]
+    },
+    "scorePercent": {
+      "type": "integer"
+    },
+    "correctCount": {
+      "type": "integer"
+    },
+    "totalCount": {
+      "type": "integer"
+    },
+    "answers": {
+      "type": "json"
+    },
+    "startedAt": {
+      "type": "datetime"
+    },
+    "finishedAt": {
+      "type": "datetime"
+    }
+  }
+}

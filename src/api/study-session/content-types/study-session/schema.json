@@ -46,6 +46,12 @@
       "relation": "oneToMany",
       "target": "api::session-progress.session-progress",
       "mappedBy": "study_session"
+    },
+    "session_test": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "api::session-test.session-test",
+      "mappedBy": "study_session"
     }
   }
 }

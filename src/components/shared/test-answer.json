@@ -1,0 +1,22 @@
+{
+  "collectionName": "components_shared_test_answers",
+  "info": {
+    "displayName": "test-answer"
+  },
+  "options": {},
+  "attributes": {
+    "text": {
+      "type": "text",
+      "required": true
+    },
+    "isCorrect": {
+      "type": "boolean",
+      "default": false
+    },
+    "order": {
+      "type": "integer",
+      "default": 1
+    }
+  },
+  "config": {}
+}

@@ -94,6 +94,12 @@
       "relation": "oneToMany",
       "target": "api::homework-progress.homework-progress",
       "mappedBy": "user"
+    },
+    "test_attempts": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::test-attempt.test-attempt",
+      "mappedBy": "user"
     }
   }
 }

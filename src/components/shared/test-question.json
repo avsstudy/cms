@@ -1,0 +1,28 @@
+{
+  "collectionName": "components_shared_test_questions",
+  "info": {
+    "displayName": "test-question"
+  },
+  "options": {},
+  "attributes": {
+    "title": {
+      "type": "string",
+      "required": true
+    },
+    "explanation": {
+      "type": "richtext"
+    },
+    "order": {
+      "type": "integer",
+      "default": 1
+    },
+    "answers": {
+      "type": "component",
+      "component": "shared.test-answer",
+      "repeatable": true,
+      "min": 4,
+      "max": 4
+    }
+  },
+  "config": {}
+}

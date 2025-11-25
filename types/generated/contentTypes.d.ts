@@ -1245,6 +1245,48 @@ export interface ApiSessionProgressSessionProgress
   };
 }
 
+export interface ApiSessionTestSessionTest extends Struct.CollectionTypeSchema {
+  collectionName: 'session_tests';
+  info: {
+    displayName: 'Session test';
+    pluralName: 'session-tests';
+    singularName: 'session-test';
+  };
+  options: {
+    draftAndPublish: false;
+  };
+  attributes: {
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::session-test.session-test'
+    > &
+      Schema.Attribute.Private;
+    maxAttempts: Schema.Attribute.Integer & Schema.Attribute.DefaultTo<1>;
+    passingScorePercent: Schema.Attribute.Integer &
+      Schema.Attribute.DefaultTo<80>;
+    publishedAt: Schema.Attribute.DateTime;
+    questions: Schema.Attribute.Component<'shared.test-question', true>;
+    slug: Schema.Attribute.UID<'title'>;
+    study_session: Schema.Attribute.Relation<
+      'oneToOne',
+      'api::study-session.study-session'
+    >;
+    test_attempts: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::test-attempt.test-attempt'
+    >;
+    timeLimitSeconds: Schema.Attribute.Integer;
+    title: Schema.Attribute.String & Schema.Attribute.Required;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
 export interface ApiSpeakerSpeaker extends Struct.CollectionTypeSchema {
   collectionName: 'speakers';
   info: {
@@ -1325,6 +1367,10 @@ export interface ApiStudySessionStudySession
       'oneToMany',
       'api::session-progress.session-progress'
     >;
+    session_test: Schema.Attribute.Relation<
+      'oneToOne',
+      'api::session-test.session-test'
+    >;
     slug: Schema.Attribute.UID<'title'>;
     title: Schema.Attribute.String & Schema.Attribute.Required;
     updatedAt: Schema.Attribute.DateTime;
@@ -1376,6 +1422,50 @@ export interface ApiSubscriptionTypeSubscriptionType
     video_recording: Schema.Attribute.Relation<
       'manyToMany',
       'api::video-recording.video-recording'
+    >;
+  };
+}
+
+export interface ApiTestAttemptTestAttempt extends Struct.CollectionTypeSchema {
+  collectionName: 'test_attempts';
+  info: {
+    displayName: 'Test attempt';
+    pluralName: 'test-attempts';
+    singularName: 'test-attempt';
+  };
+  options: {
+    draftAndPublish: false;
+  };
+  attributes: {
+    answers: Schema.Attribute.JSON;
+    attempt_status: Schema.Attribute.Enumeration<
+      ['in_progress', 'passed', 'failed', 'timeout']
+    >;
+    correctCount: Schema.Attribute.Integer;
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    finishedAt: Schema.Attribute.DateTime;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::test-attempt.test-attempt'
+    > &
+      Schema.Attribute.Private;
+    publishedAt: Schema.Attribute.DateTime;
+    scorePercent: Schema.Attribute.Integer;
+    session_test: Schema.Attribute.Relation<
+      'manyToOne',
+      'api::session-test.session-test'
+    >;
+    startedAt: Schema.Attribute.DateTime;
+    totalCount: Schema.Attribute.Integer;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    user: Schema.Attribute.Relation<
+      'manyToOne',
+      'plugin::users-permissions.user'
     >;
   };
 }
@@ -2102,6 +2192,10 @@ export interface PluginUsersPermissionsUser
       'oneToMany',
       'api::session-progress.session-progress'
     >;
+    test_attempts: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::test-attempt.test-attempt'
+    >;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
@@ -2148,9 +2242,11 @@ declare module '@strapi/strapi' {
       'api::news-article.news-article': ApiNewsArticleNewsArticle;
       'api::review.review': ApiReviewReview;
       'api::session-progress.session-progress': ApiSessionProgressSessionProgress;
+      'api::session-test.session-test': ApiSessionTestSessionTest;
       'api::speaker.speaker': ApiSpeakerSpeaker;
       'api::study-session.study-session': ApiStudySessionStudySession;
       'api::subscription-type.subscription-type': ApiSubscriptionTypeSubscriptionType;
+      'api::test-attempt.test-attempt': ApiTestAttemptTestAttempt;
       'api::topic-dps.topic-dps': ApiTopicDpsTopicDps;
       'api::topic-group.topic-group': ApiTopicGroupTopicGroup;
       'api::topic.topic': ApiTopicTopic;

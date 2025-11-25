@@ -1,0 +1,51 @@
+{
+  "kind": "collectionType",
+  "collectionName": "session_tests",
+  "info": {
+    "singularName": "session-test",
+    "pluralName": "session-tests",
+    "displayName": "Session test"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "title": {
+      "type": "string",
+      "required": true
+    },
+    "slug": {
+      "type": "uid",
+      "targetField": "title"
+    },
+    "timeLimitSeconds": {
+      "type": "integer"
+    },
+    "maxAttempts": {
+      "type": "integer",
+      "default": 1
+    },
+    "passingScorePercent": {
+      "type": "integer",
+      "default": 80
+    },
+    "questions": {
+      "type": "component",
+      "component": "shared.test-question",
+      "repeatable": true
+    },
+    "study_session": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "api::study-session.study-session",
+      "inversedBy": "session_test"
+    },
+    "test_attempts": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::test-attempt.test-attempt",
+      "mappedBy": "session_test"
+    }
+  }
+}
