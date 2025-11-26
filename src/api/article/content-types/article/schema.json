@@ -69,7 +69,8 @@
         "shared.zakon",
         "shared.ipk",
         "shared.custom-quote",
-        "shared.ck-editor-table"
+        "shared.ck-editor-table",
+        "shared.ck-editor-text"
       ],
       "required": false
     },

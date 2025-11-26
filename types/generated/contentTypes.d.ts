@@ -524,6 +524,7 @@ export interface ApiArticleArticle extends Struct.CollectionTypeSchema {
         'shared.ipk',
         'shared.custom-quote',
         'shared.ck-editor-table',
+        'shared.ck-editor-text',
       ]
     >;
     locale: Schema.Attribute.String & Schema.Attribute.Private;
