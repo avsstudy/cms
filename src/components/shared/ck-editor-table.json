@@ -11,6 +11,12 @@
       "options": {
         "preset": "defaultHtml"
       }
+    },
+    "anchor": {
+      "type": "string"
+    },
+    "anchor_title": {
+      "type": "string"
     }
   },
   "config": {}

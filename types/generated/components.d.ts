@@ -31,6 +31,8 @@ export interface SharedCkEditorTable extends Struct.ComponentSchema {
     displayName: 'CKEditor-table';
   };
   attributes: {
+    anchor: Schema.Attribute.String;
+    anchor_title: Schema.Attribute.String;
     table: Schema.Attribute.RichText &
       Schema.Attribute.CustomField<
         'plugin::ckeditor5.CKEditor',
