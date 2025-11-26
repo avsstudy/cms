@@ -43,6 +43,24 @@ export interface SharedCkEditorTable extends Struct.ComponentSchema {
   };
 }
 
+export interface SharedCkEditorText extends Struct.ComponentSchema {
+  collectionName: 'components_shared_ck_editor_texts';
+  info: {
+    displayName: 'CKEditor-text';
+  };
+  attributes: {
+    anchor: Schema.Attribute.String;
+    anchor_title: Schema.Attribute.String;
+    text_content: Schema.Attribute.RichText &
+      Schema.Attribute.CustomField<
+        'plugin::ckeditor5.CKEditor',
+        {
+          preset: 'defaultHtml';
+        }
+      >;
+  };
+}
+
 export interface SharedCourseOnlineLanding extends Struct.ComponentSchema {
   collectionName: 'components_shared_course_online_landings';
   info: {
@@ -423,6 +441,7 @@ declare module '@strapi/strapi' {
       'shared.blank': SharedBlank;
       'shared.chapter': SharedChapter;
       'shared.ck-editor-table': SharedCkEditorTable;
+      'shared.ck-editor-text': SharedCkEditorText;
       'shared.course-online-landing': SharedCourseOnlineLanding;
       'shared.course-recording-landing': SharedCourseRecordingLanding;
       'shared.course-subscription-landing': SharedCourseSubscriptionLanding;

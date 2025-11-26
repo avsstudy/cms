@@ -1,0 +1,23 @@
+{
+  "collectionName": "components_shared_ck_editor_texts",
+  "info": {
+    "displayName": "CKEditor-text"
+  },
+  "options": {},
+  "attributes": {
+    "text_content": {
+      "type": "customField",
+      "customField": "plugin::ckeditor5.CKEditor",
+      "options": {
+        "preset": "defaultHtml"
+      }
+    },
+    "anchor": {
+      "type": "string"
+    },
+    "anchor_title": {
+      "type": "string"
+    }
+  },
+  "config": {}
+}
