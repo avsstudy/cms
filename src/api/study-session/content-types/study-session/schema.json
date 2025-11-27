@@ -69,6 +69,9 @@
         "live"
       ]
     },
+    "session_question_deadline": {
+      "type": "datetime"
+    },
     "session_questions": {
       "type": "relation",
       "relation": "oneToMany",

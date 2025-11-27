@@ -122,6 +122,7 @@ module.exports = createCoreController("api::course.course", ({ strapi }) => ({
             "session_admin_status",
             "session_date",
             "session_stream",
+            "session_question_deadline",
           ],
           sort: ["session_number:asc"],
         },

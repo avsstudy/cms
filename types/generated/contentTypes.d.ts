@@ -1408,6 +1408,7 @@ export interface ApiStudySessionStudySession
       'oneToMany',
       'api::session-progress.session-progress'
     >;
+    session_question_deadline: Schema.Attribute.DateTime;
     session_questions: Schema.Attribute.Relation<
       'oneToMany',
       'api::session-question.session-question'
