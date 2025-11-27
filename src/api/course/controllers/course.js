@@ -113,7 +113,16 @@ module.exports = createCoreController("api::course.course", ({ strapi }) => ({
         general_content: { populate: "*" },
         reviews: { populate: "*" },
         study_session: {
-          fields: ["id", "title", "slug", "session_number", "documentId"],
+          fields: [
+            "id",
+            "title",
+            "slug",
+            "session_number",
+            "documentId",
+            "session_admin_status",
+            "session_date",
+            "session_stream",
+          ],
           sort: ["session_number:asc"],
         },
       },

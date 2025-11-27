@@ -65,7 +65,8 @@
       "enum": [
         "not_opened",
         "chat",
-        "stream_recording"
+        "stream_recording",
+        "live"
       ]
     },
     "session_questions": {

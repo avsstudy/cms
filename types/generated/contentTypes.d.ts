@@ -1393,7 +1393,7 @@ export interface ApiStudySessionStudySession
       Schema.Attribute.Private;
     publishedAt: Schema.Attribute.DateTime;
     session_admin_status: Schema.Attribute.Enumeration<
-      ['not_opened', 'chat', 'stream_recording']
+      ['not_opened', 'chat', 'stream_recording', 'live']
     > &
       Schema.Attribute.DefaultTo<'not_opened'>;
     session_content: Schema.Attribute.Component<
