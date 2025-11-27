@@ -1359,6 +1359,7 @@ export interface ApiStudySessionStudySession
       'shared.custom-video-recording',
       false
     >;
+    session_date: Schema.Attribute.DateTime;
     session_number: Schema.Attribute.Integer &
       Schema.Attribute.Required &
       Schema.Attribute.DefaultTo<1>;
@@ -1366,6 +1367,7 @@ export interface ApiStudySessionStudySession
       'oneToMany',
       'api::session-progress.session-progress'
     >;
+    session_stream: Schema.Attribute.String;
     session_test: Schema.Attribute.Relation<
       'oneToOne',
       'api::session-test.session-test'

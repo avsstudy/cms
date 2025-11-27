@@ -52,6 +52,12 @@
       "relation": "oneToOne",
       "target": "api::session-test.session-test",
       "mappedBy": "study_session"
+    },
+    "session_date": {
+      "type": "datetime"
+    },
+    "session_stream": {
+      "type": "string"
     }
   }
 }
