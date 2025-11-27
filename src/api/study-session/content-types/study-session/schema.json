@@ -67,6 +67,12 @@
         "chat",
         "stream_recording"
       ]
+    },
+    "session_questions": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::session-question.session-question",
+      "mappedBy": "study_session"
     }
   }
 }

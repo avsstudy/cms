@@ -100,6 +100,12 @@
       "relation": "oneToMany",
       "target": "api::test-attempt.test-attempt",
       "mappedBy": "user"
+    },
+    "session_questions": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::session-question.session-question",
+      "mappedBy": "users_permissions_user"
     }
   }
 }

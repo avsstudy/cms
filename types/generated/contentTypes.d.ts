@@ -1244,6 +1244,43 @@ export interface ApiSessionProgressSessionProgress
   };
 }
 
+export interface ApiSessionQuestionSessionQuestion
+  extends Struct.CollectionTypeSchema {
+  collectionName: 'session_questions';
+  info: {
+    displayName: 'Session_question';
+    pluralName: 'session-questions';
+    singularName: 'session-question';
+  };
+  options: {
+    draftAndPublish: false;
+  };
+  attributes: {
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::session-question.session-question'
+    > &
+      Schema.Attribute.Private;
+    publishedAt: Schema.Attribute.DateTime;
+    question: Schema.Attribute.Text;
+    study_session: Schema.Attribute.Relation<
+      'manyToOne',
+      'api::study-session.study-session'
+    >;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    users_permissions_user: Schema.Attribute.Relation<
+      'manyToOne',
+      'plugin::users-permissions.user'
+    >;
+  };
+}
+
 export interface ApiSessionTestSessionTest extends Struct.CollectionTypeSchema {
   collectionName: 'session_tests';
   info: {
@@ -1370,6 +1407,10 @@ export interface ApiStudySessionStudySession
     session_progresses: Schema.Attribute.Relation<
       'oneToMany',
       'api::session-progress.session-progress'
+    >;
+    session_questions: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::session-question.session-question'
     >;
     session_stream: Schema.Attribute.String;
     session_test: Schema.Attribute.Relation<
@@ -2197,6 +2238,10 @@ export interface PluginUsersPermissionsUser
       'oneToMany',
       'api::session-progress.session-progress'
     >;
+    session_questions: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::session-question.session-question'
+    >;
     test_attempts: Schema.Attribute.Relation<
       'oneToMany',
       'api::test-attempt.test-attempt'
@@ -2247,6 +2292,7 @@ declare module '@strapi/strapi' {
       'api::news-article.news-article': ApiNewsArticleNewsArticle;
       'api::review.review': ApiReviewReview;
       'api::session-progress.session-progress': ApiSessionProgressSessionProgress;
+      'api::session-question.session-question': ApiSessionQuestionSessionQuestion;
       'api::session-test.session-test': ApiSessionTestSessionTest;
       'api::speaker.speaker': ApiSpeakerSpeaker;
       'api::study-session.study-session': ApiStudySessionStudySession;

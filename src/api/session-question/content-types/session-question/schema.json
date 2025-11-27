@@ -1,0 +1,30 @@
+{
+  "kind": "collectionType",
+  "collectionName": "session_questions",
+  "info": {
+    "singularName": "session-question",
+    "pluralName": "session-questions",
+    "displayName": "Session_question"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "question": {
+      "type": "text"
+    },
+    "users_permissions_user": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "plugin::users-permissions.user",
+      "inversedBy": "session_questions"
+    },
+    "study_session": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::study-session.study-session",
+      "inversedBy": "session_questions"
+    }
+  }
+}
