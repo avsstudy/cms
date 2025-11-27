@@ -46,6 +46,12 @@
       "relation": "oneToMany",
       "target": "api::test-attempt.test-attempt",
       "mappedBy": "session_test"
+    },
+    "course": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "api::course.course",
+      "mappedBy": "course_test"
     }
   }
 }

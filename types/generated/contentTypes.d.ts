@@ -734,6 +734,10 @@ export interface ApiCourseCourse extends Struct.CollectionTypeSchema {
       'oneToMany',
       'api::course-access.course-access'
     >;
+    course_test: Schema.Attribute.Relation<
+      'oneToOne',
+      'api::session-test.session-test'
+    >;
     course_type: Schema.Attribute.Enumeration<
       ['course_recording', 'course_online']
     > &
@@ -1292,6 +1296,7 @@ export interface ApiSessionTestSessionTest extends Struct.CollectionTypeSchema {
     draftAndPublish: false;
   };
   attributes: {
+    course: Schema.Attribute.Relation<'oneToOne', 'api::course.course'>;
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;

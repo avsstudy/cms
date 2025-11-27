@@ -94,6 +94,12 @@
       "relation": "oneToMany",
       "target": "api::course-access.course-access",
       "mappedBy": "course"
+    },
+    "course_test": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "api::session-test.session-test",
+      "inversedBy": "course"
     }
   }
 }

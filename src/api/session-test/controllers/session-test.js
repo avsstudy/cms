@@ -78,6 +78,79 @@ module.exports = createCoreController(
       };
     },
 
+    async byCourse(ctx) {
+      const { courseId } = ctx.params;
+      const user = ctx.state.user;
+
+      if (!user) {
+        return ctx.unauthorized("You must be authenticated");
+      }
+
+      const tests = await strapi.entityService.findMany(
+        "api::session-test.session-test",
+        {
+          filters: {
+            course: {
+              documentId: courseId,
+            },
+          },
+          populate: {
+            questions: {
+              populate: {
+                answers: true,
+              },
+            },
+          },
+          limit: 1,
+        }
+      );
+
+      const test = Array.isArray(tests) ? tests[0] : tests;
+
+      if (!test) {
+        return ctx.notFound("Course test not found for this course");
+      }
+
+      const attemptsCount = await strapi.entityService.count(
+        "api::test-attempt.test-attempt",
+        {
+          filters: {
+            user: user.id,
+            session_test: test.id,
+          },
+        }
+      );
+
+      const maxAttempts = test.maxAttempts || null;
+      const canAttempt = !maxAttempts || attemptsCount < maxAttempts;
+
+      const questions = (test.questions || [])
+        .sort((a, b) => (a.order || 0) - (b.order || 0))
+        .map((q) => ({
+          id: q.id,
+          title: q.title,
+          order: q.order,
+          answers: (q.answers || [])
+            .sort((a, b) => (a.order || 0) - (b.order || 0))
+            .map((a) => ({
+              id: a.id,
+              text: a.text,
+              order: a.order,
+            })),
+        }));
+
+      ctx.body = {
+        id: test.id,
+        title: test.title,
+        timeLimitSeconds: test.timeLimitSeconds || null,
+        passingScorePercent: test.passingScorePercent,
+        maxAttempts: test.maxAttempts,
+        attemptsCount,
+        canAttempt,
+        questions,
+      };
+    },
+
     async submit(ctx) {
       const user = ctx.state.user;
       if (!user) {

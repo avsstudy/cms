@@ -11,6 +11,14 @@ module.exports = {
       },
     },
     {
+      method: "GET",
+      path: "/session-tests/by-course/:courseId",
+      handler: "session-test.byCourse",
+      config: {
+        policies: ["global::is-authenticated"],
+      },
+    },
+    {
       method: "POST",
       path: "/session-tests/:id/submit",
       handler: "session-test.submit",
