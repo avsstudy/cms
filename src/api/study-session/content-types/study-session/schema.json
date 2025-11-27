@@ -58,6 +58,15 @@
     },
     "session_stream": {
       "type": "string"
+    },
+    "session_admin_status": {
+      "type": "enumeration",
+      "default": "not_opened",
+      "enum": [
+        "not_opened",
+        "chat",
+        "stream_recording"
+      ]
     }
   }
 }
