@@ -26,92 +26,36 @@ module.exports = ({ env }) => ({
   },
   meilisearch: {
     config: {
-      host: env("MEILISEARCH_HOST", "http://avssearch.duckdns.org"),
+      host: env("MEILISEARCH_HOST"),
       apiKey: env("MEILISEARCH_ADMIN_API_KEY"),
 
-      "api::article.article": {
-        indexName: "articles",
+      // 🔥 СУПЕР ВАЖЛИВО: правильний ключ - назва моделі = article
+      article: {
+        indexName: "article",
 
         transformEntry({ entry }) {
-          const categories = Array.isArray(entry.category)
-            ? entry.category.map((c) => ({
-                id: c.id,
-                name: c.name,
-                slug: c.slug,
-              }))
-            : [];
-
-          const topics = Array.isArray(entry.topic)
-            ? entry.topic.map((t) => ({
-                id: t.id,
-                name: t.name,
-                slug: t.slug,
-              }))
-            : [];
-
-          const author = entry.author
-            ? {
-                id: entry.author.id,
-                name: entry.author.name,
-                slug: entry.author.slug,
-              }
-            : null;
-
-          const topicIds = topics.map((t) => t.id);
-          const topicSlugs = topics.map((t) => t.slug);
-          const categoryIds = categories.map((c) => c.id);
-          const categorySlugs = categories.map((c) => c.slug);
-
-          const cover = entry.cover
-            ? {
-                id: entry.cover.id,
-                url: entry.cover.url,
-                name: entry.cover.name,
-                alternativeText: entry.cover.alternativeText,
-              }
-            : null;
-
           return {
             id: entry.id,
             title: entry.title,
-            article_date: entry.article_date,
             description: entry.description,
-            slug: entry.slug,
-            cover,
-            categories,
-            topics,
-            author,
-            topicIds,
-            topicSlugs,
-            categoryIds,
-            categorySlugs,
             views: entry.views,
-            subscription_type: entry.subscription_type,
-            pinned: entry.pinned,
-            general_content: entry.general_content,
+            article_date: entry.article_date,
+
+            // categories: relation many-to-many
+            categoryIds: entry.category?.map((c) => c.id) ?? [],
+
+            // topics: relation many-to-many
+            topicIds: entry.topic?.map((t) => t.id) ?? [],
+
+            // search fields
+            content: [entry.title ?? "", entry.description ?? ""].join(" "),
           };
         },
 
         settings: {
-          searchableAttributes: [
-            "title",
-            "description",
-            "slug",
-            "author.name",
-            "topics.name",
-            "categories.name",
-          ],
-
-          filterableAttributes: [
-            "subscription_type",
-            "pinned",
-            "topicIds",
-            "topicSlugs",
-            "categoryIds",
-            "categorySlugs",
-            "author.id",
-          ],
-          sortableAttributes: ["article_date", "views", "createdAt"],
+          searchableAttributes: ["title", "description", "content"],
+          filterableAttributes: ["categoryIds", "topicIds"],
+          sortableAttributes: ["article_date", "views"],
         },
       },
     },
