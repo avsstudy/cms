@@ -29,7 +29,6 @@ module.exports = ({ env }) => ({
       host: env("MEILISEARCH_HOST"),
       apiKey: env("MEILISEARCH_ADMIN_API_KEY"),
 
-      // 🔥 СУПЕР ВАЖЛИВО: правильний ключ - назва моделі = article
       article: {
         indexName: "article",
 
@@ -41,13 +40,10 @@ module.exports = ({ env }) => ({
             views: entry.views,
             article_date: entry.article_date,
 
-            // categories: relation many-to-many
             categoryIds: entry.category?.map((c) => c.id) ?? [],
 
-            // topics: relation many-to-many
             topicIds: entry.topic?.map((t) => t.id) ?? [],
 
-            // search fields
             content: [entry.title ?? "", entry.description ?? ""].join(" "),
           };
         },

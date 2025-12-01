@@ -4,12 +4,11 @@ const { createCoreController } = require("@strapi/strapi").factories;
 const { MeiliSearch } = require("meilisearch");
 
 const meiliClient = new MeiliSearch({
-  host: process.env.MEILISEARCH_HOST, // http://avssearch.duckdns.org
-  apiKey: process.env.MEILISEARCH_ADMIN_API_KEY, // твій master/admin key
+  host: process.env.MEILISEARCH_HOST,
+  apiKey: process.env.MEILISEARCH_ADMIN_API_KEY,
 });
 
 module.exports = createCoreController("api::article.article", ({ strapi }) => ({
-  // 🔹 Підрахунок переглядів (твій існуючий код)
   async views(ctx) {
     const id = Number(ctx.params.id);
     if (!id) return ctx.badRequest("Invalid id");
@@ -40,20 +39,13 @@ module.exports = createCoreController("api::article.article", ({ strapi }) => ({
     }
   },
 
-  // 🔹 Пошук через Meilisearch
   async search(ctx) {
-    const {
-      q = "",
-      topics, // "1,2,3"
-      page = 1,
-      pageSize = 20,
-    } = ctx.request.query;
+    const { q = "", topics, page = 1, pageSize = 20 } = ctx.request.query;
 
     const pageNum = Number(page) || 1;
     const limit = Number(pageSize) || 20;
     const offset = (pageNum - 1) * limit;
 
-    // Фільтри для Meilisearch
     const filters = [];
     if (topics) {
       const ids = String(topics)
@@ -61,7 +53,6 @@ module.exports = createCoreController("api::article.article", ({ strapi }) => ({
         .map((s) => s.trim())
         .filter(Boolean);
       if (ids.length) {
-        // ми індексували topicIds в Meili
         filters.push(`topicIds IN [${ids.join(", ")}]`);
       }
     }
@@ -77,7 +68,6 @@ module.exports = createCoreController("api::article.article", ({ strapi }) => ({
       searchOptions.filter = filters.join(" AND ");
     }
 
-    // 🔍 Запит до Meilisearch
     const result = await index.search(q, searchOptions);
     const hits = result.hits || [];
 
@@ -98,13 +88,11 @@ module.exports = createCoreController("api::article.article", ({ strapi }) => ({
       return;
     }
 
-    // 📥 Тепер добираємо повні статті зі Strapi за id
     const articles = await strapi.entityService.findMany(
       "api::article.article",
       {
         filters: { id: { $in: hitIds } },
         sort: ["article_date:desc"],
-        // ті ж поля, що у твоєму getArticles
         fields: [
           "title",
           "slug",
@@ -123,7 +111,6 @@ module.exports = createCoreController("api::article.article", ({ strapi }) => ({
       }
     );
 
-    // Пересортовуємо за порядком Meili (relevance)
     const mapById = new Map(articles.map((a) => [a.id, a]));
     const sortedArticles = hitIds.map((id) => mapById.get(id)).filter(Boolean);
 
@@ -132,7 +119,6 @@ module.exports = createCoreController("api::article.article", ({ strapi }) => ({
 
     const pageCount = Math.max(1, Math.ceil(total / limit));
 
-    // Віддаємо у strapi-подібній формі
     ctx.body = {
       data: sortedArticles.map((article) => ({
         id: article.id,
