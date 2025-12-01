@@ -7,9 +7,8 @@ const meiliClient = new MeiliSearch({
   host: process.env.MEILISEARCH_HOST,
   apiKey: process.env.MEILISEARCH_ADMIN_API_KEY,
 });
-// ⚙️ Нормальний і безпечний хелпер
+
 const getMeiliClient = (strapi) => {
-  // Забираємо весь конфіг плагіна
   const pluginConfig = strapi.config.get("plugin.meilisearch") || {};
   const fromPlugin = pluginConfig.config || {};
 
@@ -99,7 +98,6 @@ module.exports = createCoreController("api::article.article", ({ strapi }) => ({
     const total = result.estimatedTotalHits ?? result.nbHits ?? hits.length;
     const pageCount = total > 0 ? Math.ceil(total / limit) : 0;
 
-    // 🔥 Приводимо хіти Meili до структури ArticleListClient
     const normalizedArticles = hits.map((hit) => ({
       id: hit.id,
       slug: hit.slug,
@@ -116,7 +114,6 @@ module.exports = createCoreController("api::article.article", ({ strapi }) => ({
       category: Array.isArray(hit.category) ? hit.category : [],
       topic: Array.isArray(hit.topic) ? hit.topic : [],
 
-      // якщо хочеш мати всі поля — додаємо їх теж
       description: hit.description,
       article_date: hit.article_date,
       subscription_type: hit.subscription_type,
@@ -126,7 +123,6 @@ module.exports = createCoreController("api::article.article", ({ strapi }) => ({
     }));
 
     ctx.body = {
-      // або просто data: normalizedArticles, якщо ти не хочеш strapi-style {id, attributes}
       data: normalizedArticles,
       meta: {
         pagination: {
