@@ -32,25 +32,79 @@ module.exports = ({ env }) => ({
       article: {
         indexName: "article",
 
+        // 🔽 обовʼязкове populate для звʼязків і медіа
+        populate: {
+          cover: { fields: ["id", "url", "alternativeText"] },
+          category: { fields: ["id", "title"] },
+          topic: { fields: ["id", "title"] },
+          author: { fields: ["id", "name"] },
+        },
+
         transformEntry({ entry }) {
           return {
             id: entry.id,
             title: entry.title,
+            slug: entry.slug,
             description: entry.description,
             views: entry.views,
             article_date: entry.article_date,
+            publishedAt: entry.publishedAt,
+            documentId: entry.documentId,
 
-            categoryIds: entry.category?.map((c) => c.id) ?? [],
+            subscription_type: entry.subscription_type,
+            pinned: entry.pinned,
 
-            topicIds: entry.topic?.map((t) => t.id) ?? [],
+            // обкладинка (з урахуванням Strapi-media)
+            cover: entry.cover
+              ? {
+                  id: entry.cover.id,
+                  url: entry.cover.url,
+                  alternativeText: entry.cover.alternativeText,
+                }
+              : null,
 
+            // категорії
+            category: Array.isArray(entry.category)
+              ? entry.category.map((c) => ({
+                  id: c.id,
+                  title: c.title,
+                }))
+              : [],
+
+            // топіки
+            topic: Array.isArray(entry.topic)
+              ? entry.topic.map((t) => ({
+                  id: t.id,
+                  title: t.title,
+                }))
+              : [],
+
+            // автор
+            author: entry.author
+              ? { id: entry.author.id, name: entry.author.name }
+              : null,
+
+            // ID для фільтрів
+            categoryIds: Array.isArray(entry.category)
+              ? entry.category.map((c) => c.id)
+              : [],
+            topicIds: Array.isArray(entry.topic)
+              ? entry.topic.map((t) => t.id)
+              : [],
+
+            // текст для пошуку
             content: [entry.title ?? "", entry.description ?? ""].join(" "),
           };
         },
 
         settings: {
           searchableAttributes: ["title", "description", "content"],
-          filterableAttributes: ["categoryIds", "topicIds"],
+          filterableAttributes: [
+            "categoryIds",
+            "topicIds",
+            "subscription_type",
+            "pinned",
+          ],
           sortableAttributes: ["article_date", "views"],
         },
       },

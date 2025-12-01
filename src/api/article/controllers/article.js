@@ -7,6 +7,28 @@ const meiliClient = new MeiliSearch({
   host: process.env.MEILISEARCH_HOST,
   apiKey: process.env.MEILISEARCH_ADMIN_API_KEY,
 });
+// ⚙️ Нормальний і безпечний хелпер
+const getMeiliClient = (strapi) => {
+  // Забираємо весь конфіг плагіна
+  const pluginConfig = strapi.config.get("plugin.meilisearch") || {};
+  const fromPlugin = pluginConfig.config || {};
+
+  const host = fromPlugin.host || process.env.MEILISEARCH_HOST;
+  const apiKey = fromPlugin.apiKey || process.env.MEILISEARCH_ADMIN_API_KEY;
+
+  if (!host) {
+    strapi.log.error(
+      "[meilisearch] host не налаштований (plugin.meilisearch.config.host або MEILISEARCH_HOST)"
+    );
+  }
+  if (!apiKey) {
+    strapi.log.error(
+      "[meilisearch] apiKey не налаштований (plugin.meilisearch.config.apiKey або MEILISEARCH_ADMIN_API_KEY)"
+    );
+  }
+
+  return new MeiliSearch({ host, apiKey });
+};
 
 module.exports = createCoreController("api::article.article", ({ strapi }) => ({
   async views(ctx) {
@@ -46,22 +68,25 @@ module.exports = createCoreController("api::article.article", ({ strapi }) => ({
     const limit = Number(pageSize) || 20;
     const offset = (pageNum - 1) * limit;
 
+    const meiliClient = getMeiliClient(strapi);
+    const index = meiliClient.index("article");
+
     const filters = [];
     if (topics) {
       const ids = String(topics)
         .split(",")
         .map((s) => s.trim())
         .filter(Boolean);
+
       if (ids.length) {
         filters.push(`topicIds IN [${ids.join(", ")}]`);
       }
     }
 
-    const index = meiliClient.index("articles");
-
     const searchOptions = {
       limit,
       offset,
+      sort: ["article_date:desc"],
     };
 
     if (filters.length) {
@@ -71,59 +96,38 @@ module.exports = createCoreController("api::article.article", ({ strapi }) => ({
     const result = await index.search(q, searchOptions);
     const hits = result.hits || [];
 
-    const hitIds = hits.map((h) => h.id).filter(Boolean);
+    const total = result.estimatedTotalHits ?? result.nbHits ?? hits.length;
+    const pageCount = total > 0 ? Math.ceil(total / limit) : 0;
 
-    if (!hitIds.length) {
-      ctx.body = {
-        data: [],
-        meta: {
-          pagination: {
-            page: pageNum,
-            pageSize: limit,
-            total: 0,
-            pageCount: 0,
-          },
-        },
-      };
-      return;
-    }
+    // 🔥 Приводимо хіти Meili до структури ArticleListClient
+    const normalizedArticles = hits.map((hit) => ({
+      id: hit.id,
+      slug: hit.slug,
+      title: hit.title,
+      publishedAt: hit.publishedAt || hit.article_date || null,
+      views: hit.views ?? 0,
 
-    const articles = await strapi.entityService.findMany(
-      "api::article.article",
-      {
-        filters: { id: { $in: hitIds } },
-        sort: ["article_date:desc"],
-        fields: [
-          "title",
-          "slug",
-          "description",
-          "publishedAt",
-          "documentId",
-          "views",
-          "article_date",
-        ],
-        populate: {
-          category: { fields: ["title", "id"] },
-          cover: { fields: ["url", "alternativeText"] },
-          author: { fields: ["name"] },
-          topic: { fields: ["title", "id"] },
-        },
-      }
-    );
+      cover: hit.cover
+        ? {
+            url: hit.cover.url,
+          }
+        : undefined,
 
-    const mapById = new Map(articles.map((a) => [a.id, a]));
-    const sortedArticles = hitIds.map((id) => mapById.get(id)).filter(Boolean);
+      category: Array.isArray(hit.category) ? hit.category : [],
+      topic: Array.isArray(hit.topic) ? hit.topic : [],
 
-    const total =
-      result.estimatedTotalHits ?? result.nbHits ?? sortedArticles.length;
-
-    const pageCount = Math.max(1, Math.ceil(total / limit));
+      // якщо хочеш мати всі поля — додаємо їх теж
+      description: hit.description,
+      article_date: hit.article_date,
+      subscription_type: hit.subscription_type,
+      pinned: hit.pinned,
+      documentId: hit.documentId,
+      author: hit.author ?? null,
+    }));
 
     ctx.body = {
-      data: sortedArticles.map((article) => ({
-        id: article.id,
-        attributes: article,
-      })),
+      // або просто data: normalizedArticles, якщо ти не хочеш strapi-style {id, attributes}
+      data: normalizedArticles,
       meta: {
         pagination: {
           page: pageNum,
