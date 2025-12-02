@@ -83,7 +83,7 @@ module.exports = createCoreController(
       const page = Math.max(1, Number(ctx.query.page ?? 1));
       const pageSize = Math.min(
         100,
-        Math.max(1, Number(ctx.query.pageSize ?? 20))
+        Math.max(1, Number(ctx.query.pageSize ?? 10))
       );
       const start = (page - 1) * pageSize;
       const status = ctx.query.status;

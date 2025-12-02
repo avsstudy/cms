@@ -61,10 +61,10 @@ module.exports = createCoreController("api::article.article", ({ strapi }) => ({
   },
 
   async search(ctx) {
-    const { q = "", topics, page = 1, pageSize = 20 } = ctx.request.query;
+    const { q = "", topics, page = 1, pageSize = 10 } = ctx.request.query;
 
     const pageNum = Number(page) || 1;
-    const limit = Number(pageSize) || 20;
+    const limit = Number(pageSize) || 10;
     const offset = (pageNum - 1) * limit;
 
     const meiliClient = getMeiliClient(strapi);
