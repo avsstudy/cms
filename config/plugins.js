@@ -208,10 +208,6 @@ module.exports = ({ env }) => ({
                 }))
               : [],
 
-            topicIds: Array.isArray(entry.topic)
-              ? entry.topic.map((t) => t.id)
-              : [],
-
             author: entry.author
               ? { id: entry.author.id, name: entry.author.name }
               : null,
@@ -224,8 +220,13 @@ module.exports = ({ env }) => ({
               : null,
 
             topic_dps: entry.topic_dps
-              ? { id: entry.topic_dps.id, title: entry.topic_dps.title }
+              ? {
+                  id: entry.topic_dps.id,
+                  title: entry.topic_dps.title,
+                }
               : null,
+
+            topicDpsId: entry.topic_dps ? entry.topic_dps.id : null,
 
             ipk_file: entry.ipk_file
               ? {
@@ -241,7 +242,7 @@ module.exports = ({ env }) => ({
 
         settings: {
           searchableAttributes: ["ipk_title", "slug", "description", "content"],
-          filterableAttributes: ["topicIds", "subscription_type.id"],
+          filterableAttributes: ["topicDpsId", "subscription_type.id"],
           sortableAttributes: ["ipk_date", "publishedAt", "views"],
         },
       },
