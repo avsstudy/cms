@@ -350,6 +350,55 @@ module.exports = ({ env }) => ({
           sortableAttributes: ["publishedAt", "views"],
         },
       },
+      "expert-answer": {
+        indexName: "expert_answer",
+        populate: {
+          topic: { fields: ["id", "title"] },
+          author: { fields: ["id", "name"] },
+          subscription_type: { fields: ["id"] },
+        },
+        transformEntry({ entry }) {
+          const topics = Array.isArray(entry.topic) ? entry.topic : [];
+          const author = entry.author || null;
+          const subscription = entry.subscription_type || null;
+
+          return {
+            id: entry.id,
+            short_title: entry.short_title,
+            question_title: entry.question_title,
+            slug: entry.slug,
+            views: entry.views,
+            publishedAt: entry.publishedAt,
+            documentId: entry.documentId,
+            pinned: entry.pinned,
+
+            topic: topics.map((t) => ({
+              id: t.id,
+              title: t.title,
+            })),
+
+            author: author
+              ? {
+                  id: author.id,
+                  name: author.name,
+                }
+              : null,
+
+            subscriptionTypeId: subscription ? subscription.id : null,
+
+            topicIds: topics.map((t) => t.id),
+
+            content: [entry.short_title ?? "", entry.question_title ?? ""].join(
+              " "
+            ),
+          };
+        },
+        settings: {
+          searchableAttributes: ["short_title", "question_title", "content"],
+          filterableAttributes: ["topicIds", "subscriptionTypeId", "pinned"],
+          sortableAttributes: ["publishedAt", "views"],
+        },
+      },
     },
   },
 });
