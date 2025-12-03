@@ -178,6 +178,73 @@ module.exports = ({ env }) => ({
           sortableAttributes: ["publishedAt", "views"],
         },
       },
+
+      ipk: {
+        indexName: "ipk",
+
+        populate: {
+          topic: { fields: ["id", "title"] },
+          author: { fields: ["id", "name"] },
+          subscription_type: { fields: ["id", "title"] },
+          topic_dps: { fields: ["id", "title"] },
+          ipk_file: { fields: ["id", "url", "name"] },
+        },
+
+        transformEntry({ entry }) {
+          return {
+            id: entry.id,
+            ipk_title: entry.ipk_title,
+            slug: entry.slug,
+            description: entry.description,
+            ipk_date: entry.ipk_date,
+            publishedAt: entry.publishedAt,
+            documentId: entry.documentId,
+            views: entry.views,
+
+            topic: Array.isArray(entry.topic)
+              ? entry.topic.map((t) => ({
+                  id: t.id,
+                  title: t.title,
+                }))
+              : [],
+
+            topicIds: Array.isArray(entry.topic)
+              ? entry.topic.map((t) => t.id)
+              : [],
+
+            author: entry.author
+              ? { id: entry.author.id, name: entry.author.name }
+              : null,
+
+            subscription_type: entry.subscription_type
+              ? {
+                  id: entry.subscription_type.id,
+                  title: entry.subscription_type.title,
+                }
+              : null,
+
+            topic_dps: entry.topic_dps
+              ? { id: entry.topic_dps.id, title: entry.topic_dps.title }
+              : null,
+
+            ipk_file: entry.ipk_file
+              ? {
+                  id: entry.ipk_file.id,
+                  url: entry.ipk_file.url,
+                  name: entry.ipk_file.name,
+                }
+              : null,
+
+            content: [entry.ipk_title ?? "", entry.description ?? ""].join(" "),
+          };
+        },
+
+        settings: {
+          searchableAttributes: ["ipk_title", "description", "content"],
+          filterableAttributes: ["topicIds", "subscription_type.id"],
+          sortableAttributes: ["ipk_date", "publishedAt", "views"],
+        },
+      },
     },
   },
 });
