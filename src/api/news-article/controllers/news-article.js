@@ -100,7 +100,6 @@ module.exports = createCoreController(
       const searchOptions = {
         limit,
         offset,
-        sort: ["publishedAt:desc"],
       };
 
       if (filters.length) {
@@ -108,7 +107,13 @@ module.exports = createCoreController(
       }
 
       const result = await index.search(q, searchOptions);
-      const hits = result.hits || [];
+      const hits = (result.hits || []).slice();
+
+      hits.sort((a, b) => {
+        const da = a.publishedAt ? new Date(a.publishedAt).getTime() : 0;
+        const db = b.publishedAt ? new Date(b.publishedAt).getTime() : 0;
+        return db - da;
+      });
 
       const total = result.estimatedTotalHits ?? result.nbHits ?? hits.length;
       const pageCount = total > 0 ? Math.ceil(total / limit) : 0;
