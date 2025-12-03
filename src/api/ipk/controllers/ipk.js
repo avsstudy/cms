@@ -82,13 +82,6 @@ module.exports = createCoreController("api::ipk.ipk", ({ strapi }) => ({
       }
     }
 
-    if (from) {
-      filters.push(`ipk_date >= ${from}`);
-    }
-    if (to) {
-      filters.push(`ipk_date <= ${to}`);
-    }
-
     const searchOptions = {
       limit,
       offset,
@@ -101,7 +94,24 @@ module.exports = createCoreController("api::ipk.ipk", ({ strapi }) => ({
     const result = await index.search(q, searchOptions);
     const hits = (result.hits || []).slice();
 
-    hits.sort((a, b) => {
+    let filteredHits = hits;
+
+    if (from || to) {
+      const fromTs = from ? Date.parse(from) : null;
+      const toTs = to ? Date.parse(to) : null;
+
+      filteredHits = hits.filter((hit) => {
+        if (!hit.ipk_date) return false;
+        const ts = Date.parse(hit.ipk_date);
+        if (!Number.isFinite(ts)) return false;
+
+        if (fromTs !== null && ts < fromTs) return false;
+        if (toTs !== null && ts > toTs) return false;
+        return true;
+      });
+    }
+
+    filteredHits.sort((a, b) => {
       const da = a.ipk_date
         ? new Date(a.ipk_date).getTime()
         : a.publishedAt
@@ -117,10 +127,14 @@ module.exports = createCoreController("api::ipk.ipk", ({ strapi }) => ({
       return db - da;
     });
 
-    const total = result.estimatedTotalHits ?? result.nbHits ?? hits.length;
+    const total = filteredHits.length;
     const pageCount = total > 0 ? Math.ceil(total / limit) : 0;
 
-    const normalizedIpks = hits.map((hit) => ({
+    const start = offset;
+    const end = offset + limit;
+    const pageHits = filteredHits.slice(start, end);
+
+    const normalizedIpks = pageHits.map((hit) => ({
       id: hit.id,
       slug: hit.slug,
       ipk_title: hit.ipk_title,
@@ -129,7 +143,6 @@ module.exports = createCoreController("api::ipk.ipk", ({ strapi }) => ({
       publishedAt: hit.publishedAt,
       views: hit.views ?? 0,
       documentId: hit.documentId,
-
       topic: Array.isArray(hit.topic) ? hit.topic : [],
       author: hit.author ?? null,
       subscription_type: hit.subscription_type ?? null,

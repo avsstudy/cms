@@ -241,11 +241,7 @@ module.exports = ({ env }) => ({
 
         settings: {
           searchableAttributes: ["ipk_title", "slug", "description", "content"],
-          filterableAttributes: [
-            "topicIds",
-            "subscription_type.id",
-            "ipk_date",
-          ],
+          filterableAttributes: ["topicIds", "subscription_type.id"],
           sortableAttributes: ["ipk_date", "publishedAt", "views"],
         },
       },
