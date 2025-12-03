@@ -78,7 +78,6 @@ module.exports = createCoreController("api::ipk.ipk", ({ strapi }) => ({
     const searchOptions = {
       limit,
       offset,
-      sort: ["ipk_date:desc"],
     };
 
     if (filters.length) {
@@ -86,7 +85,23 @@ module.exports = createCoreController("api::ipk.ipk", ({ strapi }) => ({
     }
 
     const result = await index.search(q, searchOptions);
-    const hits = result.hits || [];
+    const hits = (result.hits || []).slice();
+
+    hits.sort((a, b) => {
+      const da = a.ipk_date
+        ? new Date(a.ipk_date).getTime()
+        : a.publishedAt
+          ? new Date(a.publishedAt).getTime()
+          : 0;
+
+      const db = b.ipk_date
+        ? new Date(b.ipk_date).getTime()
+        : b.publishedAt
+          ? new Date(b.publishedAt).getTime()
+          : 0;
+
+      return db - da;
+    });
 
     const total = result.estimatedTotalHits ?? result.nbHits ?? hits.length;
     const pageCount = total > 0 ? Math.ceil(total / limit) : 0;
