@@ -69,7 +69,6 @@ module.exports = createCoreController("api::ipk.ipk", ({ strapi }) => ({
     const meiliClient = getMeiliClient(strapi);
     const index = meiliClient.index("ipk");
 
-    // 🔹 масив id з query (?topics=74 => [74])
     const topicDpsFilter = topics
       ? String(topics)
           .split(",")
@@ -77,7 +76,6 @@ module.exports = createCoreController("api::ipk.ipk", ({ strapi }) => ({
           .filter((n) => Number.isFinite(n))
       : [];
 
-    // 🔹 Meili НЕ фільтрує по topicDpsId — тільки q, limit, offset
     const searchOptions = {
       limit,
       offset,
@@ -88,16 +86,20 @@ module.exports = createCoreController("api::ipk.ipk", ({ strapi }) => ({
 
     let filteredHits = hits;
 
-    // 1) фільтр по topic_dps (topicDpsId з Meili-документа)
     if (topicDpsFilter.length) {
       filteredHits = filteredHits.filter((hit) => {
-        const dpsId = Number(hit.topicDpsId);
+        const rawId =
+          hit.topicDpsId != null
+            ? hit.topicDpsId
+            : hit.topic_dps && hit.topic_dps.id;
+
+        const dpsId = Number(rawId);
         if (!Number.isFinite(dpsId)) return false;
+
         return topicDpsFilter.includes(dpsId);
       });
     }
 
-    // 2) фільтр по діапазону дат (from / to)
     if (from || to) {
       const fromTs = from ? Date.parse(from) : null;
       const toTs = to ? Date.parse(to) : null;
@@ -113,7 +115,6 @@ module.exports = createCoreController("api::ipk.ipk", ({ strapi }) => ({
       });
     }
 
-    // 3) сортування по даті (ipk_date / publishedAt)
     filteredHits.sort((a, b) => {
       const da = a.ipk_date
         ? new Date(a.ipk_date).getTime()
