@@ -53,7 +53,14 @@ module.exports = createCoreController("api::ipk.ipk", ({ strapi }) => ({
   },
 
   async search(ctx) {
-    const { q = "", topics, page = 1, pageSize = 10 } = ctx.request.query;
+    const {
+      q = "",
+      topics,
+      page = 1,
+      pageSize = 10,
+      from,
+      to,
+    } = ctx.request.query;
 
     const pageNum = Number(page) || 1;
     const limit = Number(pageSize) || 10;
@@ -73,6 +80,13 @@ module.exports = createCoreController("api::ipk.ipk", ({ strapi }) => ({
       if (ids.length) {
         filters.push(`topicIds IN [${ids.join(", ")}]`);
       }
+    }
+
+    if (from) {
+      filters.push(`ipk_date >= ${from}`);
+    }
+    if (to) {
+      filters.push(`ipk_date <= ${to}`);
     }
 
     const searchOptions = {
