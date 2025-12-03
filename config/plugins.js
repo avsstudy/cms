@@ -246,6 +246,110 @@ module.exports = ({ env }) => ({
           sortableAttributes: ["ipk_date", "publishedAt", "views"],
         },
       },
+
+      "avs-document": {
+        indexName: "avs_document",
+        populate: {
+          topic: { fields: ["id", "title"] },
+          author: { fields: ["id", "name"] },
+          subscription_type: { fields: ["id"] },
+        },
+        transformEntry({ entry }) {
+          const topics = Array.isArray(entry.topic) ? entry.topic : [];
+          const authors = Array.isArray(entry.author) ? entry.author : [];
+          const subs = Array.isArray(entry.subscription_type)
+            ? entry.subscription_type
+            : [];
+
+          return {
+            id: entry.id,
+            title: entry.title,
+            slug: entry.slug,
+            description: entry.description,
+            views: entry.views,
+            publishedAt: entry.publishedAt,
+            documentId: entry.documentId,
+            pinned: entry.pinned,
+
+            topic: topics.map((t) => ({
+              id: t.id,
+              title: t.title,
+            })),
+
+            author: authors.map((a) => ({
+              id: a.id,
+              name: a.name,
+            })),
+
+            subscriptionTypeIds: subs.map((s) => s.id),
+
+            topicIds: topics.map((t) => t.id),
+            authorIds: authors.map((a) => a.id),
+
+            content: [entry.title ?? "", entry.description ?? ""].join(" "),
+          };
+        },
+        settings: {
+          searchableAttributes: ["title", "description", "content"],
+          filterableAttributes: [
+            "topicIds",
+            "authorIds",
+            "subscriptionTypeIds",
+            "pinned",
+          ],
+          sortableAttributes: ["publishedAt", "views"],
+        },
+      },
+
+      handbook: {
+        indexName: "handbook",
+        populate: {
+          topic: { fields: ["id", "title"] },
+          authors: { fields: ["id", "name"] },
+        },
+        transformEntry({ entry }) {
+          const topics = Array.isArray(entry.topic) ? entry.topic : [];
+          const authors = Array.isArray(entry.authors) ? entry.authors : [];
+
+          return {
+            id: entry.id,
+            title: entry.title,
+            slug: entry.slug,
+            description: entry.description,
+            views: entry.views,
+            publishedAt: entry.publishedAt,
+            documentId: entry.documentId,
+            pinned: entry.pinned,
+
+            subscription_type: entry.subscription_type,
+
+            topic: topics.map((t) => ({
+              id: t.id,
+              title: t.title,
+            })),
+
+            authors: authors.map((a) => ({
+              id: a.id,
+              name: a.name,
+            })),
+
+            topicIds: topics.map((t) => t.id),
+            authorIds: authors.map((a) => a.id),
+
+            content: [entry.title ?? "", entry.description ?? ""].join(" "),
+          };
+        },
+        settings: {
+          searchableAttributes: ["title", "description", "content"],
+          filterableAttributes: [
+            "topicIds",
+            "authorIds",
+            "subscription_type",
+            "pinned",
+          ],
+          sortableAttributes: ["publishedAt", "views"],
+        },
+      },
     },
   },
 });
