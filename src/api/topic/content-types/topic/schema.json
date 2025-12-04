@@ -61,6 +61,12 @@
       "relation": "manyToMany",
       "target": "api::course.course",
       "mappedBy": "topic"
+    },
+    "video_recordings": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "api::video-recording.video-recording",
+      "inversedBy": "topic"
     }
   }
 }
