@@ -400,7 +400,7 @@ module.exports = ({ env }) => ({
         },
       },
       "video-recording": {
-        indexName: "video_recording",
+        indexName: "video-recording",
         populate: {
           card_cover: { fields: ["id", "url", "alternativeText"] },
           topic: { fields: ["id", "title"] },
