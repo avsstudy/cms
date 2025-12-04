@@ -31,6 +31,7 @@ module.exports = createCoreController(
       const {
         q = "",
         topics,
+        speakers,
         page = 1,
         pageSize = 10,
         videoTypes,
@@ -57,13 +58,24 @@ module.exports = createCoreController(
         }
       }
 
+      if (speakers) {
+        const ids = String(speakers)
+          .split(",")
+          .map((s) => s.trim())
+          .filter(Boolean);
+
+        if (ids.length) {
+          filters.push(`speakerIds IN [${ids.join(", ")}]`);
+        }
+      }
+
       if (videoTypes) {
         const types = String(videoTypes)
           .split(",")
           .map((s) => s.trim())
           .filter(Boolean);
+
         if (types.length) {
-          // video_type — поле в індексі
           filters.push(
             `video_type IN [${types.map((t) => `"${t}"`).join(", ")}]`
           );
@@ -75,6 +87,7 @@ module.exports = createCoreController(
           .split(",")
           .map((s) => s.trim())
           .filter(Boolean);
+
         if (types.length) {
           filters.push(
             `NOT video_type IN [${types.map((t) => `"${t}"`).join(", ")}]`
