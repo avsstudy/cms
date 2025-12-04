@@ -1626,6 +1626,10 @@ export interface ApiTopicTopic extends Struct.CollectionTypeSchema {
       'manyToMany',
       'api::user-question.user-question'
     >;
+    video_recordings: Schema.Attribute.Relation<
+      'manyToMany',
+      'api::video-recording.video-recording'
+    >;
   };
 }
 
@@ -1727,6 +1731,7 @@ export interface ApiVideoRecordingVideoRecording
     >;
     title: Schema.Attribute.String & Schema.Attribute.Required;
     top: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<false>;
+    topic: Schema.Attribute.Relation<'manyToMany', 'api::topic.topic'>;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
