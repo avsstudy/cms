@@ -399,6 +399,76 @@ module.exports = ({ env }) => ({
           sortableAttributes: ["publishedAt", "views"],
         },
       },
+      "video-recording": {
+        indexName: "video_recording",
+        populate: {
+          card_cover: { fields: ["id", "url", "alternativeText"] },
+          topic: { fields: ["id", "title"] },
+          speaker: { fields: ["id", "first_name", "last_name"] },
+          subscription_type: { fields: ["id"] },
+        },
+        transformEntry({ entry }) {
+          const topics = Array.isArray(entry.topic) ? entry.topic : [];
+          const speakers = Array.isArray(entry.speaker) ? entry.speaker : [];
+          const subs = Array.isArray(entry.subscription_type)
+            ? entry.subscription_type
+            : [];
+
+          return {
+            id: entry.id,
+            title: entry.title,
+            description: entry.description,
+            slug: entry.slug,
+            video_type: entry.video_type,
+            stream_date: entry.stream_date,
+            publishedAt: entry.publishedAt,
+            documentId: entry.documentId,
+            top: entry.top ?? false,
+
+            card_cover: entry.card_cover
+              ? {
+                  id: entry.card_cover.id,
+                  url: entry.card_cover.url,
+                  alternativeText: entry.card_cover.alternativeText,
+                }
+              : null,
+
+            topic: topics.map((t) => ({
+              id: t.id,
+              title: t.title,
+            })),
+            topicIds: topics.map((t) => t.id),
+
+            speaker: speakers.map((s) => ({
+              id: s.id,
+              first_name: s.first_name,
+              last_name: s.last_name,
+            })),
+            speakerIds: speakers.map((s) => s.id),
+
+            subscriptionTypeIds: subs.map((s) => s.id),
+
+            content: [
+              entry.title ?? "",
+              entry.description ?? "",
+              speakers
+                .map((s) => `${s.first_name ?? ""} ${s.last_name ?? ""}`.trim())
+                .join(" "),
+            ].join(" "),
+          };
+        },
+        settings: {
+          searchableAttributes: ["title", "description", "content"],
+          filterableAttributes: [
+            "topicIds",
+            "speakerIds",
+            "subscriptionTypeIds",
+            "video_type",
+            "top",
+          ],
+          sortableAttributes: ["publishedAt", "stream_date", "top"],
+        },
+      },
     },
   },
 });
