@@ -31,18 +31,18 @@ module.exports = createCoreController(
       const {
         q = "",
         topics,
+        page = 1,
+        pageSize = 10,
         videoTypes,
         excludeTypes,
-        page = 1,
-        pageSize = 12,
       } = ctx.request.query;
 
       const pageNum = Number(page) || 1;
-      const limit = Number(pageSize) || 12;
+      const limit = Number(pageSize) || 10;
       const offset = (pageNum - 1) * limit;
 
       const meiliClient = getMeiliClient(strapi);
-      const index = meiliClient.index("video_recording");
+      const index = meiliClient.index("video-recording");
 
       const filters = [];
 
@@ -63,8 +63,10 @@ module.exports = createCoreController(
           .map((s) => s.trim())
           .filter(Boolean);
         if (types.length) {
-          const quoted = types.map((t) => `"${t}"`).join(", ");
-          filters.push(`video_type IN [${quoted}]`);
+          // video_type — поле в індексі
+          filters.push(
+            `video_type IN [${types.map((t) => `"${t}"`).join(", ")}]`
+          );
         }
       }
 
@@ -74,15 +76,16 @@ module.exports = createCoreController(
           .map((s) => s.trim())
           .filter(Boolean);
         if (types.length) {
-          const quoted = types.map((t) => `"${t}"`).join(", ");
-          filters.push(`video_type NOT IN [${quoted}]`);
+          filters.push(
+            `NOT video_type IN [${types.map((t) => `"${t}"`).join(", ")}]`
+          );
         }
       }
 
       const searchOptions = {
         limit,
         offset,
-        sort: ["top:desc", "stream_date:desc", "publishedAt:desc"],
+        sort: ["publishedAt:desc"],
       };
 
       if (filters.length) {
@@ -99,22 +102,12 @@ module.exports = createCoreController(
         id: hit.id,
         slug: hit.slug,
         title: hit.title,
-        description: hit.description,
+        publishedAt: hit.publishedAt,
         video_type: hit.video_type,
         stream_date: hit.stream_date,
-        publishedAt: hit.publishedAt,
-        documentId: hit.documentId,
         top: hit.top ?? false,
-
-        card_cover: hit.card_cover
-          ? {
-              url: hit.card_cover.url,
-              alternativeText: hit.card_cover.alternativeText,
-            }
-          : null,
-
-        topic: Array.isArray(hit.topic) ? hit.topic : [],
-        speaker: Array.isArray(hit.speaker) ? hit.speaker : [],
+        card_cover: hit.card_cover ?? null,
+        speaker: hit.speaker ?? [],
       }));
 
       ctx.body = {
