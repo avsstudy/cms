@@ -27,59 +27,73 @@ module.exports = createCoreController(
 
       const pageNum = Number(page) || 1;
       const limit = Number(pageSize) || 10;
-      const offset = (pageNum - 1) * limit;
+
+      // парсимо topicIds / speakerIds з query
+      const topicIdsFilter = topics
+        ? String(topics)
+            .split(",")
+            .map((s) => s.trim())
+            .filter(Boolean)
+            .map((s) => Number(s))
+            .filter((n) => Number.isFinite(n))
+        : [];
+
+      const speakerIdsFilter = speakers
+        ? String(speakers)
+            .split(",")
+            .map((s) => s.trim())
+            .filter(Boolean)
+            .map((s) => Number(s))
+            .filter((n) => Number.isFinite(n))
+        : [];
 
       const meiliClient = getMeiliClient(strapi);
       const index = meiliClient.index("free-webinar");
 
-      const filters = [];
-
-      if (topics) {
-        const ids = String(topics)
-          .split(",")
-          .map((s) => s.trim())
-          .filter(Boolean);
-
-        if (ids.length) {
-          filters.push(`topicIds IN [${ids.join(", ")}]`);
-        }
-      }
-
-      if (speakers) {
-        const ids = String(speakers)
-          .split(",")
-          .map((s) => s.trim())
-          .filter(Boolean);
-
-        if (ids.length) {
-          filters.push(`speakerIds IN [${ids.join(", ")}]`);
-        }
-      }
-
+      // ⚠️ тут більше НЕ використовуємо filter і sort Meili,
+      // все робимо на нашому боці
       const searchOptions = {
-        limit,
-        offset,
-        // ❌ БІЛЬШЕ НЕ ВИКОРИСТОВУЄМО sort тут:
-        // sort: ["publishedAt:desc"],
+        // беремо "із запасом" — вебінарів небагато
+        limit: 1000,
       };
 
-      if (filters.length) {
-        searchOptions.filter = filters.join(" AND ");
-      }
-
       const result = await index.search(q, searchOptions);
+      const hitsAll = result.hits || [];
 
-      // ✅ Якщо хочеш зберегти сортування за датою – робимо це вже тут:
-      const hits = (result.hits || []).slice().sort((a, b) => {
+      // фільтрація по topics / speakers в JS,
+      // а не через Meili filterableAttributes
+      const filtered = hitsAll.filter((hit) => {
+        const topicIds = Array.isArray(hit.topicIds) ? hit.topicIds : [];
+        const speakerIds = Array.isArray(hit.speakerIds) ? hit.speakerIds : [];
+
+        const topicPass =
+          !topicIdsFilter.length ||
+          topicIds.some((id) => topicIdsFilter.includes(id));
+
+        const speakerPass =
+          !speakerIdsFilter.length ||
+          speakerIds.some((id) => speakerIdsFilter.includes(id));
+
+        return topicPass && speakerPass;
+      });
+
+      // сортування — якщо хочеш за датою публікації,
+      // або можна замінити логіку на date_1/time
+      const sorted = filtered.slice().sort((a, b) => {
         const tA = a.publishedAt ? new Date(a.publishedAt).getTime() : 0;
         const tB = b.publishedAt ? new Date(b.publishedAt).getTime() : 0;
         return tB - tA; // desc
       });
 
-      const total = result.estimatedTotalHits ?? result.nbHits ?? hits.length;
+      // пагінація тепер теж на нашому боці
+      const total = sorted.length;
       const pageCount = total > 0 ? Math.ceil(total / limit) : 0;
 
-      const normalized = hits.map((hit) => ({
+      const start = (pageNum - 1) * limit;
+      const end = start + limit;
+      const pageItems = sorted.slice(start, end);
+
+      const normalized = pageItems.map((hit) => ({
         id: hit.id,
         slug: hit.slug,
         title: hit.title,
