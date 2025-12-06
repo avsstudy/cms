@@ -469,6 +469,147 @@ module.exports = ({ env }) => ({
           sortableAttributes: ["publishedAt", "stream_date", "top"],
         },
       },
+      "free-webinar": {
+        indexName: "free-webinar",
+        populate: {
+          card_cover: { fields: ["id", "url", "alternativeText"] },
+          topic: { fields: ["id", "title"] },
+          speaker: { fields: ["id", "first_name", "last_name"] },
+        },
+        transformEntry({ entry }) {
+          const topics = Array.isArray(entry.topic) ? entry.topic : [];
+          const speakers = Array.isArray(entry.speaker) ? entry.speaker : [];
+
+          return {
+            id: entry.id,
+            title: entry.title,
+            description: entry.description,
+            slug: entry.slug,
+            webinar_type: entry.webinar_type,
+            date_1: entry.date_1,
+            date_2: entry.date_2,
+            date_3: entry.date_3,
+            time: entry.time,
+            stream_url: entry.stream_url,
+            pinned: entry.pinned ?? false,
+            documentId: entry.documentId,
+
+            card_cover: entry.card_cover
+              ? {
+                  id: entry.card_cover.id,
+                  url: entry.card_cover.url,
+                  alternativeText: entry.card_cover.alternativeText,
+                }
+              : null,
+
+            topic: topics.map((t) => ({
+              id: t.id,
+              title: t.title,
+            })),
+            topicIds: topics.map((t) => t.id),
+
+            speaker: speakers.map((s) => ({
+              id: s.id,
+              first_name: s.first_name,
+              last_name: s.last_name,
+            })),
+            speakerIds: speakers.map((s) => s.id),
+
+            content: [
+              entry.title ?? "",
+              entry.description ?? "",
+              speakers
+                .map((s) => `${s.first_name ?? ""} ${s.last_name ?? ""}`.trim())
+                .join(" "),
+            ].join(" "),
+          };
+        },
+        settings: {
+          searchableAttributes: ["title", "description", "content"],
+          filterableAttributes: [
+            "topicIds",
+            "speakerIds",
+            "webinar_type",
+            "pinned",
+          ],
+          sortableAttributes: [
+            "publishedAt",
+            "date_1",
+            "date_2",
+            "date_3",
+            "time",
+          ],
+        },
+      },
+      course: {
+        indexName: "course",
+        populate: {
+          card_cover: { fields: ["id", "url", "alternativeText"] },
+          topic: { fields: ["id", "title"] },
+          speaker: {
+            fields: ["id", "first_name", "last_name"],
+          },
+          subscription_type: { fields: ["id"] },
+        },
+        transformEntry({ entry }) {
+          const topics = Array.isArray(entry.topic) ? entry.topic : [];
+          const speakers = Array.isArray(entry.speaker) ? entry.speaker : [];
+          const subs = Array.isArray(entry.subscription_type)
+            ? entry.subscription_type
+            : [];
+
+          return {
+            id: entry.id,
+            title: entry.title,
+            description: entry.description,
+            slug: entry.slug,
+            course_type: entry.course_type,
+            publishedAt: entry.publishedAt,
+            documentId: entry.documentId,
+
+            card_cover: entry.card_cover
+              ? {
+                  id: entry.card_cover.id,
+                  url: entry.card_cover.url,
+                  alternativeText: entry.card_cover.alternativeText,
+                }
+              : null,
+
+            topic: topics.map((t) => ({
+              id: t.id,
+              title: t.title,
+            })),
+            topicIds: topics.map((t) => t.id),
+
+            speaker: speakers.map((s) => ({
+              id: s.id,
+              first_name: s.first_name,
+              last_name: s.last_name,
+            })),
+            speakerIds: speakers.map((s) => s.id),
+
+            subscriptionTypeIds: subs.map((s) => s.id),
+
+            content: [
+              entry.title ?? "",
+              entry.description ?? "",
+              speakers
+                .map((s) => `${s.first_name ?? ""} ${s.last_name ?? ""}`.trim())
+                .join(" "),
+            ].join(" "),
+          };
+        },
+        settings: {
+          searchableAttributes: ["title", "description", "content"],
+          filterableAttributes: [
+            "topicIds",
+            "speakerIds",
+            "subscriptionTypeIds",
+            "course_type",
+          ],
+          sortableAttributes: ["publishedAt"],
+        },
+      },
     },
   },
 });
