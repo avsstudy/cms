@@ -384,7 +384,7 @@ module.exports = createCoreController("api::course.course", ({ strapi }) => ({
     }
 
     // якщо хочеш, можна ще фільтрувати course_type:
-    filters.push(`course_type != "course_online"`);
+    // filters.push(`course_type != "course_online"`);
 
     const searchOptions = {
       limit,

@@ -605,7 +605,6 @@ module.exports = ({ env }) => ({
             "topicIds",
             "speakerIds",
             "subscriptionTypeIds",
-            "course_type",
           ],
           sortableAttributes: ["publishedAt"],
         },
