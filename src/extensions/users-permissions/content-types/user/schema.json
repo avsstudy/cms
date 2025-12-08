@@ -106,6 +106,9 @@
       "relation": "oneToMany",
       "target": "api::session-question.session-question",
       "mappedBy": "users_permissions_user"
+    },
+    "zoho_id": {
+      "type": "string"
     }
   }
 }
