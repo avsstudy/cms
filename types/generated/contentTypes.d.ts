@@ -2270,6 +2270,7 @@ export interface PluginUsersPermissionsUser
       Schema.Attribute.SetMinMaxLength<{
         minLength: 3;
       }>;
+    zoho_id: Schema.Attribute.String;
   };
 }
 
