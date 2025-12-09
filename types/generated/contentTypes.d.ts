@@ -730,6 +730,7 @@ export interface ApiCourseCourse extends Struct.CollectionTypeSchema {
     > &
       Schema.Attribute.Required &
       Schema.Attribute.DefaultTo<'industry'>;
+    client_title: Schema.Attribute.String & Schema.Attribute.Required;
     course_accesses: Schema.Attribute.Relation<
       'oneToMany',
       'api::course-access.course-access'

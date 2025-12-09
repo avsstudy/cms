@@ -11,6 +11,10 @@
   },
   "pluginOptions": {},
   "attributes": {
+    "client_title": {
+      "type": "string",
+      "required": true
+    },
     "title": {
       "type": "string",
       "required": true
