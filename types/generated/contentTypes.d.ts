@@ -1534,6 +1534,14 @@ export interface ApiTopBannerTopBanner extends Struct.CollectionTypeSchema {
     draftAndPublish: false;
   };
   attributes: {
+    background_color: Schema.Attribute.String & Schema.Attribute.Required;
+    banner_1000: Schema.Attribute.Media<'images'> & Schema.Attribute.Required;
+    banner_375: Schema.Attribute.Media<'images'> & Schema.Attribute.Required;
+    banner_768: Schema.Attribute.Media<'images'> & Schema.Attribute.Required;
+    banner_status: Schema.Attribute.Enumeration<['active', 'inactive']> &
+      Schema.Attribute.Required &
+      Schema.Attribute.DefaultTo<'inactive'>;
+    banner_url: Schema.Attribute.String;
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
@@ -1543,7 +1551,9 @@ export interface ApiTopBannerTopBanner extends Struct.CollectionTypeSchema {
       'api::top-banner.top-banner'
     > &
       Schema.Attribute.Private;
+    priority: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<false>;
     publishedAt: Schema.Attribute.DateTime;
+    title: Schema.Attribute.String & Schema.Attribute.Required;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
