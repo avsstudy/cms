@@ -10,5 +10,55 @@
     "draftAndPublish": false
   },
   "pluginOptions": {},
-  "attributes": {}
+  "attributes": {
+    "title": {
+      "type": "string",
+      "required": true
+    },
+    "banner_url": {
+      "type": "string"
+    },
+    "banner_1000": {
+      "type": "media",
+      "multiple": false,
+      "required": true,
+      "allowedTypes": [
+        "images"
+      ]
+    },
+    "banner_768": {
+      "type": "media",
+      "multiple": false,
+      "required": true,
+      "allowedTypes": [
+        "images"
+      ]
+    },
+    "banner_375": {
+      "type": "media",
+      "multiple": false,
+      "required": true,
+      "allowedTypes": [
+        "images"
+      ]
+    },
+    "background_color": {
+      "type": "string",
+      "required": true
+    },
+    "priority": {
+      "type": "boolean",
+      "required": false,
+      "default": false
+    },
+    "banner_status": {
+      "type": "enumeration",
+      "required": true,
+      "default": "inactive",
+      "enum": [
+        "active",
+        "inactive"
+      ]
+    }
+  }
 }
