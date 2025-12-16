@@ -1523,6 +1523,33 @@ export interface ApiTestAttemptTestAttempt extends Struct.CollectionTypeSchema {
   };
 }
 
+export interface ApiTopBannerTopBanner extends Struct.CollectionTypeSchema {
+  collectionName: 'top_banners';
+  info: {
+    displayName: 'Top_banner';
+    pluralName: 'top-banners';
+    singularName: 'top-banner';
+  };
+  options: {
+    draftAndPublish: false;
+  };
+  attributes: {
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::top-banner.top-banner'
+    > &
+      Schema.Attribute.Private;
+    publishedAt: Schema.Attribute.DateTime;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
 export interface ApiTopicDpsTopicDps extends Struct.CollectionTypeSchema {
   collectionName: 'topics_dps';
   info: {
@@ -2311,6 +2338,7 @@ declare module '@strapi/strapi' {
       'api::study-session.study-session': ApiStudySessionStudySession;
       'api::subscription-type.subscription-type': ApiSubscriptionTypeSubscriptionType;
       'api::test-attempt.test-attempt': ApiTestAttemptTestAttempt;
+      'api::top-banner.top-banner': ApiTopBannerTopBanner;
       'api::topic-dps.topic-dps': ApiTopicDpsTopicDps;
       'api::topic-group.topic-group': ApiTopicGroupTopicGroup;
       'api::topic.topic': ApiTopicTopic;
