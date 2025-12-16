@@ -327,7 +327,7 @@ export interface SharedTestQuestion extends Struct.ComponentSchema {
       Schema.Attribute.SetMinMax<
         {
           max: 4;
-          min: 4;
+          min: 1;
         },
         number
       >;
