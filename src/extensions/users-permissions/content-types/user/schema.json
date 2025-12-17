@@ -109,6 +109,16 @@
     },
     "zoho_id": {
       "type": "string"
-    }
+    },
+    "lastName": {
+  "type": "string"
+},
+"gender": {
+  "type": "enumeration",
+  "enum": ["male", "female"]
+},
+"birthday": {
+  "type": "date"
+}
   }
 }
