@@ -14,6 +14,12 @@
     "url": {
       "type": "string",
       "required": true
+    },
+    "aside_banners": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "api::aside-banner.aside-banner",
+      "mappedBy": "site_pages"
     }
   }
 }

@@ -38,6 +38,12 @@
         "active",
         "inactive"
       ]
+    },
+    "site_pages": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "api::site-page.site-page",
+      "inversedBy": "aside_banners"
     }
   }
 }

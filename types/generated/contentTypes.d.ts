@@ -575,6 +575,10 @@ export interface ApiAsideBannerAsideBanner extends Struct.CollectionTypeSchema {
       Schema.Attribute.Private;
     priority: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<false>;
     publishedAt: Schema.Attribute.DateTime;
+    site_pages: Schema.Attribute.Relation<
+      'manyToMany',
+      'api::site-page.site-page'
+    >;
     title: Schema.Attribute.String & Schema.Attribute.Required;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
@@ -1374,6 +1378,10 @@ export interface ApiSitePageSitePage extends Struct.CollectionTypeSchema {
     draftAndPublish: false;
   };
   attributes: {
+    aside_banners: Schema.Attribute.Relation<
+      'manyToMany',
+      'api::aside-banner.aside-banner'
+    >;
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
@@ -1387,6 +1395,7 @@ export interface ApiSitePageSitePage extends Struct.CollectionTypeSchema {
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
+    url: Schema.Attribute.String & Schema.Attribute.Required;
   };
 }
 
