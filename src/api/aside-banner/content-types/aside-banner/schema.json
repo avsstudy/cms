@@ -1,0 +1,14 @@
+{
+  "kind": "collectionType",
+  "collectionName": "aside_banners",
+  "info": {
+    "singularName": "aside-banner",
+    "pluralName": "aside-banners",
+    "displayName": "Aside_banner"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {}
+}
