@@ -10,5 +10,34 @@
     "draftAndPublish": false
   },
   "pluginOptions": {},
-  "attributes": {}
+  "attributes": {
+    "title": {
+      "type": "string",
+      "required": true
+    },
+    "banner_url": {
+      "type": "string"
+    },
+    "banner_312": {
+      "type": "media",
+      "multiple": false,
+      "required": true,
+      "allowedTypes": [
+        "images"
+      ]
+    },
+    "priority": {
+      "type": "boolean",
+      "default": false
+    },
+    "banner_status": {
+      "type": "enumeration",
+      "required": true,
+      "default": "inactive",
+      "enum": [
+        "active",
+        "inactive"
+      ]
+    }
+  }
 }

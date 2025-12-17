@@ -559,6 +559,11 @@ export interface ApiAsideBannerAsideBanner extends Struct.CollectionTypeSchema {
     draftAndPublish: false;
   };
   attributes: {
+    banner_312: Schema.Attribute.Media<'images'> & Schema.Attribute.Required;
+    banner_status: Schema.Attribute.Enumeration<['active', 'inactive']> &
+      Schema.Attribute.Required &
+      Schema.Attribute.DefaultTo<'inactive'>;
+    banner_url: Schema.Attribute.String;
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
@@ -568,7 +573,9 @@ export interface ApiAsideBannerAsideBanner extends Struct.CollectionTypeSchema {
       'api::aside-banner.aside-banner'
     > &
       Schema.Attribute.Private;
+    priority: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<false>;
     publishedAt: Schema.Attribute.DateTime;
+    title: Schema.Attribute.String & Schema.Attribute.Required;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
@@ -1350,6 +1357,33 @@ export interface ApiSessionTestSessionTest extends Struct.CollectionTypeSchema {
     >;
     timeLimitSeconds: Schema.Attribute.Integer;
     title: Schema.Attribute.String & Schema.Attribute.Required;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
+export interface ApiSitePageSitePage extends Struct.CollectionTypeSchema {
+  collectionName: 'site_pages';
+  info: {
+    displayName: 'Site_page';
+    pluralName: 'site-pages';
+    singularName: 'site-page';
+  };
+  options: {
+    draftAndPublish: false;
+  };
+  attributes: {
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::site-page.site-page'
+    > &
+      Schema.Attribute.Private;
+    publishedAt: Schema.Attribute.DateTime;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
@@ -2372,6 +2406,7 @@ declare module '@strapi/strapi' {
       'api::session-progress.session-progress': ApiSessionProgressSessionProgress;
       'api::session-question.session-question': ApiSessionQuestionSessionQuestion;
       'api::session-test.session-test': ApiSessionTestSessionTest;
+      'api::site-page.site-page': ApiSitePageSitePage;
       'api::speaker.speaker': ApiSpeakerSpeaker;
       'api::study-session.study-session': ApiStudySessionStudySession;
       'api::subscription-type.subscription-type': ApiSubscriptionTypeSubscriptionType;
