@@ -111,14 +111,23 @@
       "type": "string"
     },
     "lastName": {
-  "type": "string"
-},
-"gender": {
-  "type": "enumeration",
-  "enum": ["male", "female"]
-},
-"birthday": {
-  "type": "date"
-}
+      "type": "string"
+    },
+    "gender": {
+      "type": "enumeration",
+      "enum": [
+        "male",
+        "female"
+      ]
+    },
+    "birthday": {
+      "type": "date"
+    },
+    "photo": {
+      "type": "media",
+      "multiple": false,
+      "required": false,
+      "allowedTypes": ["images"]
+    }
   }
 }

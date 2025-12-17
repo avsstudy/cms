@@ -14,7 +14,6 @@ const READ_FIELDS = [
   "birthday",
   "zoho_id",
 ];
-
 const UPDATE_FIELDS = [
   "username",
   "email",
@@ -23,8 +22,11 @@ const UPDATE_FIELDS = [
   "gender",
   "birthday",
 ];
-
 const ZOHO_FIELDS = ["username", "email", "phone", "lastName"];
+
+const USERS_PHOTO_FOLDER_ID = process.env.USERS_PHOTO_FOLDER_ID
+  ? Number(process.env.USERS_PHOTO_FOLDER_ID)
+  : null;
 
 function pick(obj, keys) {
   const out = {};
@@ -40,6 +42,17 @@ function changedAny(before, patch, keys) {
   );
 }
 
+function normalizeBody(body) {
+  const out = { ...body };
+
+  if (out.gender === "null" || out.gender === "") out.gender = null;
+  if (out.birthday === "null" || out.birthday === "") out.birthday = null;
+  if (out.lastName === "null" || out.lastName === "") out.lastName = null;
+  if (out.phone === "null" || out.phone === "") out.phone = null;
+
+  return out;
+}
+
 module.exports = {
   async me(ctx) {
     const userId = ctx.state.user?.id;
@@ -48,7 +61,12 @@ module.exports = {
     const user = await strapi.entityService.findOne(
       "plugin::users-permissions.user",
       userId,
-      { fields: READ_FIELDS }
+      {
+        fields: READ_FIELDS,
+        populate: {
+          photo: true,
+        },
+      }
     );
 
     ctx.body = { user };
@@ -58,8 +76,8 @@ module.exports = {
     const userId = ctx.state.user?.id;
     if (!userId) return ctx.unauthorized();
 
-    const body = ctx.request.body || {};
-    const data = pick(body, UPDATE_FIELDS);
+    const rawBody = normalizeBody(ctx.request.body || {});
+    const data = pick(rawBody, UPDATE_FIELDS);
 
     if (data.gender && !["male", "female"].includes(data.gender)) {
       return ctx.badRequest("Invalid gender");
@@ -68,14 +86,60 @@ module.exports = {
     const before = await strapi.entityService.findOne(
       "plugin::users-permissions.user",
       userId,
-      { fields: [...ZOHO_FIELDS, "zoho_id"] }
+      {
+        fields: [...ZOHO_FIELDS, "zoho_id"],
+        populate: { photo: true },
+      }
     );
+
+    let uploadedPhoto = null;
+    const files = ctx.request.files || {};
+    const photoFile = files.photo;
+
+    if (photoFile) {
+      const uploadService = strapi.plugin("upload").service("upload");
+
+      const uploaded = await uploadService.upload({
+        data: {
+          fileInfo: {
+            folder: USERS_PHOTO_FOLDER_ID || undefined,
+            name: `user-${userId}-photo`,
+          },
+        },
+        files: photoFile,
+      });
+
+      uploadedPhoto = Array.isArray(uploaded) ? uploaded[0] : uploaded;
+    }
+
+    const updateData = {
+      ...data,
+      ...(uploadedPhoto?.id ? { photo: uploadedPhoto.id } : {}),
+    };
 
     const updated = await strapi.entityService.update(
       "plugin::users-permissions.user",
       userId,
-      { data, fields: READ_FIELDS }
+      {
+        data: updateData,
+        fields: READ_FIELDS,
+        populate: { photo: true },
+      }
     );
+
+    try {
+      if (
+        uploadedPhoto?.id &&
+        before?.photo?.id &&
+        before.photo.id !== uploadedPhoto.id
+      ) {
+        await strapi.plugin("upload").service("upload").remove(before.photo);
+      }
+    } catch (e) {
+      strapi.log.warn(
+        "[profile.updateMe] failed to remove old photo: " + (e?.message || e)
+      );
+    }
 
     const needZohoUpdate = changedAny(before, data, ZOHO_FIELDS);
 
@@ -96,36 +160,13 @@ module.exports = {
             lastName: updated.lastName || "",
           };
 
-          strapi.log.info(
-            "[profile.updateMe] Sending UPDATE to Zoho payload:",
-            JSON.stringify(zohoPayload)
-          );
-
-          const zohoResp = await axios.post(
+          await axios.post(
             "https://core.avstudy.com.ua/api/lead/new",
             zohoPayload,
-            { httpsAgent: insecureAgent }
+            {
+              httpsAgent: insecureAgent,
+            }
           );
-
-          strapi.log.info(
-            "[profile.updateMe] Zoho update status:",
-            zohoResp.status
-          );
-          strapi.log.info(
-            "[profile.updateMe] Zoho update data:",
-            JSON.stringify(zohoResp.data)
-          );
-
-          const newZohoId = zohoResp.data?.crm?.contact_id;
-          if (newZohoId && newZohoId !== updated.zoho_id) {
-            const finalUser = await strapi.entityService.update(
-              "plugin::users-permissions.user",
-              userId,
-              { data: { zoho_id: newZohoId }, fields: READ_FIELDS }
-            );
-            ctx.body = { user: finalUser };
-            return;
-          }
         } catch (err) {
           strapi.log.warn(
             "[profile.updateMe] Zoho update failed: " + (err?.message || err)
