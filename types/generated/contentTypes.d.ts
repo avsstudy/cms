@@ -874,6 +874,42 @@ export interface ApiExpertAnswerExpertAnswer
   };
 }
 
+export interface ApiFavoriteFavorite extends Struct.CollectionTypeSchema {
+  collectionName: 'favorites';
+  info: {
+    displayName: 'favorite';
+    pluralName: 'favorites';
+    singularName: 'favorite';
+  };
+  options: {
+    draftAndPublish: false;
+  };
+  attributes: {
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    itemDocumentId: Schema.Attribute.String & Schema.Attribute.Required;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::favorite.favorite'
+    > &
+      Schema.Attribute.Private;
+    publishedAt: Schema.Attribute.DateTime;
+    type: Schema.Attribute.Enumeration<
+      ['article', 'news-article', 'video-recording']
+    > &
+      Schema.Attribute.Required;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    user: Schema.Attribute.Relation<
+      'manyToOne',
+      'plugin::users-permissions.user'
+    >;
+  };
+}
+
 export interface ApiFreeWebinarReasonFreeWebinarReason
   extends Struct.CollectionTypeSchema {
   collectionName: 'free_webinar_reasons';
@@ -2407,6 +2443,7 @@ declare module '@strapi/strapi' {
       'api::course-access.course-access': ApiCourseAccessCourseAccess;
       'api::course.course': ApiCourseCourse;
       'api::expert-answer.expert-answer': ApiExpertAnswerExpertAnswer;
+      'api::favorite.favorite': ApiFavoriteFavorite;
       'api::free-webinar-reason.free-webinar-reason': ApiFreeWebinarReasonFreeWebinarReason;
       'api::free-webinar.free-webinar': ApiFreeWebinarFreeWebinar;
       'api::global.global': ApiGlobalGlobal;

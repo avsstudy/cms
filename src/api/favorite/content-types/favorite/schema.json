@@ -1,0 +1,29 @@
+{
+  "kind": "collectionType",
+  "collectionName": "favorites",
+  "info": {
+    "singularName": "favorite",
+    "pluralName": "favorites",
+    "displayName": "favorite"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+  "type": {
+    "type": "enumeration",
+    "enum": ["article", "news-article", "video-recording"],
+    "required": true
+  },
+  "itemDocumentId": {
+    "type": "string",
+    "required": true
+  },
+  "user": {
+    "type": "relation",
+    "relation": "manyToOne",
+    "target": "plugin::users-permissions.user"
+  }
+}
+}
