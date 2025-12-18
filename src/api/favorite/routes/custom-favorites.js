@@ -20,7 +20,6 @@ module.exports = {
       handler: "favorite.videoRecordingIds",
       config: { policies: ["global::is-authenticated"] },
     },
-
     {
       method: "POST",
       path: "/favorites/toggle",

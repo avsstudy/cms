@@ -3,7 +3,6 @@
 const { createCoreController } = require("@strapi/strapi").factories;
 
 const UID = "api::favorite.favorite";
-
 const ALLOWED_TYPES = new Set(["article", "news-article", "video-recording"]);
 
 function normalizeId(v) {
@@ -38,25 +37,21 @@ module.exports = createCoreController(UID, ({ strapi }) => ({
   async articleIds(ctx) {
     const userId = ctx.state.user?.id;
     if (!userId) return ctx.unauthorized();
-
     ctx.body = await getIds(strapi, userId, "article");
   },
 
   async newsArticleIds(ctx) {
     const userId = ctx.state.user?.id;
     if (!userId) return ctx.unauthorized();
-
     ctx.body = await getIds(strapi, userId, "news-article");
   },
 
   async videoRecordingIds(ctx) {
     const userId = ctx.state.user?.id;
     if (!userId) return ctx.unauthorized();
-
     ctx.body = await getIds(strapi, userId, "video-recording");
   },
 
-  // ===== unified toggle =====
   async toggle(ctx) {
     const userId = ctx.state.user?.id;
     if (!userId) return ctx.unauthorized();
