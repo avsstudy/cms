@@ -28,7 +28,6 @@ module.exports = createCoreController(
       const pageNum = Number(page) || 1;
       const limit = Number(pageSize) || 10;
 
-      // парсимо topicIds / speakerIds з query
       const topicIdsFilter = topics
         ? String(topics)
             .split(",")
@@ -50,18 +49,13 @@ module.exports = createCoreController(
       const meiliClient = getMeiliClient(strapi);
       const index = meiliClient.index("free-webinar");
 
-      // ⚠️ тут більше НЕ використовуємо filter і sort Meili,
-      // все робимо на нашому боці
       const searchOptions = {
-        // беремо "із запасом" — вебінарів небагато
         limit: 1000,
       };
 
       const result = await index.search(q, searchOptions);
       const hitsAll = result.hits || [];
 
-      // фільтрація по topics / speakers в JS,
-      // а не через Meili filterableAttributes
       const filtered = hitsAll.filter((hit) => {
         const topicIds = Array.isArray(hit.topicIds) ? hit.topicIds : [];
         const speakerIds = Array.isArray(hit.speakerIds) ? hit.speakerIds : [];
@@ -77,15 +71,12 @@ module.exports = createCoreController(
         return topicPass && speakerPass;
       });
 
-      // сортування — якщо хочеш за датою публікації,
-      // або можна замінити логіку на date_1/time
       const sorted = filtered.slice().sort((a, b) => {
         const tA = a.publishedAt ? new Date(a.publishedAt).getTime() : 0;
         const tB = b.publishedAt ? new Date(b.publishedAt).getTime() : 0;
-        return tB - tA; // desc
+        return tB - tA;
       });
 
-      // пагінація тепер теж на нашому боці
       const total = sorted.length;
       const pageCount = total > 0 ? Math.ceil(total / limit) : 0;
 

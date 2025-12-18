@@ -82,7 +82,6 @@ module.exports = createCoreController(
         }
       }
 
-      // NOT video_type IN [...]
       if (excludeTypes) {
         const types = String(excludeTypes)
           .split(",")
