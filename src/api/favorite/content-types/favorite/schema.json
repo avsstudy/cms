@@ -13,7 +13,15 @@
   "attributes": {
   "type": {
     "type": "enumeration",
-    "enum": ["article", "news-article", "video-recording"],
+    "enum": [
+        "article",
+        "news-article",
+        "video-recording",
+        "avs-document",
+        "expert-answer",
+        "handbook",
+        "course"
+      ],
     "required": true
   },
   "itemDocumentId": {

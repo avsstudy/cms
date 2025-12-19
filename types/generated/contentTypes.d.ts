@@ -897,7 +897,15 @@ export interface ApiFavoriteFavorite extends Struct.CollectionTypeSchema {
       Schema.Attribute.Private;
     publishedAt: Schema.Attribute.DateTime;
     type: Schema.Attribute.Enumeration<
-      ['article', 'news-article', 'video-recording']
+      [
+        'article',
+        'news-article',
+        'video-recording',
+        'avs-document',
+        'expert-answer',
+        'handbook',
+        'course',
+      ]
     > &
       Schema.Attribute.Required;
     updatedAt: Schema.Attribute.DateTime;

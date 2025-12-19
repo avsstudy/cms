@@ -3,7 +3,15 @@
 const { createCoreController } = require("@strapi/strapi").factories;
 
 const UID = "api::favorite.favorite";
-const ALLOWED_TYPES = new Set(["article", "news-article", "video-recording"]);
+const ALLOWED_TYPES = new Set([
+  "article",
+  "news-article",
+  "video-recording",
+  "avs-document",
+  "expert-answer",
+  "handbook",
+  "course",
+]);
 
 function normalizeId(v) {
   return String(v ?? "").trim();
@@ -50,6 +58,26 @@ module.exports = createCoreController(UID, ({ strapi }) => ({
     const userId = ctx.state.user?.id;
     if (!userId) return ctx.unauthorized();
     ctx.body = await getIds(strapi, userId, "video-recording");
+  },
+  async avsDocumentIds(ctx) {
+    const userId = ctx.state.user?.id;
+    if (!userId) return ctx.unauthorized();
+    ctx.body = await getIds(strapi, userId, "avs-document");
+  },
+  async expertAnswerIds(ctx) {
+    const userId = ctx.state.user?.id;
+    if (!userId) return ctx.unauthorized();
+    ctx.body = await getIds(strapi, userId, "expert-answer");
+  },
+  async handbookIds(ctx) {
+    const userId = ctx.state.user?.id;
+    if (!userId) return ctx.unauthorized();
+    ctx.body = await getIds(strapi, userId, "handbook");
+  },
+  async courseIds(ctx) {
+    const userId = ctx.state.user?.id;
+    if (!userId) return ctx.unauthorized();
+    ctx.body = await getIds(strapi, userId, "course");
   },
 
   async toggle(ctx) {
