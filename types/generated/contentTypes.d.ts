@@ -536,6 +536,10 @@ export interface ApiArticleArticle extends Struct.CollectionTypeSchema {
     pinned: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<false>;
     publishedAt: Schema.Attribute.DateTime;
     slug: Schema.Attribute.UID<'title'> & Schema.Attribute.Required;
+    subscription: Schema.Attribute.Relation<
+      'manyToOne',
+      'api::subscription.subscription'
+    >;
     subscription_type: Schema.Attribute.Enumeration<['free', 'paid']> &
       Schema.Attribute.Required &
       Schema.Attribute.DefaultTo<'free'>;
@@ -663,6 +667,10 @@ export interface ApiAvsDocumentAvsDocument extends Struct.CollectionTypeSchema {
       Schema.Attribute.DefaultTo<false>;
     publishedAt: Schema.Attribute.DateTime;
     slug: Schema.Attribute.UID<'title'> & Schema.Attribute.Required;
+    subscription: Schema.Attribute.Relation<
+      'manyToOne',
+      'api::subscription.subscription'
+    >;
     subscription_type: Schema.Attribute.Relation<
       'manyToMany',
       'api::subscription-type.subscription-type'
@@ -806,6 +814,10 @@ export interface ApiCourseCourse extends Struct.CollectionTypeSchema {
     study_session: Schema.Attribute.Relation<
       'manyToMany',
       'api::study-session.study-session'
+    >;
+    subscription: Schema.Attribute.Relation<
+      'manyToOne',
+      'api::subscription.subscription'
     >;
     subscription_type: Schema.Attribute.Relation<
       'manyToMany',
@@ -994,6 +1006,10 @@ export interface ApiFreeWebinarFreeWebinar extends Struct.CollectionTypeSchema {
     slug: Schema.Attribute.UID<'title'> & Schema.Attribute.Required;
     speaker: Schema.Attribute.Relation<'manyToMany', 'api::speaker.speaker'>;
     stream_url: Schema.Attribute.String & Schema.Attribute.Required;
+    subscription: Schema.Attribute.Relation<
+      'manyToOne',
+      'api::subscription.subscription'
+    >;
     time: Schema.Attribute.Time & Schema.Attribute.Required;
     title: Schema.Attribute.String & Schema.Attribute.Required;
     updatedAt: Schema.Attribute.DateTime;
@@ -1075,6 +1091,10 @@ export interface ApiHandbookHandbook extends Struct.CollectionTypeSchema {
       Schema.Attribute.DefaultTo<false>;
     publishedAt: Schema.Attribute.DateTime;
     slug: Schema.Attribute.UID<'title'> & Schema.Attribute.Required;
+    subscription: Schema.Attribute.Relation<
+      'manyToOne',
+      'api::subscription.subscription'
+    >;
     subscription_type: Schema.Attribute.Enumeration<['free', 'paid']> &
       Schema.Attribute.Required &
       Schema.Attribute.DefaultTo<'free'>;
@@ -1188,6 +1208,10 @@ export interface ApiIpkIpk extends Struct.CollectionTypeSchema {
       Schema.Attribute.Private;
     publishedAt: Schema.Attribute.DateTime;
     slug: Schema.Attribute.UID<'ipk_title'> & Schema.Attribute.Required;
+    subscription: Schema.Attribute.Relation<
+      'manyToOne',
+      'api::subscription.subscription'
+    >;
     subscription_type: Schema.Attribute.Relation<
       'manyToOne',
       'api::subscription-type.subscription-type'
@@ -1249,6 +1273,10 @@ export interface ApiNewsArticleNewsArticle extends Struct.CollectionTypeSchema {
       Schema.Attribute.DefaultTo<false>;
     publishedAt: Schema.Attribute.DateTime;
     slug: Schema.Attribute.UID<'title'> & Schema.Attribute.Required;
+    subscription: Schema.Attribute.Relation<
+      'manyToOne',
+      'api::subscription.subscription'
+    >;
     subscription_type: Schema.Attribute.Relation<
       'manyToOne',
       'api::subscription-type.subscription-type'
@@ -1593,6 +1621,55 @@ export interface ApiSubscriptionTypeSubscriptionType
   };
 }
 
+export interface ApiSubscriptionSubscription
+  extends Struct.CollectionTypeSchema {
+  collectionName: 'subscriptions';
+  info: {
+    displayName: 'Subscription';
+    pluralName: 'subscriptions';
+    singularName: 'subscription';
+  };
+  options: {
+    draftAndPublish: false;
+  };
+  attributes: {
+    article: Schema.Attribute.Relation<'oneToMany', 'api::article.article'>;
+    avs_document: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::avs-document.avs-document'
+    >;
+    course: Schema.Attribute.Relation<'oneToMany', 'api::course.course'>;
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    free_webinar: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::free-webinar.free-webinar'
+    >;
+    handbook: Schema.Attribute.Relation<'oneToMany', 'api::handbook.handbook'>;
+    ipk: Schema.Attribute.Relation<'oneToMany', 'api::ipk.ipk'>;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::subscription.subscription'
+    > &
+      Schema.Attribute.Private;
+    news_article: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::news-article.news-article'
+    >;
+    publishedAt: Schema.Attribute.DateTime;
+    title: Schema.Attribute.String & Schema.Attribute.Required;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    video_recording: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::video-recording.video-recording'
+    >;
+  };
+}
+
 export interface ApiTestAttemptTestAttempt extends Struct.CollectionTypeSchema {
   collectionName: 'test_attempts';
   info: {
@@ -1877,6 +1954,10 @@ export interface ApiVideoRecordingVideoRecording
     slug: Schema.Attribute.UID<'title'>;
     speaker: Schema.Attribute.Relation<'manyToMany', 'api::speaker.speaker'>;
     stream_date: Schema.Attribute.Date;
+    subscription: Schema.Attribute.Relation<
+      'manyToOne',
+      'api::subscription.subscription'
+    >;
     subscription_type: Schema.Attribute.Relation<
       'manyToMany',
       'api::subscription-type.subscription-type'
@@ -2468,6 +2549,7 @@ declare module '@strapi/strapi' {
       'api::speaker.speaker': ApiSpeakerSpeaker;
       'api::study-session.study-session': ApiStudySessionStudySession;
       'api::subscription-type.subscription-type': ApiSubscriptionTypeSubscriptionType;
+      'api::subscription.subscription': ApiSubscriptionSubscription;
       'api::test-attempt.test-attempt': ApiTestAttemptTestAttempt;
       'api::top-banner.top-banner': ApiTopBannerTopBanner;
       'api::topic-dps.topic-dps': ApiTopicDpsTopicDps;

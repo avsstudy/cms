@@ -64,6 +64,12 @@
         "shared.custom-quote"
       ],
       "required": true
+    },
+    "subscription": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::subscription.subscription",
+      "inversedBy": "handbook"
     }
   }
 }

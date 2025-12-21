@@ -78,6 +78,12 @@
         "shared.ck-editor-table"
       ],
       "required": true
+    },
+    "subscription": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::subscription.subscription",
+      "inversedBy": "news_article"
     }
   }
 }

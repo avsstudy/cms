@@ -104,6 +104,12 @@
       "relation": "oneToOne",
       "target": "api::session-test.session-test",
       "inversedBy": "course"
+    },
+    "subscription": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::subscription.subscription",
+      "inversedBy": "course"
     }
   }
 }

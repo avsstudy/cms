@@ -1,0 +1,67 @@
+{
+  "kind": "collectionType",
+  "collectionName": "subscriptions",
+  "info": {
+    "singularName": "subscription",
+    "pluralName": "subscriptions",
+    "displayName": "Subscription"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "title": {
+      "type": "string",
+      "required": true
+    },
+    "article": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::article.article",
+      "mappedBy": "subscription"
+    },
+    "news_article": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::news-article.news-article",
+      "mappedBy": "subscription"
+    },
+    "ipk": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::ipk.ipk",
+      "mappedBy": "subscription"
+    },
+    "free_webinar": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::free-webinar.free-webinar",
+      "mappedBy": "subscription"
+    },
+    "avs_document": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::avs-document.avs-document",
+      "mappedBy": "subscription"
+    },
+    "handbook": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::handbook.handbook",
+      "mappedBy": "subscription"
+    },
+    "video_recording": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::video-recording.video-recording",
+      "mappedBy": "subscription"
+    },
+    "course": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::course.course",
+      "mappedBy": "subscription"
+    }
+  }
+}

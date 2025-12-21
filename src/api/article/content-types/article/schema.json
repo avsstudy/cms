@@ -87,6 +87,12 @@
       "type": "boolean",
       "required": false,
       "default": false
+    },
+    "subscription": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::subscription.subscription",
+      "inversedBy": "article"
     }
   }
 }

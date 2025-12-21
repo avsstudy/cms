@@ -79,6 +79,12 @@
         "shared.custom-video-recording",
         "shared.upcoming-session"
       ]
+    },
+    "subscription": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::subscription.subscription",
+      "inversedBy": "video_recording"
     }
   }
 }
