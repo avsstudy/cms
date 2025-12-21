@@ -127,7 +127,15 @@
       "type": "media",
       "multiple": false,
       "required": false,
-      "allowedTypes": ["images"]
+      "allowedTypes": [
+        "images"
+      ]
+    },
+    "package": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::package.package",
+      "inversedBy": "users"
     }
   }
 }

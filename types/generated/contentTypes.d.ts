@@ -1290,6 +1290,33 @@ export interface ApiNewsArticleNewsArticle extends Struct.CollectionTypeSchema {
   };
 }
 
+export interface ApiPackagePackage extends Struct.CollectionTypeSchema {
+  collectionName: 'packages';
+  info: {
+    displayName: 'Package';
+    pluralName: 'packages';
+    singularName: 'package';
+  };
+  options: {
+    draftAndPublish: false;
+  };
+  attributes: {
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::package.package'
+    > &
+      Schema.Attribute.Private;
+    publishedAt: Schema.Attribute.DateTime;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
 export interface ApiReviewReview extends Struct.CollectionTypeSchema {
   collectionName: 'reviews';
   info: {
@@ -2541,6 +2568,7 @@ declare module '@strapi/strapi' {
       'api::homework.homework': ApiHomeworkHomework;
       'api::ipk.ipk': ApiIpkIpk;
       'api::news-article.news-article': ApiNewsArticleNewsArticle;
+      'api::package.package': ApiPackagePackage;
       'api::review.review': ApiReviewReview;
       'api::session-progress.session-progress': ApiSessionProgressSessionProgress;
       'api::session-question.session-question': ApiSessionQuestionSessionQuestion;

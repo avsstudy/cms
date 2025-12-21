@@ -1,0 +1,50 @@
+{
+  "kind": "collectionType",
+  "collectionName": "packages",
+  "info": {
+    "singularName": "package",
+    "pluralName": "packages",
+    "displayName": "Package"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "title": {
+      "type": "string",
+      "required": true
+    },
+    "subscription": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::subscription.subscription",
+      "mappedBy": "package"
+    },
+    "course": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::course.course",
+      "mappedBy": "package"
+    },
+    "video_recording": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::video-recording.video-recording",
+      "mappedBy": "package"
+    },
+    "price_UAH": {
+      "type": "decimal",
+      "required": true
+    },
+    "zoho_product_ID": {
+      "type": "string"
+    },
+    "users": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "plugin::users-permissions.user",
+      "mappedBy": "package"
+    }
+  }
+}

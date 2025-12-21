@@ -62,6 +62,12 @@
       "relation": "oneToMany",
       "target": "api::course.course",
       "mappedBy": "subscription"
+    },
+    "package": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::package.package",
+      "inversedBy": "subscription"
     }
   }
 }

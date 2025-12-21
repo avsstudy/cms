@@ -85,6 +85,12 @@
       "relation": "manyToOne",
       "target": "api::subscription.subscription",
       "inversedBy": "video_recording"
+    },
+    "package": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::package.package",
+      "inversedBy": "video_recording"
     }
   }
 }
