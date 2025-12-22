@@ -178,188 +178,46 @@ module.exports = {
   },
 
   async webhook(ctx) {
-    const startedAt = Date.now();
-
     strapi.log.info("[WFP] webhook HIT");
     strapi.log.info("[WFP] headers=" + JSON.stringify(ctx.request.headers));
 
-    // Логуємо "сирий" body як його бачить Strapi
+    const body = ctx.request.body;
+
+    // 1) Просто показуємо тип body
+    strapi.log.info("[WFP] bodyType=" + typeof body);
+
+    // 2) Просто витягуємо ключі body
+    const keys = body && typeof body === "object" ? Object.keys(body) : [];
+    strapi.log.info("[WFP] bodyKeys=" + JSON.stringify(keys));
+
+    // 3) Беремо перший ключ (саме там у тебе лежить "payload")
+    const firstKey = keys[0] || "";
+    strapi.log.info("[WFP] firstKeyLen=" + String(firstKey.length));
+    strapi.log.info("[WFP] firstKeyFirst200=" + firstKey.slice(0, 200));
+
+    // 4) Якщо треба — пробуємо дістати значення під цим ключем (у тебе воно "" або об'єкт)
+    // Це НЕ парсинг, просто доступ по ключу
+    const firstValue = firstKey ? body[firstKey] : undefined;
     try {
-      const raw = ctx.request.body;
-      strapi.log.info("[WFP] rawBodyType=" + typeof raw);
-      if (raw && typeof raw === "object") {
-        strapi.log.info(
-          "[WFP] rawBodyKeys=" + JSON.stringify(Object.keys(raw))
-        );
-      }
-      strapi.log.info("[WFP] rawBody=" + JSON.stringify(raw));
+      strapi.log.info("[WFP] firstValueType=" + typeof firstValue);
+      strapi.log.info("[WFP] firstValue=" + JSON.stringify(firstValue));
     } catch (e) {
-      strapi.log.warn("[WFP] failed to log raw body: " + e.message);
+      strapi.log.warn("[WFP] firstValue stringify failed: " + e.message);
     }
 
-    // Нормалізація payload
-    let payload = normalizeWfpPayload(ctx.request.body);
-
-    // Логуємо нормалізований payload
-    try {
-      strapi.log.info("[WFP] normalizedType=" + typeof payload);
-      if (payload && typeof payload === "object") {
-        strapi.log.info(
-          "[WFP] normalizedKeys=" + JSON.stringify(Object.keys(payload))
-        );
-      }
-      strapi.log.info("[WFP] normalizedPayload=" + JSON.stringify(payload));
-    } catch (e) {
-      strapi.log.warn("[WFP] failed to log normalized payload: " + e.message);
-    }
-
-    // Далі працюємо тільки з payload
-    const merchantAccount = payload?.merchantAccount;
-    const orderReference = payload?.orderReference;
-    const amount = String(payload?.amount ?? "");
-    const currency = payload?.currency;
-
-    const authCode = payload?.authCode ?? "";
-    const cardPan = payload?.cardPan ?? "";
-    const transactionStatus = payload?.transactionStatus;
-    const reasonCode = payload?.reasonCode ?? "";
-
-    const receivedSignature = payload?.merchantSignature;
-
-    // Якщо досі не розпарсилося — покажемо явний лог, щоб не гадати
-    if (!orderReference || !receivedSignature || !transactionStatus) {
-      strapi.log.warn(
-        "[WFP] Missing required fields. " +
-          JSON.stringify({
-            orderReference: !!orderReference,
-            receivedSignature: !!receivedSignature,
-            transactionStatus: !!transactionStatus,
-            contentType: ctx.request.headers["content-type"],
-          })
-      );
-      return ctx.badRequest("Missing required fields");
-    }
-
-    const secretKey = process.env.WFP_SECRET_KEY;
-    if (!secretKey) return ctx.internalServerError("WFP_SECRET_KEY not set");
-
-    // Підпис, який ви перевіряєте (залишаю як у вас)
-    const baseString = [
-      merchantAccount,
-      orderReference,
-      amount,
-      currency,
-      authCode,
-      cardPan,
-      transactionStatus,
-      String(reasonCode),
-    ].join(";");
-
-    const expectedSignature = hmacMd5(baseString, secretKey);
-
-    strapi.log.info("[WFP] receivedSignature=" + receivedSignature);
-    strapi.log.info("[WFP] baseString=" + baseString);
-    strapi.log.info("[WFP] expectedSignature=" + expectedSignature);
-    strapi.log.info("[WFP] transactionStatus=" + transactionStatus);
-
-    if (expectedSignature !== receivedSignature) {
-      strapi.log.warn(
-        "[WFP] Invalid signature for orderReference=" +
-          orderReference +
-          " expected=" +
-          expectedSignature +
-          " received=" +
-          receivedSignature
-      );
-      return ctx.forbidden("Invalid signature");
-    }
-
-    const payments = await strapi.entityService.findMany(
-      "api::payment.payment",
-      {
-        filters: { orderReference },
-        populate: { user: true, package: true },
-        limit: 1,
-      }
-    );
-
-    const payment = payments?.[0];
-    if (!payment) {
-      strapi.log.warn(
-        "[WFP] Payment not found for orderReference=" + orderReference
-      );
-      return ctx.notFound("Payment not found");
-    }
-
-    // Оновлення payment + видача пакета
-    if (transactionStatus === "Approved") {
-      await strapi.entityService.update("api::payment.payment", payment.id, {
-        data: {
-          payment_status: "APPROVED",
-          paidAt: new Date(),
-          wayforpayPayload: payload,
-        },
-      });
-
-      const userId = payment?.user?.id;
-      const packageId = payment?.package?.id;
-
-      strapi.log.info(
-        "[WFP] Approved. Will attach package to user: " +
-          JSON.stringify({ userId, packageId })
-      );
-
-      if (userId && packageId) {
-        await strapi.entityService.update(
-          "plugin::users-permissions.user",
-          userId,
-          {
-            data: { package: packageId },
-          }
-        );
-      } else {
-        strapi.log.warn(
-          "[WFP] Approved but missing userId/packageId on populated payment: " +
-            JSON.stringify({
-              paymentId: payment.id,
-              hasUser: !!payment?.user,
-              hasPackage: !!payment?.package,
-            })
-        );
-      }
-    } else if (transactionStatus === "Declined") {
-      await strapi.entityService.update("api::payment.payment", payment.id, {
-        data: {
-          payment_status: "DECLINED",
-          wayforpayPayload: payload,
-          failReason: payload?.reason ?? "Declined",
-        },
-      });
-    } else {
-      await strapi.entityService.update("api::payment.payment", payment.id, {
-        data: { wayforpayPayload: payload },
-      });
-    }
-
-    // Відповідь WayForPay: "accept" + signature
-    // (це важливо, інакше WFP може вважати webhook не підтвердженим та робити ретраї)
-    const time = unixNow();
-    const status = "accept";
-    const responseSignature = hmacMd5(
-      [orderReference, status, String(time)].join(";"),
-      secretKey
-    );
-
-    ctx.body = { orderReference, status, time, signature: responseSignature };
-
+    // 5) І одразу видно, чому 400: реальних полів тут немає
     strapi.log.info(
-      "[WFP] webhook handled in " +
-        (Date.now() - startedAt) +
-        "ms for " +
-        orderReference
+      "[WFP] directFields=" +
+        JSON.stringify({
+          merchantAccount: body?.merchantAccount,
+          orderReference: body?.orderReference,
+          transactionStatus: body?.transactionStatus,
+          merchantSignature: body?.merchantSignature,
+        })
     );
-  },
 
+    return (ctx.body = { ok: true });
+  },
   async status(ctx) {
     const user = ctx.state.user;
     const orderReference = ctx.query.orderReference;
