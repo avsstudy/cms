@@ -2,6 +2,64 @@
 
 const crypto = require("crypto");
 
+async function readRawBody(ctx) {
+  return await new Promise((resolve, reject) => {
+    let data = "";
+    ctx.req.setEncoding("utf8");
+    ctx.req.on("data", (chunk) => (data += chunk));
+    ctx.req.on("end", () => resolve(data));
+    ctx.req.on("error", reject);
+  });
+}
+
+function normalizeWfpPayload(parsedBody, rawText) {
+  if (
+    parsedBody &&
+    typeof parsedBody === "object" &&
+    parsedBody.merchantAccount
+  ) {
+    return parsedBody;
+  }
+
+  const t = (rawText || "").trim();
+  if (t.startsWith("{") && t.endsWith("}")) {
+    try {
+      return JSON.parse(t);
+    } catch {}
+  }
+
+  try {
+    const params = new URLSearchParams(t);
+    const maybeJson =
+      params.get("data") || params.get("response") || params.get("payload");
+
+    if (maybeJson && maybeJson.trim().startsWith("{")) {
+      return JSON.parse(maybeJson);
+    }
+
+    const obj = {};
+    for (const [k, v] of params.entries()) obj[k] = v;
+    if (obj.merchantAccount || obj.orderReference) return obj;
+  } catch {}
+
+  try {
+    if (parsedBody && typeof parsedBody === "object") {
+      const keys = Object.keys(parsedBody);
+      if (
+        keys.length === 1 &&
+        (parsedBody[keys[0]] === "" || parsedBody[keys[0]] == null)
+      ) {
+        const maybe = keys[0];
+        if (maybe.trim().startsWith("{") && maybe.trim().endsWith("}")) {
+          return JSON.parse(maybe);
+        }
+      }
+    }
+  } catch {}
+
+  return null;
+}
+
 function hmacMd5(str, secret) {
   return crypto.createHmac("md5", secret).update(str, "utf8").digest("hex");
 }
@@ -132,79 +190,66 @@ module.exports = {
     };
   },
   async webhook(ctx) {
-    let payload = ctx.request.body || {};
-
+    let rawText = "";
     try {
-      const keys =
-        payload && typeof payload === "object" ? Object.keys(payload) : [];
-      if (
-        keys.length === 1 &&
-        (payload[keys[0]] === "" || payload[keys[0]] == null)
-      ) {
-        const maybeJson = keys[0];
-        if (
-          maybeJson.trim().startsWith("{") &&
-          maybeJson.trim().endsWith("}")
-        ) {
-          payload = JSON.parse(maybeJson);
-        }
-      }
-    } catch (e) {}
+      rawText = await readRawBody(ctx);
+    } catch {
+      rawText = "";
+    }
 
-    strapi.log.info("[WFP] normalized payload=" + JSON.stringify(payload));
+    const parsedBody = ctx.request.body || {};
+    const payload = normalizeWfpPayload(parsedBody, rawText);
 
-    const merchantAccount = payload.merchantAccount;
-    const orderReference = payload.orderReference;
-    const amount = String(payload.amount ?? "");
-    const currency = payload.currency;
+    strapi.log.info("[WFP] raw=" + rawText);
+    strapi.log.info("[WFP] payload=" + JSON.stringify(payload));
 
-    const authCode = payload.authCode ?? "";
-    const cardPan = payload.cardPan ?? "";
-    const transactionStatus = payload.transactionStatus;
-    const reasonCode = payload.reasonCode ?? "";
-
-    const receivedSignature = payload.merchantSignature;
-
-    if (!orderReference || !receivedSignature || !transactionStatus) {
+    if (!payload) {
       ctx.status = 200;
-      ctx.body = {
-        ok: false,
-        error: "Missing required fields",
-        orderReference,
-      };
+      ctx.body = { error: "Cannot parse payload" };
+      return;
+    }
+
+    const {
+      merchantAccount,
+      orderReference,
+      amount,
+      currency,
+      authCode = "",
+      cardPan = "",
+      transactionStatus,
+      reasonCode = "",
+      merchantSignature: receivedSignature,
+    } = payload;
+
+    if (!orderReference || !transactionStatus || !receivedSignature) {
+      ctx.status = 200;
+      ctx.body = { error: "Missing required fields", orderReference };
       return;
     }
 
     const secretKey = process.env.WFP_SECRET_KEY;
     if (!secretKey) {
       ctx.status = 500;
-      ctx.body = { ok: false, error: "WFP_SECRET_KEY not set" };
+      ctx.body = { error: "WFP_SECRET_KEY not set" };
       return;
     }
 
     const baseString = [
       merchantAccount,
       orderReference,
-      amount,
+      String(amount ?? ""),
       currency,
-      authCode,
-      cardPan,
-      transactionStatus,
-      String(reasonCode),
+      String(authCode ?? ""),
+      String(cardPan ?? ""),
+      String(transactionStatus ?? ""),
+      String(reasonCode ?? ""),
     ].join(";");
 
-    const expectedSignature = crypto
-      .createHmac("md5", secretKey)
-      .update(baseString, "utf8")
-      .digest("hex");
-
-    strapi.log.info(`[WFP] baseString=${baseString}`);
-    strapi.log.info(`[WFP] expected=${expectedSignature}`);
-    strapi.log.info(`[WFP] received=${receivedSignature}`);
+    const expectedSignature = hmacMd5(baseString, secretKey);
 
     if (expectedSignature !== receivedSignature) {
       ctx.status = 200;
-      ctx.body = { ok: false, error: "Invalid signature" };
+      ctx.body = { error: "Invalid signature" };
       return;
     }
 
@@ -220,7 +265,7 @@ module.exports = {
     const payment = payments?.[0];
     if (!payment) {
       ctx.status = 200;
-      ctx.body = { ok: false, error: "Payment not found" };
+      ctx.body = { error: "Payment not found" };
       return;
     }
 
@@ -235,7 +280,6 @@ module.exports = {
 
       const userId = payment.user?.id;
       const packageId = payment.package?.id;
-
       if (userId && packageId) {
         await strapi.entityService.update(
           "plugin::users-permissions.user",
@@ -253,22 +297,26 @@ module.exports = {
           failReason: payload.reason ?? "Declined",
         },
       });
-    } else if (transactionStatus === "Refunded") {
-      await strapi.entityService.update("api::payment.payment", payment.id, {
-        data: {
-          payment_status: "DECLINED",
-          wayforpayPayload: payload,
-          failReason: "Refunded",
-        },
-      });
     } else {
       await strapi.entityService.update("api::payment.payment", payment.id, {
         data: { wayforpayPayload: payload },
       });
     }
 
+    const time = nowUnix();
+    const status = "accept";
+    const responseSignature = hmacMd5(
+      `${orderReference};${status};${time}`,
+      secretKey
+    );
+
     ctx.status = 200;
-    ctx.body = { ok: true };
+    ctx.body = {
+      orderReference,
+      status,
+      time,
+      signature: responseSignature,
+    };
   },
 
   async status(ctx) {
