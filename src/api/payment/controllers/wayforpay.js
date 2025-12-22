@@ -93,9 +93,7 @@ module.exports = {
     const baseString = baseParts.join(";");
     const merchantSignature = hmacMd5(baseString, secretKey);
 
-    const returnUrl = `${process.env.FRONTEND_URL}/payment/return?order=${encodeURIComponent(
-      orderReference
-    )}`;
+    const returnUrl = `${process.env.FRONTEND_URL}/payment/wayforpay/return`;
     const serviceUrl = `${process.env.BACKEND_URL}/api/payments/wayforpay/webhook`;
 
     await strapi.entityService.update("api::payment.payment", payment.id, {
