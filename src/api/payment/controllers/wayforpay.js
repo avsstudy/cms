@@ -190,24 +190,75 @@ module.exports = {
     };
   },
   async webhook(ctx) {
+    const reqId = `wfp_${Date.now()}_${Math.random().toString(16).slice(2)}`;
+
+    const log = (level, msg, obj) => {
+      const payload = obj ? ` | ${JSON.stringify(obj)}` : "";
+      // strapi.log.* не завжди показує stack, тому дублюю console
+      try {
+        strapi.log[level](`[WFP][${reqId}] ${msg}${payload}`);
+      } catch {}
+      // eslint-disable-next-line no-console
+      console[level === "error" ? "error" : "log"](
+        `[WFP][${reqId}] ${msg}`,
+        obj || ""
+      );
+    };
+
+    const mask = (v, keep = 6) => {
+      if (v == null) return v;
+      const s = String(v);
+      if (s.length <= keep) return "***";
+      return s.slice(0, keep) + "***";
+    };
+
     let rawText = "";
     try {
       rawText = await readRawBody(ctx);
-    } catch {
+    } catch (e) {
+      log("error", "Failed to read raw body", { err: e?.message });
       rawText = "";
     }
 
     const parsedBody = ctx.request.body || {};
     const payload = normalizeWfpPayload(parsedBody, rawText);
 
-    strapi.log.info("[WFP] raw=" + rawText);
-    strapi.log.info("[WFP] payload=" + JSON.stringify(payload));
+    log("info", "Incoming webhook", {
+      method: ctx.method,
+      url: ctx.url,
+      contentType: ctx.request?.headers?.["content-type"],
+      rawLen: rawText?.length,
+      parsedBodyType: typeof parsedBody,
+      parsedBodyKeys:
+        parsedBody && typeof parsedBody === "object"
+          ? Object.keys(parsedBody)
+          : null,
+    });
+
+    // ВАЖЛИВО: raw може містити PII, краще в логах зберігати коротко
+    log("info", "Raw body (preview)", {
+      rawPreview: (rawText || "").slice(0, 500),
+    });
 
     if (!payload) {
+      log("error", "Cannot parse payload", { parsedBody });
       ctx.status = 200;
       ctx.body = { error: "Cannot parse payload" };
       return;
     }
+
+    // Лог payload без зайвого “світіння” картки/підписів
+    log("info", "Payload parsed", {
+      merchantAccount: payload.merchantAccount,
+      orderReference: payload.orderReference,
+      amount: payload.amount,
+      currency: payload.currency,
+      transactionStatus: payload.transactionStatus,
+      reasonCode: payload.reasonCode,
+      authCode: mask(payload.authCode),
+      cardPan: mask(payload.cardPan),
+      receivedSignature: mask(payload.merchantSignature),
+    });
 
     const {
       merchantAccount,
@@ -221,7 +272,33 @@ module.exports = {
       merchantSignature: receivedSignature,
     } = payload;
 
-    if (!orderReference || !transactionStatus || !receivedSignature) {
+    if (
+      !orderReference ||
+      !transactionStatus ||
+      !receivedSignature ||
+      !merchantAccount
+    ) {
+      log("error", "Missing required fields", {
+        merchantAccount,
+        orderReference,
+        transactionStatus,
+        hasSignature: !!receivedSignature,
+      });
+
+      // Можна віддати reject, щоб WFP ретраїв/показав проблему
+      const secretKey = process.env.WFP_SECRET_KEY;
+      if (secretKey && orderReference) {
+        const time = unixNow();
+        const status = "reject";
+        const signature = hmacMd5(
+          `${orderReference};${status};${time}`,
+          secretKey
+        );
+        ctx.status = 200;
+        ctx.body = { orderReference, status, time, signature };
+        return;
+      }
+
       ctx.status = 200;
       ctx.body = { error: "Missing required fields", orderReference };
       return;
@@ -229,16 +306,18 @@ module.exports = {
 
     const secretKey = process.env.WFP_SECRET_KEY;
     if (!secretKey) {
+      log("error", "WFP_SECRET_KEY not set");
       ctx.status = 500;
       ctx.body = { error: "WFP_SECRET_KEY not set" };
       return;
     }
 
+    // ВАЖЛИВО: amount може бути "100.00" або 100 — для підпису важливий точний string
     const baseString = [
       merchantAccount,
       orderReference,
       String(amount ?? ""),
-      currency,
+      String(currency ?? ""),
       String(authCode ?? ""),
       String(cardPan ?? ""),
       String(transactionStatus ?? ""),
@@ -247,76 +326,192 @@ module.exports = {
 
     const expectedSignature = hmacMd5(baseString, secretKey);
 
+    log("info", "Signature check", {
+      baseString,
+      expectedSignature: mask(expectedSignature),
+      receivedSignature: mask(receivedSignature),
+      amountType: typeof amount,
+      currencyType: typeof currency,
+    });
+
     if (expectedSignature !== receivedSignature) {
-      ctx.status = 200;
-      ctx.body = { error: "Invalid signature" };
-      return;
-    }
-
-    const payments = await strapi.entityService.findMany(
-      "api::payment.payment",
-      {
-        filters: { orderReference },
-        populate: { user: true, package: true },
-        limit: 1,
-      }
-    );
-
-    const payment = payments?.[0];
-    if (!payment) {
-      ctx.status = 200;
-      ctx.body = { error: "Payment not found" };
-      return;
-    }
-
-    if (transactionStatus === "Approved") {
-      await strapi.entityService.update("api::payment.payment", payment.id, {
-        data: {
-          payment_status: "APPROVED",
-          paidAt: new Date(),
-          wayforpayPayload: payload,
-        },
+      log("error", "Invalid signature", {
+        expectedSignature,
+        receivedSignature,
+        baseString,
       });
 
-      const userId = payment.user?.id;
-      const packageId = payment.package?.id;
-      if (userId && packageId) {
-        await strapi.entityService.update(
-          "plugin::users-permissions.user",
-          userId,
+      const time = unixNow();
+      const status = "reject";
+      const signature = hmacMd5(
+        `${orderReference};${status};${time}`,
+        secretKey
+      );
+
+      ctx.status = 200;
+      ctx.body = { orderReference, status, time, signature };
+      return;
+    }
+
+    // Шукаємо payment
+    let payment;
+    try {
+      const payments = await strapi.entityService.findMany(
+        "api::payment.payment",
+        {
+          filters: { orderReference },
+          populate: { user: true, package: true },
+          limit: 1,
+        }
+      );
+      payment = payments?.[0];
+
+      log("info", "Payment lookup result", {
+        orderReference,
+        found: !!payment,
+        paymentId: payment?.id,
+        currentStatus: payment?.payment_status,
+        userId: payment?.user?.id,
+        packageId: payment?.package?.id,
+      });
+    } catch (e) {
+      log("error", "Payment lookup failed", {
+        err: e?.message,
+        orderReference,
+      });
+    }
+
+    if (!payment) {
+      const time = unixNow();
+      const status = "reject";
+      const signature = hmacMd5(
+        `${orderReference};${status};${time}`,
+        secretKey
+      );
+
+      ctx.status = 200;
+      ctx.body = { orderReference, status, time, signature };
+      return;
+    }
+
+    // Оновлення payment
+    try {
+      if (transactionStatus === "Approved") {
+        log("info", "Applying APPROVED update", { paymentId: payment.id });
+
+        const upd = await strapi.entityService.update(
+          "api::payment.payment",
+          payment.id,
           {
-            data: { package: packageId },
+            data: {
+              payment_status: "APPROVED",
+              paidAt: new Date(),
+              wayforpayPayload: payload,
+            },
           }
         );
+
+        log("info", "Payment updated APPROVED", {
+          paymentId: payment.id,
+          newStatus: upd?.payment_status,
+          paidAt: upd?.paidAt,
+        });
+
+        const userId = payment.user?.id;
+        const packageId = payment.package?.id;
+
+        if (userId && packageId) {
+          try {
+            const userUpd = await strapi.entityService.update(
+              "plugin::users-permissions.user",
+              userId,
+              { data: { package: packageId } }
+            );
+            log("info", "User package updated", {
+              userId,
+              packageId,
+              ok: !!userUpd,
+            });
+          } catch (e) {
+            log("error", "Failed to update user package", {
+              userId,
+              packageId,
+              err: e?.message,
+            });
+          }
+        } else {
+          log("error", "Missing userId/packageId on payment populate", {
+            userId,
+            packageId,
+            paymentId: payment.id,
+          });
+        }
+      } else if (transactionStatus === "Declined") {
+        log("info", "Applying DECLINED update", { paymentId: payment.id });
+
+        const upd = await strapi.entityService.update(
+          "api::payment.payment",
+          payment.id,
+          {
+            data: {
+              payment_status: "DECLINED",
+              wayforpayPayload: payload,
+              failReason: payload.reason ?? "Declined",
+            },
+          }
+        );
+
+        log("info", "Payment updated DECLINED", {
+          paymentId: payment.id,
+          newStatus: upd?.payment_status,
+          failReason: upd?.failReason,
+        });
+      } else {
+        log("info", "Non-final transactionStatus, saving payload only", {
+          paymentId: payment.id,
+          transactionStatus,
+        });
+
+        await strapi.entityService.update("api::payment.payment", payment.id, {
+          data: { wayforpayPayload: payload },
+        });
       }
-    } else if (transactionStatus === "Declined") {
-      await strapi.entityService.update("api::payment.payment", payment.id, {
-        data: {
-          payment_status: "DECLINED",
-          wayforpayPayload: payload,
-          failReason: payload.reason ?? "Declined",
-        },
+    } catch (e) {
+      log("error", "Payment update failed", {
+        paymentId: payment.id,
+        err: e?.message,
+        transactionStatus,
       });
-    } else {
-      await strapi.entityService.update("api::payment.payment", payment.id, {
-        data: { wayforpayPayload: payload },
-      });
+
+      const time = unixNow();
+      const status = "reject";
+      const signature = hmacMd5(
+        `${orderReference};${status};${time}`,
+        secretKey
+      );
+
+      ctx.status = 200;
+      ctx.body = { orderReference, status, time, signature };
+      return;
     }
 
-    const time = nowUnix();
+    // Відповідь WFP
+    const time = unixNow();
     const status = "accept";
     const responseSignature = hmacMd5(
       `${orderReference};${status};${time}`,
       secretKey
     );
 
-    ctx.status = 200;
-    ctx.body = {
+    log("info", "Responding to WFP", {
       orderReference,
       status,
       time,
-      signature: responseSignature,
-    };
+      responseSignature: mask(responseSignature),
+    });
+
+    ctx.status = 200;
+    ctx.body = { orderReference, status, time, signature: responseSignature };
   },
 
   async status(ctx) {
