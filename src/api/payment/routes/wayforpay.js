@@ -8,5 +8,11 @@ module.exports = {
         policies: ["global::is-authenticated"],
       },
     },
+    {
+      method: "POST",
+      path: "/payments/wayforpay/webhook",
+      handler: "wayforpay.webhook",
+      config: {},
+    },
   ],
 };

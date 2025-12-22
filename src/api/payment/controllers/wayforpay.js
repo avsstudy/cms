@@ -93,7 +93,7 @@ module.exports = {
     const baseString = baseParts.join(";");
     const merchantSignature = hmacMd5(baseString, secretKey);
 
-    const returnUrl = `${process.env.FRONTEND_URL}/payment/wayforpay/return`;
+    const returnUrl = `${process.env.FRONTEND_URL}/payment/wayforpay/return?order=${encodeURIComponent(orderReference)}`;
     const serviceUrl = `${process.env.BACKEND_URL}/api/payments/wayforpay/webhook`;
 
     await strapi.entityService.update("api::payment.payment", payment.id, {
@@ -130,5 +130,121 @@ module.exports = {
         language: "UA",
       },
     };
+  },
+  async webhook(ctx) {
+    const payload = ctx.request.body;
+
+    const merchantAccount = payload.merchantAccount;
+    const orderReference = payload.orderReference;
+    const amount = String(payload.amount ?? "");
+    const currency = payload.currency;
+
+    const authCode = payload.authCode ?? "";
+    const cardPan = payload.cardPan ?? "";
+    const transactionStatus = payload.transactionStatus;
+    const reasonCode = payload.reasonCode ?? "";
+
+    const receivedSignature = payload.merchantSignature;
+
+    if (!orderReference || !receivedSignature || !transactionStatus) {
+      return ctx.badRequest("Missing required fields");
+    }
+
+    const secretKey = process.env.WFP_SECRET_KEY;
+    if (!secretKey) return ctx.internalServerError("WFP_SECRET_KEY not set");
+
+    const baseString = [
+      merchantAccount,
+      orderReference,
+      amount,
+      currency,
+      authCode,
+      cardPan,
+      transactionStatus,
+      String(reasonCode),
+    ].join(";");
+
+    const expectedSignature = hmacMd5(baseString, secretKey);
+
+    if (expectedSignature !== receivedSignature) {
+      return ctx.forbidden("Invalid signature");
+    }
+
+    const payments = await strapi.entityService.findMany(
+      "api::payment.payment",
+      {
+        filters: { orderReference },
+        populate: { user: true, package: true },
+        limit: 1,
+      }
+    );
+
+    const payment = payments?.[0];
+    const paymentAny = payment;
+    if (!payment) return ctx.notFound("Payment not found");
+
+    if (transactionStatus === "Approved") {
+      await strapi.entityService.update("api::payment.payment", payment.id, {
+        data: {
+          payment_status: "APPROVED",
+          paidAt: new Date(),
+          wayforpayPayload: payload,
+        },
+      });
+
+      const userId = paymentAny?.user?.id;
+      const packageId = paymentAny?.package?.id;
+
+      if (userId && packageId) {
+        await strapi.entityService.update(
+          "plugin::users-permissions.user",
+          userId,
+          {
+            data: { package: packageId },
+          }
+        );
+      }
+    } else if (transactionStatus === "Declined") {
+      await strapi.entityService.update("api::payment.payment", payment.id, {
+        data: {
+          payment_status: "DECLINED",
+          wayforpayPayload: payload,
+          failReason: payload.reason ?? "Declined",
+        },
+      });
+    } else {
+      await strapi.entityService.update("api::payment.payment", payment.id, {
+        data: { wayforpayPayload: payload },
+      });
+    }
+
+    ctx.body = { ok: true };
+  },
+  async status(ctx) {
+    const user = ctx.state.user;
+    const orderReference = ctx.query.orderReference;
+
+    if (!user?.id) return ctx.unauthorized("Unauthorized");
+    if (!orderReference) return ctx.badRequest("orderReference is required");
+
+    const payments = await strapi.entityService.findMany(
+      "api::payment.payment",
+      {
+        filters: { orderReference, user: user.id },
+        fields: [
+          "orderReference",
+          "payment_status",
+          "amount",
+          "currency",
+          "paidAt",
+        ],
+        limit: 1,
+      }
+    );
+
+    const payment = payments?.[0];
+    if (!payment) return ctx.notFound("Payment not found");
+
+    ctx.body = payment;
   },
 };
