@@ -132,11 +132,26 @@ module.exports = {
     };
   },
   async webhook(ctx) {
-    strapi.log.info("[WFP] webhook HIT");
-    strapi.log.info("[WFP] headers=" + JSON.stringify(ctx.request.headers));
-    strapi.log.info("[WFP] body=" + JSON.stringify(ctx.request.body));
+    let payload = ctx.request.body || {};
 
-    const payload = ctx.request.body;
+    try {
+      const keys =
+        payload && typeof payload === "object" ? Object.keys(payload) : [];
+      if (
+        keys.length === 1 &&
+        (payload[keys[0]] === "" || payload[keys[0]] == null)
+      ) {
+        const maybeJson = keys[0];
+        if (
+          maybeJson.trim().startsWith("{") &&
+          maybeJson.trim().endsWith("}")
+        ) {
+          payload = JSON.parse(maybeJson);
+        }
+      }
+    } catch (e) {}
+
+    strapi.log.info("[WFP] normalized payload=" + JSON.stringify(payload));
 
     const merchantAccount = payload.merchantAccount;
     const orderReference = payload.orderReference;
@@ -151,11 +166,21 @@ module.exports = {
     const receivedSignature = payload.merchantSignature;
 
     if (!orderReference || !receivedSignature || !transactionStatus) {
-      return ctx.badRequest("Missing required fields");
+      ctx.status = 200;
+      ctx.body = {
+        ok: false,
+        error: "Missing required fields",
+        orderReference,
+      };
+      return;
     }
 
     const secretKey = process.env.WFP_SECRET_KEY;
-    if (!secretKey) return ctx.internalServerError("WFP_SECRET_KEY not set");
+    if (!secretKey) {
+      ctx.status = 500;
+      ctx.body = { ok: false, error: "WFP_SECRET_KEY not set" };
+      return;
+    }
 
     const baseString = [
       merchantAccount,
@@ -168,15 +193,19 @@ module.exports = {
       String(reasonCode),
     ].join(";");
 
-    const expectedSignature = hmacMd5(baseString, secretKey);
+    const expectedSignature = crypto
+      .createHmac("md5", secretKey)
+      .update(baseString, "utf8")
+      .digest("hex");
 
-    strapi.log.info("[WFP] receivedSignature=" + receivedSignature);
-    strapi.log.info("[WFP] baseString=" + baseString);
-    strapi.log.info("[WFP] expectedSignature=" + expectedSignature);
-    strapi.log.info("[WFP] transactionStatus=" + transactionStatus);
+    strapi.log.info(`[WFP] baseString=${baseString}`);
+    strapi.log.info(`[WFP] expected=${expectedSignature}`);
+    strapi.log.info(`[WFP] received=${receivedSignature}`);
 
     if (expectedSignature !== receivedSignature) {
-      return ctx.forbidden("Invalid signature");
+      ctx.status = 200;
+      ctx.body = { ok: false, error: "Invalid signature" };
+      return;
     }
 
     const payments = await strapi.entityService.findMany(
@@ -189,8 +218,11 @@ module.exports = {
     );
 
     const payment = payments?.[0];
-    const paymentAny = payment;
-    if (!payment) return ctx.notFound("Payment not found");
+    if (!payment) {
+      ctx.status = 200;
+      ctx.body = { ok: false, error: "Payment not found" };
+      return;
+    }
 
     if (transactionStatus === "Approved") {
       await strapi.entityService.update("api::payment.payment", payment.id, {
@@ -201,8 +233,8 @@ module.exports = {
         },
       });
 
-      const userId = paymentAny?.user?.id;
-      const packageId = paymentAny?.package?.id;
+      const userId = payment.user?.id;
+      const packageId = payment.package?.id;
 
       if (userId && packageId) {
         await strapi.entityService.update(
@@ -221,14 +253,24 @@ module.exports = {
           failReason: payload.reason ?? "Declined",
         },
       });
+    } else if (transactionStatus === "Refunded") {
+      await strapi.entityService.update("api::payment.payment", payment.id, {
+        data: {
+          payment_status: "DECLINED",
+          wayforpayPayload: payload,
+          failReason: "Refunded",
+        },
+      });
     } else {
       await strapi.entityService.update("api::payment.payment", payment.id, {
         data: { wayforpayPayload: payload },
       });
     }
 
+    ctx.status = 200;
     ctx.body = { ok: true };
   },
+
   async status(ctx) {
     const user = ctx.state.user;
     const orderReference = ctx.query.orderReference;
