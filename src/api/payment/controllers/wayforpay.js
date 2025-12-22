@@ -178,14 +178,19 @@ module.exports = {
   },
 
   async webhook(ctx) {
-    // --- LOGS: headers + body structure ---
+    const crypto = require("crypto");
+
+    function hmacMd5(str, secret) {
+      return crypto.createHmac("md5", secret).update(str, "utf8").digest("hex");
+    }
+
     strapi.log.info("[WFP] webhook HIT");
     strapi.log.info("[WFP] headers=" + JSON.stringify(ctx.request.headers));
 
     const body = ctx.request.body;
 
+    // --- logs about parsed body ---
     strapi.log.info("[WFP] bodyType=" + typeof body);
-
     const keys = body && typeof body === "object" ? Object.keys(body) : [];
     strapi.log.info("[WFP] bodyKeys=" + JSON.stringify(keys));
 
@@ -201,64 +206,52 @@ module.exports = {
       strapi.log.warn("[WFP] firstValue stringify failed: " + e.message);
     }
 
-    // direct fields (у тебе вони порожні, бо payload “приїхав” як ключ)
-    try {
-      strapi.log.info(
-        "[WFP] directFields=" +
-          JSON.stringify({
-            merchantAccount: body?.merchantAccount,
-            orderReference: body?.orderReference,
-            transactionStatus: body?.transactionStatus,
-            merchantSignature: body?.merchantSignature,
-            amount: body?.amount,
-            currency: body?.currency,
-            authCode: body?.authCode,
-            cardPan: body?.cardPan,
-            reasonCode: body?.reasonCode,
-          })
-      );
-    } catch (e) {
-      strapi.log.warn("[WFP] directFields stringify failed: " + e.message);
-    }
-
-    // --- RAW BODY (без сторонніх бібліотек) ---
-    // Працює ТІЛЬКИ якщо у config/middlewares.js для strapi::body увімкнено includeUnparsed: true
+    // --- raw / unparsed body ---
     const sym = Symbol.for("unparsedBody");
     const raw = body?.[sym];
 
     strapi.log.info("[WFP] hasUnparsed=" + String(!!raw));
+    strapi.log.info(
+      "[WFP] unparsedType=" + (raw === null ? "null" : typeof raw)
+    );
     strapi.log.info("[WFP] unparsedIsBuffer=" + String(Buffer.isBuffer(raw)));
     strapi.log.info("[WFP] unparsedLen=" + String(raw?.length || 0));
 
-    let payload = null;
-
+    // ВАЖЛИВО: у тебе raw НЕ Buffer, а рядок (або схожий тип)
+    let rawText = "";
     if (Buffer.isBuffer(raw)) {
-      const rawText = raw.toString("utf8");
-      strapi.log.info("[WFP] unparsedFirst200=" + rawText.slice(0, 200));
-      strapi.log.info(
-        "[WFP] unparsedLast200=" +
-          rawText.slice(Math.max(0, rawText.length - 200))
-      );
-
-      // стандартний JSON.parse (це не "власний парсер")
-      try {
-        payload = JSON.parse(rawText);
-        strapi.log.info("[WFP] payloadParsed=ok");
-      } catch (e) {
-        strapi.log.error("[WFP] payloadParsed=failed " + e.message);
-      }
+      rawText = raw.toString("utf8");
+    } else if (typeof raw === "string") {
+      rawText = raw;
+    } else if (
+      raw &&
+      typeof raw === "object" &&
+      typeof raw.toString === "function"
+    ) {
+      // на випадок, якщо це тип на кшталт Uint8Array або щось подібне
+      rawText = raw.toString();
     }
 
-    // якщо raw недоступний — payload з body не збереш (у твоєму форматі він зламаний)
-    if (!payload) {
-      strapi.log.warn("[WFP] No valid payload. Cannot update payment.");
-      // Можеш повернути 200, щоб WFP не робив ретраї,
-      // але платіж/пакет не оновляться без валідного payload.
+    strapi.log.info("[WFP] rawTextFirst200=" + rawText.slice(0, 200));
+    strapi.log.info(
+      "[WFP] rawTextLast200=" + rawText.slice(Math.max(0, rawText.length - 200))
+    );
+
+    let payload = null;
+    try {
+      payload = JSON.parse(rawText);
+      strapi.log.info(
+        "[WFP] payloadParsed=ok keys=" +
+          JSON.stringify(Object.keys(payload || {}))
+      );
+    } catch (e) {
+      strapi.log.error("[WFP] payloadParsed=failed " + e.message);
+      // якщо JSON.parse не зайшов — без payload не можна ні підпис перевірити, ні payment апдейтнути
       ctx.body = { ok: true };
       return;
     }
 
-    // --- BUSINESS LOGIC (як у тебе) ---
+    // --- business fields ---
     const merchantAccount = payload.merchantAccount;
     const orderReference = payload.orderReference;
     const amount = String(payload.amount ?? "");
@@ -286,6 +279,7 @@ module.exports = {
     const secretKey = process.env.WFP_SECRET_KEY;
     if (!secretKey) return ctx.internalServerError("WFP_SECRET_KEY not set");
 
+    // signature verification (як у тебе)
     const baseString = [
       merchantAccount,
       orderReference,
@@ -297,19 +291,18 @@ module.exports = {
       String(reasonCode),
     ].join(";");
 
-    const expectedSignature = crypto
-      .createHmac("md5", secretKey)
-      .update(baseString, "utf8")
-      .digest("hex");
+    const expectedSignature = hmacMd5(baseString, secretKey);
 
     strapi.log.info("[WFP] receivedSignature=" + receivedSignature);
     strapi.log.info("[WFP] baseString=" + baseString);
     strapi.log.info("[WFP] expectedSignature=" + expectedSignature);
+    strapi.log.info("[WFP] transactionStatus=" + transactionStatus);
 
     if (expectedSignature !== receivedSignature) {
       return ctx.forbidden("Invalid signature");
     }
 
+    // find payment by orderReference
     const payments = await strapi.entityService.findMany(
       "api::payment.payment",
       {
@@ -322,6 +315,7 @@ module.exports = {
     const payment = payments?.[0];
     if (!payment) return ctx.notFound("Payment not found");
 
+    // update payment + assign package
     if (transactionStatus === "Approved") {
       await strapi.entityService.update("api::payment.payment", payment.id, {
         data: {
@@ -357,16 +351,17 @@ module.exports = {
       });
     }
 
-    // --- Response to WayForPay: accept ---
+    // response to WFP: accept
     const time = Math.floor(Date.now() / 1000);
     const status = "accept";
-    const responseSignature = crypto
-      .createHmac("md5", secretKey)
-      .update([orderReference, status, String(time)].join(";"), "utf8")
-      .digest("hex");
+    const responseSignature = hmacMd5(
+      [orderReference, status, String(time)].join(";"),
+      secretKey
+    );
 
     ctx.body = { orderReference, status, time, signature: responseSignature };
   },
+
   async status(ctx) {
     const user = ctx.state.user;
     const orderReference = ctx.query.orderReference;
