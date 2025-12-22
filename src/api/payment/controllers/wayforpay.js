@@ -132,6 +132,10 @@ module.exports = {
     };
   },
   async webhook(ctx) {
+    strapi.log.info("[WFP] webhook HIT");
+    strapi.log.info("[WFP] headers=" + JSON.stringify(ctx.request.headers));
+    strapi.log.info("[WFP] body=" + JSON.stringify(ctx.request.body));
+
     const payload = ctx.request.body;
 
     const merchantAccount = payload.merchantAccount;
@@ -165,6 +169,11 @@ module.exports = {
     ].join(";");
 
     const expectedSignature = hmacMd5(baseString, secretKey);
+
+    strapi.log.info("[WFP] receivedSignature=" + receivedSignature);
+    strapi.log.info("[WFP] baseString=" + baseString);
+    strapi.log.info("[WFP] expectedSignature=" + expectedSignature);
+    strapi.log.info("[WFP] transactionStatus=" + transactionStatus);
 
     if (expectedSignature !== receivedSignature) {
       return ctx.forbidden("Invalid signature");
