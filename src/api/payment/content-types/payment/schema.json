@@ -10,5 +10,58 @@
     "draftAndPublish": false
   },
   "pluginOptions": {},
-  "attributes": {}
+  "attributes": {
+    "orderReference": {
+      "type": "string",
+      "required": true,
+      "unique": true
+    },
+    "provider": {
+      "type": "enumeration",
+      "default": "wayforpay",
+      "enum": [
+        "wayforpay"
+      ]
+    },
+    "amount": {
+      "type": "decimal",
+      "required": true
+    },
+    "currency": {
+      "type": "string",
+      "default": "UAH"
+    },
+    "payment_status": {
+      "type": "enumeration",
+      "required": true,
+      "default": "CREATED",
+      "enum": [
+        "CREATED",
+        "APPROVED",
+        "DECLINED",
+        "EXPIRED"
+      ]
+    },
+    "paidAt": {
+      "type": "datetime"
+    },
+    "wayforpayPayload": {
+      "type": "json"
+    },
+    "failReason": {
+      "type": "text"
+    },
+    "user": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "plugin::users-permissions.user",
+      "inversedBy": "payments"
+    },
+    "package": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::package.package",
+      "inversedBy": "payments"
+    }
+  }
 }

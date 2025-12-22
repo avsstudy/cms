@@ -1312,6 +1312,7 @@ export interface ApiPackagePackage extends Struct.CollectionTypeSchema {
       'api::package.package'
     > &
       Schema.Attribute.Private;
+    payments: Schema.Attribute.Relation<'oneToMany', 'api::payment.payment'>;
     price_UAH: Schema.Attribute.Decimal & Schema.Attribute.Required;
     publishedAt: Schema.Attribute.DateTime;
     subscription: Schema.Attribute.Relation<
@@ -1345,19 +1346,39 @@ export interface ApiPaymentPayment extends Struct.CollectionTypeSchema {
     draftAndPublish: false;
   };
   attributes: {
+    amount: Schema.Attribute.Decimal & Schema.Attribute.Required;
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
+    currency: Schema.Attribute.String & Schema.Attribute.DefaultTo<'UAH'>;
+    failReason: Schema.Attribute.Text;
     locale: Schema.Attribute.String & Schema.Attribute.Private;
     localizations: Schema.Attribute.Relation<
       'oneToMany',
       'api::payment.payment'
     > &
       Schema.Attribute.Private;
+    orderReference: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.Unique;
+    package: Schema.Attribute.Relation<'manyToOne', 'api::package.package'>;
+    paidAt: Schema.Attribute.DateTime;
+    payment_status: Schema.Attribute.Enumeration<
+      ['CREATED', 'APPROVED', 'DECLINED', 'EXPIRED']
+    > &
+      Schema.Attribute.Required &
+      Schema.Attribute.DefaultTo<'CREATED'>;
+    provider: Schema.Attribute.Enumeration<['wayforpay']> &
+      Schema.Attribute.DefaultTo<'wayforpay'>;
     publishedAt: Schema.Attribute.DateTime;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
+    user: Schema.Attribute.Relation<
+      'manyToOne',
+      'plugin::users-permissions.user'
+    >;
+    wayforpayPayload: Schema.Attribute.JSON;
   };
 }
 
@@ -2547,6 +2568,7 @@ export interface PluginUsersPermissionsUser
       Schema.Attribute.SetMinMaxLength<{
         minLength: 6;
       }>;
+    payments: Schema.Attribute.Relation<'oneToMany', 'api::payment.payment'>;
     phone: Schema.Attribute.String & Schema.Attribute.Required;
     photo: Schema.Attribute.Media<'images'>;
     provider: Schema.Attribute.String;

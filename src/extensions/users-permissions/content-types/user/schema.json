@@ -136,6 +136,12 @@
       "relation": "manyToOne",
       "target": "api::package.package",
       "inversedBy": "users"
+    },
+    "payments": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::payment.payment",
+      "mappedBy": "user"
     }
   }
 }
