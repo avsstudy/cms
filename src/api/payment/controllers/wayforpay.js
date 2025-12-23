@@ -331,6 +331,7 @@ module.exports = {
 
     // --- Update payment + assign package (ONLY Approved) ---
     if (txStatus === "Approved") {
+      // 1) payment => APPROVED
       await strapi.entityService.update("api::payment.payment", payment.id, {
         data: {
           payment_status: "APPROVED",
@@ -340,26 +341,46 @@ module.exports = {
       });
 
       if (userId && packageId) {
-        strapi.log.warn(
-          "[WFP] ASSIGN PACKAGE (Approved only) " +
-            JSON.stringify({
-              orderReference,
-              transactionStatus: txStatus,
-              paymentId: payment.id,
-              userId,
-              packageId,
-            })
+        // 2) дочитуємо user з packageActiveUntil (не довіряємо populate)
+        const user = await strapi.entityService.findOne(
+          "plugin::users-permissions.user",
+          userId,
+          { fields: ["packageActiveUntil"] }
         );
 
+        const now = new Date();
+        const currentUntil = user?.packageActiveUntil
+          ? new Date(user.packageActiveUntil)
+          : null;
+
+        // Якщо ще активний — продовжуємо від нього, інакше від зараз
+        const base = currentUntil && currentUntil > now ? currentUntil : now;
+
+        const newUntil = new Date(base);
+        newUntil.setFullYear(newUntil.getFullYear() + 1);
+
+        // 3) assign package + set/extend until
         await strapi.entityService.update(
           "plugin::users-permissions.user",
           userId,
           {
-            data: { package: packageId },
+            data: {
+              package: packageId,
+              packageActiveUntil: newUntil,
+            },
           }
         );
 
-        strapi.log.info("[WFP] package assigned OK for userId=" + userId);
+        strapi.log.info(
+          "[WFP] package assigned + extended " +
+            JSON.stringify({
+              userId,
+              packageId,
+              orderReference,
+              from: base.toISOString(),
+              until: newUntil.toISOString(),
+            })
+        );
       } else {
         strapi.log.warn(
           "[WFP] Approved but missing userId/packageId " +
@@ -417,6 +438,7 @@ module.exports = {
 
     ctx.body = { orderReference, status, time, signature: responseSignature };
   },
+
   async status(ctx) {
     const user = ctx.state.user;
     const orderReference = ctx.query.orderReference;

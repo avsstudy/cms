@@ -142,6 +142,9 @@
       "relation": "oneToMany",
       "target": "api::payment.payment",
       "mappedBy": "user"
+    },
+    "packageActiveUntil": {
+      "type": "datetime"
     }
   }
 }

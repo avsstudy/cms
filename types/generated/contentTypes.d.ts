@@ -2563,6 +2563,7 @@ export interface PluginUsersPermissionsUser
     > &
       Schema.Attribute.Private;
     package: Schema.Attribute.Relation<'manyToOne', 'api::package.package'>;
+    packageActiveUntil: Schema.Attribute.DateTime;
     password: Schema.Attribute.Password &
       Schema.Attribute.Private &
       Schema.Attribute.SetMinMaxLength<{
