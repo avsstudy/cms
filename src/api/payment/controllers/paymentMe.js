@@ -14,7 +14,6 @@ module.exports = {
       50
     );
 
-    // ✅ універсально: findMany + count (працює у всіх v4)
     const filters = { user: userId };
 
     const [items, total] = await Promise.all([
@@ -37,7 +36,6 @@ module.exports = {
         limit: pageSize,
       }),
 
-      // count інколи доступний як query
       strapi.db.query("api::payment.payment").count({ where: filters }),
     ]);
 

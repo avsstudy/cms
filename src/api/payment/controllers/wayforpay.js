@@ -14,25 +14,16 @@ function makeOrderReference({ userId, packageId }) {
   return `pkg_${packageId}_u${userId}_${Date.now()}`;
 }
 
-/**
- * Нормалізація payload для кейса, коли WayForPay прислав JSON,
- * але content-type був application/x-www-form-urlencoded і Strapi/koa
- * розпарсив це як "ключ=порожньо", де ключ — це весь JSON-рядок.
- */
 function normalizeWfpPayload(rawBody) {
   let payload = rawBody;
 
-  // 1) Якщо body прийшло строкою
   if (typeof payload === "string") {
     try {
       payload = JSON.parse(payload);
       return payload;
-    } catch (e) {
-      // залишаємо як є
-    }
+    } catch (e) {}
   }
 
-  // 2) Якщо body — об’єкт з одним ключем, а ключ виглядає як JSON
   if (
     payload &&
     typeof payload === "object" &&
@@ -48,9 +39,7 @@ function normalizeWfpPayload(rawBody) {
       try {
         payload = JSON.parse(onlyKey);
         return payload;
-      } catch (e) {
-        // залишаємо як є
-      }
+      } catch (e) {}
     }
   }
 
@@ -178,12 +167,13 @@ module.exports = {
   },
 
   async webhook(ctx) {
+    const crypto = require("crypto");
+
     strapi.log.info("[WFP] webhook HIT");
     strapi.log.info("[WFP] headers=" + JSON.stringify(ctx.request.headers));
 
     const body = ctx.request.body;
 
-    // --- Debug: parsed body (воно у тебе “поламане” через form-urlencoded + крапки в email) ---
     strapi.log.info("[WFP] bodyType=" + typeof body);
     const keys = body && typeof body === "object" ? Object.keys(body) : [];
     strapi.log.info("[WFP] bodyKeys=" + JSON.stringify(keys));
@@ -200,7 +190,6 @@ module.exports = {
       strapi.log.warn("[WFP] firstValue stringify failed: " + e.message);
     }
 
-    // --- RAW / unparsed body (працює якщо includeUnparsed: true у config/middlewares.js) ---
     const sym = Symbol.for("unparsedBody");
     const raw = body?.[sym];
 
@@ -229,7 +218,6 @@ module.exports = {
       "[WFP] rawTextLast200=" + rawText.slice(Math.max(0, rawText.length - 200))
     );
 
-    // --- Parse JSON payload from rawText ---
     let payload = null;
     try {
       payload = JSON.parse(rawText);
@@ -239,12 +227,10 @@ module.exports = {
       );
     } catch (e) {
       strapi.log.error("[WFP] payloadParsed=failed " + e.message);
-      // Без payload ми не можемо ні перевірити підпис, ні оновити payment
       ctx.body = { ok: true };
       return;
     }
 
-    // --- Business fields ---
     const merchantAccount = payload.merchantAccount;
     const orderReference = payload.orderReference;
     const amount = String(payload.amount ?? "");
@@ -254,7 +240,6 @@ module.exports = {
     const cardPan = payload.cardPan ?? "";
     const transactionStatus = payload.transactionStatus;
     const reasonCode = payload.reasonCode ?? "";
-
     const receivedSignature = payload.merchantSignature;
 
     if (!orderReference || !receivedSignature || !transactionStatus) {
@@ -272,7 +257,6 @@ module.exports = {
     const secretKey = process.env.WFP_SECRET_KEY;
     if (!secretKey) return ctx.internalServerError("WFP_SECRET_KEY not set");
 
-    // Signature verification
     const baseString = [
       merchantAccount,
       orderReference,
@@ -280,7 +264,7 @@ module.exports = {
       currency,
       authCode,
       cardPan,
-      transactionStatus,
+      String(transactionStatus),
       String(reasonCode),
     ].join(";");
 
@@ -298,7 +282,6 @@ module.exports = {
       return ctx.forbidden("Invalid signature");
     }
 
-    // --- Find payment by orderReference ---
     const payments = await strapi.entityService.findMany(
       "api::payment.payment",
       {
@@ -326,12 +309,25 @@ module.exports = {
         })
     );
 
-    // Нормалізуємо статус
     const txStatus = String(transactionStatus || "").trim();
 
-    // --- Update payment + assign package (ONLY Approved) ---
+    if (payment.payment_status === "APPROVED") {
+      strapi.log.info(
+        "[WFP] already APPROVED => skip user update " + orderReference
+      );
+
+      const time = Math.floor(Date.now() / 1000);
+      const status = "accept";
+      const responseSignature = crypto
+        .createHmac("md5", secretKey)
+        .update([orderReference, status, String(time)].join(";"), "utf8")
+        .digest("hex");
+
+      ctx.body = { orderReference, status, time, signature: responseSignature };
+      return;
+    }
+
     if (txStatus === "Approved") {
-      // 1) payment => APPROVED
       await strapi.entityService.update("api::payment.payment", payment.id, {
         data: {
           payment_status: "APPROVED",
@@ -341,7 +337,6 @@ module.exports = {
       });
 
       if (userId && packageId) {
-        // 2) дочитуємо user з packageActiveUntil (не довіряємо populate)
         const user = await strapi.entityService.findOne(
           "plugin::users-permissions.user",
           userId,
@@ -353,13 +348,11 @@ module.exports = {
           ? new Date(user.packageActiveUntil)
           : null;
 
-        // Якщо ще активний — продовжуємо від нього, інакше від зараз
         const base = currentUntil && currentUntil > now ? currentUntil : now;
 
         const newUntil = new Date(base);
         newUntil.setFullYear(newUntil.getFullYear() + 1);
 
-        // 3) assign package + set/extend until
         await strapi.entityService.update(
           "plugin::users-permissions.user",
           userId,
@@ -388,7 +381,6 @@ module.exports = {
         );
       }
     } else if (txStatus === "Declined") {
-      // Тут пакет НЕ чіпаємо
       strapi.log.warn(
         "[WFP] DECLINED => package NOT assigned " +
           JSON.stringify({
@@ -410,7 +402,6 @@ module.exports = {
         },
       });
     } else {
-      // Інші статуси — також без пакета
       strapi.log.warn(
         "[WFP] status=" +
           txStatus +
@@ -428,7 +419,6 @@ module.exports = {
       });
     }
 
-    // --- Response to WayForPay: accept ---
     const time = Math.floor(Date.now() / 1000);
     const status = "accept";
     const responseSignature = crypto
