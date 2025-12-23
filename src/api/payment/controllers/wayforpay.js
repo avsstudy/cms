@@ -10,6 +10,21 @@ function unixNow() {
   return Math.floor(Date.now() / 1000);
 }
 
+function nowInKyivDate() {
+  const s = new Intl.DateTimeFormat("sv-SE", {
+    timeZone: "Europe/Kyiv",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+    hour12: false,
+  }).format(new Date());
+
+  return new Date(s.replace(" ", "T") + ".000");
+}
+
 function makeOrderReference({ userId, packageId }) {
   return `pkg_${packageId}_u${userId}_${Date.now()}`;
 }
@@ -331,7 +346,7 @@ module.exports = {
       await strapi.entityService.update("api::payment.payment", payment.id, {
         data: {
           payment_status: "APPROVED",
-          paidAt: new Date(),
+          paidAt: nowInKyivDate(),
           wayforpayPayload: payload,
         },
       });
