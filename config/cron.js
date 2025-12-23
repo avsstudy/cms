@@ -1,10 +1,5 @@
-"use strict";
-
 module.exports = {
-  /**
-   * Щодня о 03:15 (час сервера) "15 3 * * *".
-   */
-  "* * * * *": async ({ strapi }) => {
+  "15 3 * * *": async ({ strapi }) => {
     const now = new Date();
     strapi.log.info(`[CRON] expire packages start ${now.toISOString()}`);
 
