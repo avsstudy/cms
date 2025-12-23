@@ -64,11 +64,11 @@
       "target": "api::topic-dps.topic-dps",
       "inversedBy": "ipk"
     },
-    "subscription": {
+    "subscriptions": {
       "type": "relation",
-      "relation": "manyToOne",
+      "relation": "manyToMany",
       "target": "api::subscription.subscription",
-      "inversedBy": "ipk"
+      "inversedBy": "ipks"
     }
   }
 }

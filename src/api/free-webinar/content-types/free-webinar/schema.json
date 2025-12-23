@@ -96,11 +96,11 @@
       "target": "api::free-webinar-reason.free-webinar-reason",
       "mappedBy": "free_webinar"
     },
-    "subscription": {
+    "subscriptions": {
       "type": "relation",
-      "relation": "manyToOne",
+      "relation": "manyToMany",
       "target": "api::subscription.subscription",
-      "inversedBy": "free_webinar"
+      "inversedBy": "free_webinars"
     }
   }
 }

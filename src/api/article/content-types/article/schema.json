@@ -88,11 +88,11 @@
       "required": false,
       "default": false
     },
-    "subscription": {
+    "subscriptions": {
       "type": "relation",
-      "relation": "manyToOne",
+      "relation": "manyToMany",
       "target": "api::subscription.subscription",
-      "inversedBy": "article"
+      "inversedBy": "articles"
     }
   }
 }

@@ -15,59 +15,59 @@
       "type": "string",
       "required": true
     },
-    "article": {
+    "articles": {
       "type": "relation",
-      "relation": "oneToMany",
+      "relation": "manyToMany",
       "target": "api::article.article",
-      "mappedBy": "subscription"
+      "mappedBy": "subscriptions"
     },
-    "news_article": {
+    "news_articles": {
       "type": "relation",
-      "relation": "oneToMany",
+      "relation": "manyToMany",
       "target": "api::news-article.news-article",
-      "mappedBy": "subscription"
+      "mappedBy": "subscriptions"
     },
-    "ipk": {
+    "ipks": {
       "type": "relation",
-      "relation": "oneToMany",
+      "relation": "manyToMany",
       "target": "api::ipk.ipk",
-      "mappedBy": "subscription"
+      "mappedBy": "subscriptions"
     },
-    "free_webinar": {
+    "free_webinars": {
       "type": "relation",
-      "relation": "oneToMany",
+      "relation": "manyToMany",
       "target": "api::free-webinar.free-webinar",
-      "mappedBy": "subscription"
+      "mappedBy": "subscriptions"
     },
-    "avs_document": {
+    "avs_documents": {
       "type": "relation",
-      "relation": "oneToMany",
+      "relation": "manyToMany",
       "target": "api::avs-document.avs-document",
-      "mappedBy": "subscription"
+      "mappedBy": "subscriptions"
     },
-    "handbook": {
+    "handbooks": {
       "type": "relation",
-      "relation": "oneToMany",
+      "relation": "manyToMany",
       "target": "api::handbook.handbook",
-      "mappedBy": "subscription"
+      "mappedBy": "subscriptions"
     },
-    "video_recording": {
+    "video_recordings": {
       "type": "relation",
-      "relation": "oneToMany",
+      "relation": "manyToMany",
       "target": "api::video-recording.video-recording",
-      "mappedBy": "subscription"
+      "inversedBy": "subscriptions"
     },
-    "course": {
+    "courses": {
       "type": "relation",
-      "relation": "oneToMany",
+      "relation": "manyToMany",
       "target": "api::course.course",
-      "mappedBy": "subscription"
+      "mappedBy": "subscriptions"
     },
-    "package": {
+    "packages": {
       "type": "relation",
-      "relation": "manyToOne",
+      "relation": "manyToMany",
       "target": "api::package.package",
-      "inversedBy": "subscription"
+      "mappedBy": "subscriptions"
     }
   }
 }

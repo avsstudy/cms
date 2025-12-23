@@ -65,11 +65,11 @@
       ],
       "required": true
     },
-    "subscription": {
+    "subscriptions": {
       "type": "relation",
-      "relation": "manyToOne",
+      "relation": "manyToMany",
       "target": "api::subscription.subscription",
-      "inversedBy": "handbook"
+      "inversedBy": "handbooks"
     }
   }
 }

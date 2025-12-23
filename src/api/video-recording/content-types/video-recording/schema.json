@@ -80,11 +80,11 @@
         "shared.upcoming-session"
       ]
     },
-    "subscription": {
+    "subscriptions": {
       "type": "relation",
-      "relation": "manyToOne",
+      "relation": "manyToMany",
       "target": "api::subscription.subscription",
-      "inversedBy": "video_recording"
+      "mappedBy": "video_recordings"
     },
     "package": {
       "type": "relation",

@@ -105,11 +105,11 @@
       "target": "api::session-test.session-test",
       "inversedBy": "course"
     },
-    "subscription": {
+    "subscriptions": {
       "type": "relation",
-      "relation": "manyToOne",
+      "relation": "manyToMany",
       "target": "api::subscription.subscription",
-      "inversedBy": "course"
+      "inversedBy": "courses"
     },
     "package": {
       "type": "relation",

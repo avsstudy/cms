@@ -71,11 +71,11 @@
         "shared.useful-files"
       ]
     },
-    "subscription": {
+    "subscriptions": {
       "type": "relation",
-      "relation": "manyToOne",
+      "relation": "manyToMany",
       "target": "api::subscription.subscription",
-      "inversedBy": "avs_document"
+      "inversedBy": "avs_documents"
     }
   }
 }

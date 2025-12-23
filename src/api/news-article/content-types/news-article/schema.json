@@ -79,11 +79,11 @@
       ],
       "required": true
     },
-    "subscription": {
+    "subscriptions": {
       "type": "relation",
-      "relation": "manyToOne",
+      "relation": "manyToMany",
       "target": "api::subscription.subscription",
-      "inversedBy": "news_article"
+      "inversedBy": "news_articles"
     }
   }
 }
