@@ -536,13 +536,13 @@ export interface ApiArticleArticle extends Struct.CollectionTypeSchema {
     pinned: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<false>;
     publishedAt: Schema.Attribute.DateTime;
     slug: Schema.Attribute.UID<'title'> & Schema.Attribute.Required;
-    subscription: Schema.Attribute.Relation<
-      'manyToOne',
-      'api::subscription.subscription'
-    >;
     subscription_type: Schema.Attribute.Enumeration<['free', 'paid']> &
       Schema.Attribute.Required &
       Schema.Attribute.DefaultTo<'free'>;
+    subscriptions: Schema.Attribute.Relation<
+      'manyToMany',
+      'api::subscription.subscription'
+    >;
     title: Schema.Attribute.String & Schema.Attribute.Required;
     topic: Schema.Attribute.Relation<'manyToMany', 'api::topic.topic'>;
     updatedAt: Schema.Attribute.DateTime;
@@ -667,13 +667,13 @@ export interface ApiAvsDocumentAvsDocument extends Struct.CollectionTypeSchema {
       Schema.Attribute.DefaultTo<false>;
     publishedAt: Schema.Attribute.DateTime;
     slug: Schema.Attribute.UID<'title'> & Schema.Attribute.Required;
-    subscription: Schema.Attribute.Relation<
-      'manyToOne',
-      'api::subscription.subscription'
-    >;
     subscription_type: Schema.Attribute.Relation<
       'manyToMany',
       'api::subscription-type.subscription-type'
+    >;
+    subscriptions: Schema.Attribute.Relation<
+      'manyToMany',
+      'api::subscription.subscription'
     >;
     title: Schema.Attribute.String & Schema.Attribute.Required;
     topic: Schema.Attribute.Relation<'manyToMany', 'api::topic.topic'>;
@@ -816,13 +816,13 @@ export interface ApiCourseCourse extends Struct.CollectionTypeSchema {
       'manyToMany',
       'api::study-session.study-session'
     >;
-    subscription: Schema.Attribute.Relation<
-      'manyToOne',
-      'api::subscription.subscription'
-    >;
     subscription_type: Schema.Attribute.Relation<
       'manyToMany',
       'api::subscription-type.subscription-type'
+    >;
+    subscriptions: Schema.Attribute.Relation<
+      'manyToMany',
+      'api::subscription.subscription'
     >;
     title: Schema.Attribute.String & Schema.Attribute.Required;
     topic: Schema.Attribute.Relation<'manyToMany', 'api::topic.topic'>;
@@ -1007,8 +1007,8 @@ export interface ApiFreeWebinarFreeWebinar extends Struct.CollectionTypeSchema {
     slug: Schema.Attribute.UID<'title'> & Schema.Attribute.Required;
     speaker: Schema.Attribute.Relation<'manyToMany', 'api::speaker.speaker'>;
     stream_url: Schema.Attribute.String & Schema.Attribute.Required;
-    subscription: Schema.Attribute.Relation<
-      'manyToOne',
+    subscriptions: Schema.Attribute.Relation<
+      'manyToMany',
       'api::subscription.subscription'
     >;
     time: Schema.Attribute.Time & Schema.Attribute.Required;
@@ -1092,13 +1092,13 @@ export interface ApiHandbookHandbook extends Struct.CollectionTypeSchema {
       Schema.Attribute.DefaultTo<false>;
     publishedAt: Schema.Attribute.DateTime;
     slug: Schema.Attribute.UID<'title'> & Schema.Attribute.Required;
-    subscription: Schema.Attribute.Relation<
-      'manyToOne',
-      'api::subscription.subscription'
-    >;
     subscription_type: Schema.Attribute.Enumeration<['free', 'paid']> &
       Schema.Attribute.Required &
       Schema.Attribute.DefaultTo<'free'>;
+    subscriptions: Schema.Attribute.Relation<
+      'manyToMany',
+      'api::subscription.subscription'
+    >;
     title: Schema.Attribute.String & Schema.Attribute.Required;
     topic: Schema.Attribute.Relation<'manyToMany', 'api::topic.topic'>;
     updatedAt: Schema.Attribute.DateTime;
@@ -1209,13 +1209,13 @@ export interface ApiIpkIpk extends Struct.CollectionTypeSchema {
       Schema.Attribute.Private;
     publishedAt: Schema.Attribute.DateTime;
     slug: Schema.Attribute.UID<'ipk_title'> & Schema.Attribute.Required;
-    subscription: Schema.Attribute.Relation<
-      'manyToOne',
-      'api::subscription.subscription'
-    >;
     subscription_type: Schema.Attribute.Relation<
       'manyToOne',
       'api::subscription-type.subscription-type'
+    >;
+    subscriptions: Schema.Attribute.Relation<
+      'manyToMany',
+      'api::subscription.subscription'
     >;
     topic: Schema.Attribute.Relation<'manyToMany', 'api::topic.topic'>;
     topic_dps: Schema.Attribute.Relation<
@@ -1274,13 +1274,13 @@ export interface ApiNewsArticleNewsArticle extends Struct.CollectionTypeSchema {
       Schema.Attribute.DefaultTo<false>;
     publishedAt: Schema.Attribute.DateTime;
     slug: Schema.Attribute.UID<'title'> & Schema.Attribute.Required;
-    subscription: Schema.Attribute.Relation<
-      'manyToOne',
-      'api::subscription.subscription'
-    >;
     subscription_type: Schema.Attribute.Relation<
       'manyToOne',
       'api::subscription-type.subscription-type'
+    >;
+    subscriptions: Schema.Attribute.Relation<
+      'manyToMany',
+      'api::subscription.subscription'
     >;
     title: Schema.Attribute.String & Schema.Attribute.Required;
     topic: Schema.Attribute.Relation<'manyToMany', 'api::topic.topic'>;
@@ -1315,8 +1315,8 @@ export interface ApiPackagePackage extends Struct.CollectionTypeSchema {
     payments: Schema.Attribute.Relation<'oneToMany', 'api::payment.payment'>;
     price_UAH: Schema.Attribute.Decimal & Schema.Attribute.Required;
     publishedAt: Schema.Attribute.DateTime;
-    subscription: Schema.Attribute.Relation<
-      'oneToMany',
+    subscriptions: Schema.Attribute.Relation<
+      'manyToMany',
       'api::subscription.subscription'
     >;
     title: Schema.Attribute.String & Schema.Attribute.Required;
@@ -1725,39 +1725,42 @@ export interface ApiSubscriptionSubscription
     draftAndPublish: false;
   };
   attributes: {
-    article: Schema.Attribute.Relation<'oneToMany', 'api::article.article'>;
-    avs_document: Schema.Attribute.Relation<
-      'oneToMany',
+    articles: Schema.Attribute.Relation<'manyToMany', 'api::article.article'>;
+    avs_documents: Schema.Attribute.Relation<
+      'manyToMany',
       'api::avs-document.avs-document'
     >;
-    course: Schema.Attribute.Relation<'oneToMany', 'api::course.course'>;
+    courses: Schema.Attribute.Relation<'manyToMany', 'api::course.course'>;
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
-    free_webinar: Schema.Attribute.Relation<
-      'oneToMany',
+    free_webinars: Schema.Attribute.Relation<
+      'manyToMany',
       'api::free-webinar.free-webinar'
     >;
-    handbook: Schema.Attribute.Relation<'oneToMany', 'api::handbook.handbook'>;
-    ipk: Schema.Attribute.Relation<'oneToMany', 'api::ipk.ipk'>;
+    handbooks: Schema.Attribute.Relation<
+      'manyToMany',
+      'api::handbook.handbook'
+    >;
+    ipks: Schema.Attribute.Relation<'manyToMany', 'api::ipk.ipk'>;
     locale: Schema.Attribute.String & Schema.Attribute.Private;
     localizations: Schema.Attribute.Relation<
       'oneToMany',
       'api::subscription.subscription'
     > &
       Schema.Attribute.Private;
-    news_article: Schema.Attribute.Relation<
-      'oneToMany',
+    news_articles: Schema.Attribute.Relation<
+      'manyToMany',
       'api::news-article.news-article'
     >;
-    package: Schema.Attribute.Relation<'manyToOne', 'api::package.package'>;
+    packages: Schema.Attribute.Relation<'manyToMany', 'api::package.package'>;
     publishedAt: Schema.Attribute.DateTime;
     title: Schema.Attribute.String & Schema.Attribute.Required;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
-    video_recording: Schema.Attribute.Relation<
-      'oneToMany',
+    video_recordings: Schema.Attribute.Relation<
+      'manyToMany',
       'api::video-recording.video-recording'
     >;
   };
@@ -2048,13 +2051,13 @@ export interface ApiVideoRecordingVideoRecording
     slug: Schema.Attribute.UID<'title'>;
     speaker: Schema.Attribute.Relation<'manyToMany', 'api::speaker.speaker'>;
     stream_date: Schema.Attribute.Date;
-    subscription: Schema.Attribute.Relation<
-      'manyToOne',
-      'api::subscription.subscription'
-    >;
     subscription_type: Schema.Attribute.Relation<
       'manyToMany',
       'api::subscription-type.subscription-type'
+    >;
+    subscriptions: Schema.Attribute.Relation<
+      'manyToMany',
+      'api::subscription.subscription'
     >;
     title: Schema.Attribute.String & Schema.Attribute.Required;
     top: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<false>;
