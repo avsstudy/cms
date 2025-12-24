@@ -265,6 +265,7 @@ export interface SharedMiniCourseLesson extends Struct.ComponentSchema {
       'images' | 'files' | 'videos' | 'audios',
       true
     >;
+    topics: Schema.Attribute.Relation<'oneToMany', 'api::topic.topic'>;
   };
 }
 

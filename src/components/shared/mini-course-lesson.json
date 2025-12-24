@@ -23,6 +23,11 @@
         "videos",
         "audios"
       ]
+    },
+    "topics": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::topic.topic"
     }
   },
   "config": {}
