@@ -29,6 +29,31 @@ const getMeiliClient = (strapi) => {
   return new MeiliSearch({ host, apiKey });
 };
 
+const getUserFromAuthHeader = async (ctx) => {
+  const authHeader = ctx.request.header.authorization || "";
+  const [type, token] = authHeader.split(" ");
+
+  if (type !== "Bearer" || !token) return null;
+
+  try {
+    const payload = await strapi
+      .plugin("users-permissions")
+      .service("jwt")
+      .verify(token);
+
+    if (!payload?.id) return null;
+
+    const user = await strapi
+      .plugin("users-permissions")
+      .service("user")
+      .fetchAuthenticatedUser(payload.id);
+
+    return user || null;
+  } catch (e) {
+    return null;
+  }
+};
+
 module.exports = createCoreController("api::article.article", ({ strapi }) => ({
   async views(ctx) {
     const id = Number(ctx.params.id);
@@ -157,7 +182,8 @@ module.exports = createCoreController("api::article.article", ({ strapi }) => ({
       );
     }
 
-    const user = ctx.state.user || null;
+    let user = ctx.state.user || null;
+    if (!user) user = await getUserFromAuthHeader(ctx);
 
     let allowedSubscriptionIds = [freeSubId];
 
