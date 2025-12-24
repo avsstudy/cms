@@ -139,16 +139,34 @@ module.exports = createCoreController("api::article.article", ({ strapi }) => ({
     const FREE_SUB_DOCUMENT_ID =
       process.env.FREE_SUBSCRIPTION_DOCUMENT_ID || "eah7di4oabhot416js8ab6mj";
 
+    const user = ctx.state.user || null;
+    const { topics, categories, q, page = "1", pageSize = "10" } = ctx.query;
+
+    const pageNum = Math.max(1, Number(page) || 1);
+    const sizeNum = Math.max(1, Number(pageSize) || 10);
+
+    const topicIds = topics
+      ? String(topics).split(",").map(Number).filter(Boolean)
+      : [];
+
+    const categoryIds = categories
+      ? String(categories).split(",").map(Number).filter(Boolean)
+      : [];
+
     const freeSubs = await strapi.entityService.findMany(
       "api::subscription.subscription",
       {
         filters: { documentId: FREE_SUB_DOCUMENT_ID },
         fields: ["id", "documentId"],
+        populate: {
+          articles: { fields: ["id", "documentId"] },
+        },
         limit: 1,
       }
     );
 
-    const freeSubId = freeSubs?.[0]?.id;
+    const freeSubscription = freeSubs?.[0] || null;
+    const freeSubId = freeSubscription?.id || null;
 
     if (!freeSubId) {
       ctx.throw(
@@ -156,8 +174,6 @@ module.exports = createCoreController("api::article.article", ({ strapi }) => ({
         `Free subscription not found by documentId=${FREE_SUB_DOCUMENT_ID}`
       );
     }
-
-    const user = ctx.state.user || null;
 
     let packageSubIds = [];
 
@@ -169,7 +185,7 @@ module.exports = createCoreController("api::article.article", ({ strapi }) => ({
           fields: ["id", "packageActiveUntil"],
           populate: {
             package: {
-              fields: ["id", "title"],
+              fields: ["id"],
               populate: {
                 subscriptions: { fields: ["id"] },
               },
@@ -191,41 +207,83 @@ module.exports = createCoreController("api::article.article", ({ strapi }) => ({
       }
     }
 
-    const { topics, categories, q, page = "1", pageSize = "10" } = ctx.query;
-
-    const pageNum = Math.max(1, Number(page) || 1);
-    const sizeNum = Math.max(1, Number(pageSize) || 10);
-
-    const topicIds = topics
-      ? String(topics).split(",").map(Number).filter(Boolean)
+    const freeArticleRefs = Array.isArray(freeSubscription?.articles)
+      ? freeSubscription.articles
       : [];
 
-    const categoryIds = categories
-      ? String(categories).split(",").map(Number).filter(Boolean)
-      : [];
+    let packageArticleRefs = [];
 
-    const baseFilters = {
+    if (packageSubIds.length) {
+      const subs = await strapi.entityService.findMany(
+        "api::subscription.subscription",
+        {
+          filters: { id: { $in: packageSubIds } },
+          fields: ["id"],
+          populate: {
+            articles: { fields: ["id", "documentId"] },
+          },
+          limit: -1,
+        }
+      );
+
+      for (const s of subs || []) {
+        if (Array.isArray(s?.articles) && s.articles.length) {
+          packageArticleRefs.push(...s.articles);
+        }
+      }
+    }
+
+    const seenDoc = new Set();
+    const orderedIds = [];
+
+    for (const a of freeArticleRefs) {
+      const key = a?.documentId || `id:${a?.id}`;
+      if (!seenDoc.has(key) && a?.id) {
+        seenDoc.add(key);
+        orderedIds.push(a.id);
+      }
+    }
+
+    for (const a of packageArticleRefs) {
+      const key = a?.documentId || `id:${a?.id}`;
+      if (!seenDoc.has(key) && a?.id) {
+        seenDoc.add(key);
+        orderedIds.push(a.id);
+      }
+    }
+
+    if (!orderedIds.length) {
+      ctx.body = {
+        data: [],
+        meta: {
+          pagination: {
+            page: pageNum,
+            pageSize: sizeNum,
+            pageCount: 1,
+            total: 0,
+          },
+        },
+        access: { freeSubId, packageSubIds },
+      };
+      return;
+    }
+
+    const articleFilters = {
       publishedAt: { $notNull: true },
+      id: { $in: orderedIds },
     };
 
-    if (topicIds.length) baseFilters.topic = { id: { $in: topicIds } };
-    if (categoryIds.length) baseFilters.category = { id: { $in: categoryIds } };
+    if (topicIds.length) articleFilters.topic = { id: { $in: topicIds } };
+    if (categoryIds.length)
+      articleFilters.category = { id: { $in: categoryIds } };
 
     if (q && String(q).trim()) {
       const qq = String(q).trim();
-      baseFilters.$or = [
+      articleFilters.$or = [
         { title: { $containsi: qq } },
         { description: { $containsi: qq } },
       ];
     }
-
-    const populate = {
-      category: { fields: ["title", "id"] },
-      cover: { fields: ["url", "alternativeText"] },
-      author: { fields: ["name"] },
-      topic: { fields: ["title", "id"] },
-      subscriptions: { fields: ["id", "title", "documentId"] },
-    };
 
     const fields = [
       "title",
@@ -237,65 +295,38 @@ module.exports = createCoreController("api::article.article", ({ strapi }) => ({
       "article_date",
     ];
 
-    const sort = ["article_date:desc", "publishedAt:desc"];
+    const populate = {
+      category: { fields: ["title", "id"] },
+      cover: { fields: ["url", "alternativeText"] },
+      author: { fields: ["name"] },
+      topic: { fields: ["title", "id"] },
+      subscriptions: { fields: ["id", "title", "documentId"] },
+    };
 
-    const freeArticles = await strapi.entityService.findMany(
-      "api::article.article",
-      {
-        sort,
-        locale: "all",
-        fields,
-        populate,
-        filters: {
-          ...baseFilters,
-          subscriptions: { id: { $eq: freeSubId } },
-        },
-        limit: -1,
-      }
-    );
+    const found = await strapi.entityService.findMany("api::article.article", {
+      locale: "all",
+      fields,
+      populate,
+      filters: articleFilters,
+      limit: -1,
+    });
 
-    const subArticles =
-      packageSubIds.length > 0
-        ? await strapi.entityService.findMany("api::article.article", {
-            sort,
-            locale: "all",
-            fields,
-            populate,
-            filters: {
-              ...baseFilters,
-              subscriptions: { id: { $in: packageSubIds } },
-            },
-            limit: -1,
-          })
-        : [];
+    const byId = new Map();
+    for (const a of found || []) byId.set(a.id, a);
 
-    const seen = new Set();
     const merged = [];
-
-    for (const a of freeArticles || []) {
-      const key = a?.documentId || a?.id;
-      if (!seen.has(key)) {
-        seen.add(key);
-        merged.push(a);
-      }
-    }
-
-    for (const a of subArticles || []) {
-      const key = a?.documentId || a?.id;
-      if (!seen.has(key)) {
-        seen.add(key);
-        merged.push(a);
-      }
+    for (const id of orderedIds) {
+      const a = byId.get(id);
+      if (a) merged.push(a);
     }
 
     const total = merged.length;
     const pageCount = Math.max(1, Math.ceil(total / sizeNum));
     const start = (pageNum - 1) * sizeNum;
     const end = start + sizeNum;
-    const paged = merged.slice(start, end);
 
     ctx.body = {
-      data: paged,
+      data: merged.slice(start, end),
       meta: {
         pagination: {
           page: pageNum,
@@ -304,10 +335,7 @@ module.exports = createCoreController("api::article.article", ({ strapi }) => ({
           total,
         },
       },
-      access: {
-        freeSubId,
-        packageSubIds,
-      },
+      access: { freeSubId, packageSubIds },
     };
   },
 }));
