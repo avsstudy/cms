@@ -203,6 +203,7 @@ module.exports = createCoreController("api::article.article", ({ strapi }) => ({
       : [];
 
     const filters = {
+      publishedAt: { $notNull: true },
       subscriptions: { id: { $in: allowedSubscriptionIds } },
     };
 
