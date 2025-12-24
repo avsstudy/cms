@@ -23,6 +23,30 @@ const getMeiliClient = (strapi) => {
 
   return new MeiliSearch({ host, apiKey });
 };
+const getUserFromAuthHeader = async (ctx) => {
+  const authHeader = ctx.request.header.authorization || "";
+  const [type, token] = authHeader.split(" ");
+
+  if (type !== "Bearer" || !token) return null;
+
+  try {
+    const payload = await strapi
+      .plugin("users-permissions")
+      .service("jwt")
+      .verify(token);
+
+    if (!payload?.id) return null;
+
+    const user = await strapi
+      .plugin("users-permissions")
+      .service("user")
+      .fetchAuthenticatedUser(payload.id);
+
+    return user || null;
+  } catch (e) {
+    return null;
+  }
+};
 
 module.exports = createCoreController(
   "api::news-article.news-article",
@@ -152,6 +176,123 @@ module.exports = createCoreController(
             pageCount,
           },
         },
+      };
+    },
+    async accessible(ctx) {
+      const FREE_SUB_DOCUMENT_ID =
+        process.env.FREE_SUBSCRIPTION_DOCUMENT_ID || "eah7di4oabhot416js8ab6mj";
+
+      const freeSubs = await strapi.entityService.findMany(
+        "api::subscription.subscription",
+        {
+          filters: { documentId: FREE_SUB_DOCUMENT_ID },
+          fields: ["id", "documentId"],
+          limit: 1,
+        }
+      );
+
+      const freeSubId = freeSubs?.[0]?.id;
+
+      if (!freeSubId) {
+        ctx.throw(
+          500,
+          `Free subscription not found by documentId=${FREE_SUB_DOCUMENT_ID}`
+        );
+      }
+
+      let user = ctx.state.user || null;
+      if (!user) user = await getUserFromAuthHeader(ctx);
+
+      let allowedSubscriptionIds = [freeSubId];
+
+      if (user) {
+        const fullUser = await strapi.entityService.findOne(
+          "plugin::users-permissions.user",
+          user.id,
+          {
+            fields: ["id", "packageActiveUntil"],
+            populate: {
+              package: {
+                fields: ["id", "title"],
+                populate: {
+                  subscriptions: { fields: ["id"] },
+                },
+              },
+            },
+          }
+        );
+
+        const activeUntil = fullUser?.packageActiveUntil
+          ? new Date(fullUser.packageActiveUntil).getTime()
+          : null;
+
+        const isActive = activeUntil ? activeUntil > Date.now() : false;
+
+        if (isActive && fullUser?.package?.subscriptions?.length) {
+          const packageSubIds = fullUser.package.subscriptions.map((s) => s.id);
+          allowedSubscriptionIds = Array.from(
+            new Set([freeSubId, ...packageSubIds])
+          );
+        }
+      }
+
+      const { topics, categories, q, page = "1", pageSize = "10" } = ctx.query;
+
+      const topicIds = topics
+        ? String(topics).split(",").map(Number).filter(Boolean)
+        : [];
+
+      const categoryIds = categories
+        ? String(categories).split(",").map(Number).filter(Boolean)
+        : [];
+
+      const filters = {
+        publishedAt: { $notNull: true },
+        subscriptions: { id: { $in: allowedSubscriptionIds } },
+      };
+
+      if (topicIds.length) filters.topic = { id: { $in: topicIds } };
+      if (categoryIds.length) filters.category = { id: { $in: categoryIds } };
+
+      if (q && String(q).trim()) {
+        const qq = String(q).trim();
+        filters.$or = [
+          { title: { $containsi: qq } },
+          { description: { $containsi: qq } },
+        ];
+      }
+
+      // 7) fetch
+      const result = await strapi.entityService.findPage(
+        "api::news-article.news-article",
+        {
+          sort: ["pinned:desc", "publishedAt:desc"],
+          locale: "all",
+          fields: [
+            "title",
+            "slug",
+            "description",
+            "publishedAt",
+            "documentId",
+            "views",
+            "pinned",
+            "comments_enabled",
+          ],
+          populate: {
+            category: { fields: ["title", "id"] },
+            cover: { fields: ["url", "alternativeText"] },
+            topic: { fields: ["title", "id"] },
+            subscriptions: { fields: ["id", "title", "documentId"] },
+          },
+          filters,
+          pagination: { page: Number(page), pageSize: Number(pageSize) },
+        }
+      );
+
+      ctx.body = {
+        data: result.results,
+        meta: { pagination: result.pagination },
+        access: { allowedSubscriptionIds },
       };
     },
   })

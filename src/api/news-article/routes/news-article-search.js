@@ -11,5 +11,14 @@ module.exports = {
         policies: [],
       },
     },
+    {
+      method: "GET",
+      path: "/news-articles/accessible",
+      handler: "news-article.accessible",
+      config: {
+        auth: false,
+        policies: [],
+      },
+    },
   ],
 };
