@@ -24,6 +24,31 @@ const getMeiliClient = (strapi) => {
   return new MeiliSearch({ host, apiKey });
 };
 
+const getUserFromAuthHeader = async (ctx) => {
+  const authHeader = ctx.request.header.authorization || "";
+  const [type, token] = authHeader.split(" ");
+
+  if (type !== "Bearer" || !token) return null;
+
+  try {
+    const payload = await strapi
+      .plugin("users-permissions")
+      .service("jwt")
+      .verify(token);
+
+    if (!payload?.id) return null;
+
+    const user = await strapi
+      .plugin("users-permissions")
+      .service("user")
+      .fetchAuthenticatedUser(payload.id);
+
+    return user || null;
+  } catch (e) {
+    return null;
+  }
+};
+
 module.exports = createCoreController("api::ipk.ipk", ({ strapi }) => ({
   async views(ctx) {
     const id = Number(ctx.params.id);
@@ -164,6 +189,139 @@ module.exports = createCoreController("api::ipk.ipk", ({ strapi }) => ({
           pageCount,
         },
       },
+    };
+  },
+  async accessible(ctx) {
+    const FREE_SUB_DOCUMENT_ID =
+      process.env.FREE_SUBSCRIPTION_DOCUMENT_ID || "eah7di4oabhot416js8ab6mj";
+
+    const freeSubs = await strapi.entityService.findMany(
+      "api::subscription.subscription",
+      {
+        filters: { documentId: FREE_SUB_DOCUMENT_ID },
+        fields: ["id", "documentId"],
+        limit: 1,
+      }
+    );
+
+    const freeSubId = freeSubs && freeSubs[0] && freeSubs[0].id;
+
+    if (!freeSubId) {
+      ctx.throw(
+        500,
+        `Free subscription not found by documentId=${FREE_SUB_DOCUMENT_ID}`
+      );
+    }
+
+    let user = (ctx.state && ctx.state.user) || null;
+    if (!user) user = await getUserFromAuthHeader(ctx);
+
+    let allowedSubscriptionIds = [freeSubId];
+
+    if (user && user.id) {
+      const fullUser = await strapi.entityService.findOne(
+        "plugin::users-permissions.user",
+        user.id,
+        {
+          fields: ["id", "packageActiveUntil"],
+          populate: {
+            package: {
+              fields: ["id", "title"],
+              populate: {
+                subscriptions: { fields: ["id"] },
+              },
+            },
+          },
+        }
+      );
+
+      const activeUntil =
+        fullUser && fullUser.packageActiveUntil
+          ? new Date(fullUser.packageActiveUntil).getTime()
+          : null;
+
+      const isActive = activeUntil ? activeUntil > Date.now() : false;
+
+      if (
+        isActive &&
+        fullUser &&
+        fullUser.package &&
+        Array.isArray(fullUser.package.subscriptions) &&
+        fullUser.package.subscriptions.length
+      ) {
+        const packageSubIds = fullUser.package.subscriptions.map((s) => s.id);
+        allowedSubscriptionIds = Array.from(
+          new Set([freeSubId].concat(packageSubIds))
+        );
+      }
+    }
+
+    const query = ctx.query || {};
+    const topics = query.topics;
+    const q = query.q;
+    const page = query.page || "1";
+    const pageSize = query.pageSize || "10";
+    const from = query.from;
+    const to = query.to;
+
+    const topicIds = topics
+      ? String(topics)
+          .split(",")
+          .map((x) => Number(x))
+          .filter((n) => Number.isFinite(n) && n > 0)
+      : [];
+
+    const filters = {
+      publishedAt: { $notNull: true },
+      subscriptions: { id: { $in: allowedSubscriptionIds } },
+    };
+
+    if (topicIds.length) {
+      filters.topic_dps = { id: { $in: topicIds } };
+    }
+
+    if (from || to) {
+      filters.ipk_date = {};
+      if (from) filters.ipk_date.$gte = String(from);
+      if (to) filters.ipk_date.$lte = String(to);
+    }
+
+    if (q && String(q).trim()) {
+      const qq = String(q).trim();
+      filters.$or = [
+        { ipk_title: { $containsi: qq } },
+        { description: { $containsi: qq } },
+      ];
+    }
+
+    const result = await strapi.entityService.findPage("api::ipk.ipk", {
+      sort: ["publishedAt:desc"],
+      locale: "all",
+      fields: [
+        "id",
+        "documentId",
+        "ipk_title",
+        "slug",
+        "ipk_date",
+        "views",
+        "publishedAt",
+        "description",
+      ],
+      populate: {
+        topic: { fields: ["title", "id"] },
+        author: { populate: "*" },
+        topic_dps: { populate: "*" },
+        ipk_file: { populate: "*" },
+        subscriptions: { fields: ["id", "title", "documentId"] },
+      },
+      filters,
+      pagination: { page: Number(page), pageSize: Number(pageSize) },
+    });
+
+    ctx.body = {
+      data: result.results,
+      meta: { pagination: result.pagination },
+      access: { allowedSubscriptionIds },
     };
   },
 }));

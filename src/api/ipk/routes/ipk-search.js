@@ -11,5 +11,14 @@ module.exports = {
         policies: [],
       },
     },
+    {
+      method: "GET",
+      path: "/ipks/accessible",
+      handler: "ipk.accessible",
+      config: {
+        auth: false,
+        policies: [],
+      },
+    },
   ],
 };
