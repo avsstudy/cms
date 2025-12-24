@@ -11,5 +11,14 @@ module.exports = {
         policies: [],
       },
     },
+    {
+      method: "GET",
+      path: "/handbooks/accessible",
+      handler: "handbook.accessible",
+      config: {
+        auth: false,
+        policies: [],
+      },
+    },
   ],
 };

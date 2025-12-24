@@ -145,11 +145,6 @@ module.exports = {
     )}`;
     const serviceUrl = `${process.env.BACKEND_URL}/api/payments/wayforpay/webhook`;
 
-    strapi.log.info(`[WFP] merchantAccount=${merchantAccount}`);
-    strapi.log.info(`[WFP] merchantDomainName=${merchantDomainName}`);
-    strapi.log.info(`[WFP] returnUrl=${returnUrl}`);
-    strapi.log.info(`[WFP] serviceUrl=${serviceUrl}`);
-
     await strapi.entityService.update("api::payment.payment", payment.id, {
       data: {
         wayforpayPayload: {

@@ -11,5 +11,14 @@ module.exports = {
         policies: [],
       },
     },
+    {
+      method: "GET",
+      path: "/avs-documents/accessible",
+      handler: "avs-document.accessible",
+      config: {
+        auth: false,
+        policies: [],
+      },
+    },
   ],
 };
