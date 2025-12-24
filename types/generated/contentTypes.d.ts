@@ -1660,6 +1660,7 @@ export interface ApiStudySessionStudySession
     >;
     slug: Schema.Attribute.UID<'title'>;
     title: Schema.Attribute.String & Schema.Attribute.Required;
+    topics: Schema.Attribute.Relation<'manyToMany', 'api::topic.topic'>;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
@@ -1943,6 +1944,10 @@ export interface ApiTopicTopic extends Struct.CollectionTypeSchema {
       'api::news-article.news-article'
     >;
     publishedAt: Schema.Attribute.DateTime;
+    study_sessions: Schema.Attribute.Relation<
+      'manyToMany',
+      'api::study-session.study-session'
+    >;
     title: Schema.Attribute.String;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
