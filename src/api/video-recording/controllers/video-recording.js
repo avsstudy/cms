@@ -334,5 +334,179 @@ module.exports = createCoreController(
         access: { allowedSubscriptionIds },
       };
     },
+
+    async profile(ctx) {
+      let user = ctx.state.user || null;
+      if (!user) user = await getUserFromAuthHeader(ctx);
+      if (!user?.id) ctx.throw(401, "Unauthorized");
+
+      const fullUser = await strapi.entityService.findOne(
+        "plugin::users-permissions.user",
+        user.id,
+        {
+          fields: ["id"],
+          populate: {
+            package: {
+              fields: ["id", "title"],
+              populate: {
+                subscriptions: {
+                  fields: ["id", "title", "documentId"],
+                  populate: { video_recordings: { fields: ["id"] } },
+                },
+                video_recording: { fields: ["id"] },
+              },
+            },
+          },
+        }
+      );
+
+      const pkg = fullUser?.package;
+
+      const {
+        q,
+        page = "1",
+        pageSize = "10",
+        videoTypes,
+        topics,
+        speakers,
+        slug,
+      } = ctx.query;
+
+      if (!pkg?.id) {
+        ctx.body = {
+          data: [],
+          meta: {
+            pagination: {
+              page: Number(page),
+              pageSize: Number(pageSize),
+              pageCount: 0,
+              total: 0,
+            },
+          },
+          access: { allowedVideoIds: [], packageId: null, subscriptionIds: [] },
+        };
+        return;
+      }
+
+      const fromPackage = (pkg.video_recording || []).map((v) => v.id);
+
+      const fromSubscriptions = (pkg.subscriptions || [])
+        .flatMap((s) => s.video_recordings || [])
+        .map((v) => v.id);
+
+      const allowedVideoIds = Array.from(
+        new Set([...fromPackage, ...fromSubscriptions])
+      );
+
+      if (!allowedVideoIds.length) {
+        ctx.body = {
+          data: [],
+          meta: {
+            pagination: {
+              page: Number(page),
+              pageSize: Number(pageSize),
+              pageCount: 0,
+              total: 0,
+            },
+          },
+          access: {
+            allowedVideoIds: [],
+            packageId: pkg.id,
+            subscriptionIds: (pkg.subscriptions || []).map((s) => s.id),
+          },
+        };
+        return;
+      }
+
+      const videoTypeList = videoTypes
+        ? String(videoTypes)
+            .split(",")
+            .map((x) => x.trim())
+            .filter(Boolean)
+        : [];
+
+      const topicIds = topics
+        ? String(topics)
+            .split(",")
+            .map((x) => Number(x))
+            .filter(Boolean)
+        : [];
+
+      const speakerIds = speakers
+        ? String(speakers)
+            .split(",")
+            .map((x) => Number(x))
+            .filter(Boolean)
+        : [];
+
+      const and = [{ id: { $in: allowedVideoIds } }];
+
+      if (slug && String(slug).trim()) {
+        and.push({ slug: { $eq: String(slug).trim() } });
+      }
+
+      if (videoTypeList.length) {
+        and.push({ video_type: { $in: videoTypeList } });
+      }
+
+      if (topicIds.length) {
+        and.push({ topic: { id: { $in: topicIds } } });
+      }
+
+      if (speakerIds.length) {
+        and.push({ speaker: { id: { $in: speakerIds } } });
+      }
+
+      if (q && String(q).trim()) {
+        const qq = String(q).trim();
+        and.push({
+          $or: [
+            { title: { $containsi: qq } },
+            { description: { $containsi: qq } },
+          ],
+        });
+      }
+
+      const filters = and.length === 1 ? and[0] : { $and: and };
+
+      // 5) query
+      const result = await strapi.entityService.findPage(
+        "api::video-recording.video-recording",
+        {
+          sort: ["stream_date:desc", "id:desc"],
+          fields: [
+            "title",
+            "slug",
+            "description",
+            "video_type",
+            "stream_date",
+            "top",
+            "publishedAt",
+            "documentId",
+          ],
+          populate: {
+            card_cover: { fields: ["url", "alternativeText"] },
+            speaker: { fields: ["first_name", "last_name"] },
+            topic: { fields: ["title", "id"] },
+            subscriptions: { fields: ["id", "title", "documentId"] },
+          },
+          filters,
+          pagination: {
+            page: Number(page),
+            pageSize: Number(pageSize),
+          },
+        }
+      );
+
+      ctx.body = {
+        data: result.results,
+        meta: { pagination: result.pagination },
+        access: {
+          allowedVideoIds,
+          packageId: pkg.id,
+          subscriptionIds: (pkg.subscriptions || []).map((s) => s.id),
+        },
+      };
+    },
   })
 );

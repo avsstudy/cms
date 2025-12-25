@@ -20,5 +20,14 @@ module.exports = {
         policies: [],
       },
     },
+    {
+      method: "GET",
+      path: "/video-recordings/profile",
+      handler: "video-recording.profile",
+      config: {
+        auth: false,
+        policies: [],
+      },
+    },
   ],
 };
