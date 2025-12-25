@@ -73,6 +73,12 @@
       "relation": "manyToMany",
       "target": "api::study-session.study-session",
       "mappedBy": "topics"
+    },
+    "free_webinars": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "api::free-webinar.free-webinar",
+      "mappedBy": "topic"
     }
   }
 }

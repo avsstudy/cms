@@ -1013,6 +1013,7 @@ export interface ApiFreeWebinarFreeWebinar extends Struct.CollectionTypeSchema {
     >;
     time: Schema.Attribute.Time & Schema.Attribute.Required;
     title: Schema.Attribute.String & Schema.Attribute.Required;
+    topic: Schema.Attribute.Relation<'manyToMany', 'api::topic.topic'>;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
@@ -1930,6 +1931,10 @@ export interface ApiTopicTopic extends Struct.CollectionTypeSchema {
     expert_answer: Schema.Attribute.Relation<
       'manyToMany',
       'api::expert-answer.expert-answer'
+    >;
+    free_webinars: Schema.Attribute.Relation<
+      'manyToMany',
+      'api::free-webinar.free-webinar'
     >;
     handbooks: Schema.Attribute.Relation<
       'manyToMany',

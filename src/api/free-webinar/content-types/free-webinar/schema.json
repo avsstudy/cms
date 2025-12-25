@@ -101,6 +101,12 @@
       "relation": "manyToMany",
       "target": "api::subscription.subscription",
       "inversedBy": "free_webinars"
+    },
+    "topic": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "api::topic.topic",
+      "inversedBy": "free_webinars"
     }
   }
 }

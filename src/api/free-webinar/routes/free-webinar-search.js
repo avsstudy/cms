@@ -11,5 +11,14 @@ module.exports = {
         policies: [],
       },
     },
+    {
+      method: "GET",
+      path: "/free-webinars/accessible",
+      handler: "free-webinar.accessible",
+      config: {
+        auth: false,
+        policies: [],
+      },
+    },
   ],
 };
