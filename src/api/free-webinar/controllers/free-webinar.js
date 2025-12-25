@@ -38,6 +38,48 @@ const getUserFromAuthHeader = async (ctx) => {
   }
 };
 
+function pad2(n) {
+  return String(n).padStart(2, "0");
+}
+
+function kyivTodayAndThreshold(now = new Date(), backHours = 2) {
+  const tz = "Europe/Kyiv";
+
+  const dateFmt = new Intl.DateTimeFormat("uk-UA", {
+    timeZone: tz,
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  });
+
+  const timeFmt = new Intl.DateTimeFormat("uk-UA", {
+    timeZone: tz,
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+    hourCycle: "h23",
+  });
+
+  const dp = dateFmt.formatToParts(now);
+  const tp = timeFmt.formatToParts(now);
+
+  const y = Number(dp.find((p) => p.type === "year")?.value);
+  const m = Number(dp.find((p) => p.type === "month")?.value);
+  const d = Number(dp.find((p) => p.type === "day")?.value);
+
+  const hh = Number(tp.find((p) => p.type === "hour")?.value);
+  const mm = Number(tp.find((p) => p.type === "minute")?.value);
+  const ss = Number(tp.find((p) => p.type === "second")?.value);
+
+  const raw = hh - backHours;
+  const thresholdTime =
+    raw >= 0 ? `${pad2(raw)}:${pad2(mm)}:${pad2(ss)}` : "00:00:00";
+
+  const today = `${y}-${pad2(m)}-${pad2(d)}`;
+
+  return { today, thresholdTime };
+}
+
 module.exports = createCoreController(
   "api::free-webinar.free-webinar",
   ({ strapi }) => ({
@@ -141,7 +183,6 @@ module.exports = createCoreController(
       const FREE_SUB_DOCUMENT_ID =
         process.env.FREE_SUBSCRIPTION_DOCUMENT_ID || "eah7di4oabhot416js8ab6mj";
 
-      // free subscription
       const freeSubs = await strapi.entityService.findMany(
         "api::subscription.subscription",
         {
@@ -151,8 +192,7 @@ module.exports = createCoreController(
         }
       );
 
-      const freeSubId = freeSubs && freeSubs[0] && freeSubs[0].id;
-
+      const freeSubId = freeSubs?.[0]?.id;
       if (!freeSubId) {
         ctx.throw(
           500,
@@ -160,12 +200,12 @@ module.exports = createCoreController(
         );
       }
 
-      let user = (ctx.state && ctx.state.user) || null;
+      let user = ctx.state.user || null;
       if (!user) user = await getUserFromAuthHeader(ctx);
 
       let allowedSubscriptionIds = [freeSubId];
 
-      if (user && user.id) {
+      if (user) {
         const fullUser = await strapi.entityService.findOne(
           "plugin::users-permissions.user",
           user.id,
@@ -182,79 +222,84 @@ module.exports = createCoreController(
           }
         );
 
-        const activeUntil =
-          fullUser && fullUser.packageActiveUntil
-            ? new Date(fullUser.packageActiveUntil).getTime()
-            : null;
+        const activeUntil = fullUser?.packageActiveUntil
+          ? new Date(fullUser.packageActiveUntil).getTime()
+          : null;
 
         const isActive = activeUntil ? activeUntil > Date.now() : false;
 
-        if (
-          isActive &&
-          fullUser &&
-          fullUser.package &&
-          Array.isArray(fullUser.package.subscriptions) &&
-          fullUser.package.subscriptions.length
-        ) {
+        if (isActive && fullUser?.package?.subscriptions?.length) {
           const packageSubIds = fullUser.package.subscriptions.map((s) => s.id);
           allowedSubscriptionIds = Array.from(
-            new Set([freeSubId].concat(packageSubIds))
+            new Set([freeSubId, ...packageSubIds])
           );
         }
       }
 
-      const query = ctx.query || {};
-      const topics = query.topics;
-      const q = query.q;
-      const page = query.page || "1";
-      const pageSize = query.pageSize || "10";
+      const { topics, q, page = "1", pageSize = "10" } = ctx.query;
 
       const topicIds = topics
-        ? String(topics)
-            .split(",")
-            .map((x) => Number(x))
-            .filter((n) => Number.isFinite(n) && n > 0)
+        ? String(topics).split(",").map(Number).filter(Boolean)
         : [];
 
-      const accessFilter = {
+      const filters = {
         publishedAt: { $notNull: true },
         subscriptions: { id: { $in: allowedSubscriptionIds } },
       };
 
-      const incomingFilters = query.filters || null;
-
-      const filters = incomingFilters
-        ? { $and: [incomingFilters, accessFilter] }
-        : accessFilter;
-
-      const andParts = [];
-
-      if (topicIds.length) andParts.push({ topic: { id: { $in: topicIds } } });
+      if (topicIds.length) {
+        filters.topic = { id: { $in: topicIds } };
+      }
 
       if (q && String(q).trim()) {
         const qq = String(q).trim();
-        andParts.push({
-          $or: [
-            { title: { $containsi: qq } },
-            { description: { $containsi: qq } },
-          ],
-        });
+        filters.$or = [
+          { title: { $containsi: qq } },
+          { description: { $containsi: qq } },
+        ];
       }
 
-      const finalFilters =
-        andParts.length > 0 ? { $and: [filters].concat(andParts) } : filters;
+      const { today, thresholdTime } = kyivTodayAndThreshold(new Date(), 2);
+
+      const futureFilter = {
+        $or: [
+          { date_1: { $gt: today } },
+          { date_2: { $gt: today } },
+          { date_3: { $gt: today } },
+          {
+            $and: [
+              { date_1: { $eq: today } },
+              { time: { $gte: thresholdTime } },
+            ],
+          },
+          {
+            $and: [
+              { date_2: { $eq: today } },
+              { time: { $gte: thresholdTime } },
+            ],
+          },
+          {
+            $and: [
+              { date_3: { $eq: today } },
+              { time: { $gte: thresholdTime } },
+            ],
+          },
+        ],
+      };
+
+      const finalFilters = { $and: [filters, futureFilter] };
 
       const result = await strapi.entityService.findPage(
         "api::free-webinar.free-webinar",
         {
-          sort: ["pinned:desc", "publishedAt:desc"],
+          sort: ["pinned:desc", "date_1:asc", "publishedAt:desc"],
           locale: "all",
           fields: [
-            "id",
-            "documentId",
-            "publishedAt",
             "title",
             "slug",
+            "description",
+            "publishedAt",
+            "documentId",
             "webinar_type",
             "date_1",
             "date_2",
@@ -262,12 +307,11 @@ module.exports = createCoreController(
             "time",
             "stream_url",
             "pinned",
-            "description",
           ],
           populate: {
-            topic: { fields: ["title", "id"] },
             card_cover: { fields: ["url", "alternativeText"] },
             speaker: { populate: "*" },
+            topic: { fields: ["id", "title"] },
             subscriptions: { fields: ["id", "title", "documentId"] },
           },
           filters: finalFilters,
