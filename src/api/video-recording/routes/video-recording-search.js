@@ -11,5 +11,14 @@ module.exports = {
         policies: [],
       },
     },
+    {
+      method: "GET",
+      path: "/video-recordings/accessible",
+      handler: "video-recording.accessible",
+      config: {
+        auth: false,
+        policies: [],
+      },
+    },
   ],
 };
