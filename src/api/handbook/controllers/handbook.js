@@ -130,7 +130,6 @@ module.exports = createCoreController(
         pinned: hit.pinned ?? false,
         documentId: hit.documentId,
 
-        subscription_type: hit.subscription_type ?? null,
         topic: Array.isArray(hit.topic) ? hit.topic : [],
         authors: Array.isArray(hit.authors) ? hit.authors : [],
       }));

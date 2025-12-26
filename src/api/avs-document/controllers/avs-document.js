@@ -131,8 +131,6 @@ module.exports = createCoreController(
 
         topic: Array.isArray(hit.topic) ? hit.topic : [],
         author: Array.isArray(hit.author) ? hit.author : [],
-
-        subscription_type: hit.subscription_type ?? null,
       }));
 
       ctx.body = {

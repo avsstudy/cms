@@ -41,12 +41,6 @@
       "required": true,
       "default": 1
     },
-    "subscription_type": {
-      "type": "relation",
-      "relation": "manyToMany",
-      "target": "api::subscription-type.subscription-type",
-      "inversedBy": "avs_documents"
-    },
     "pinned": {
       "type": "boolean",
       "required": true,

@@ -58,12 +58,6 @@
       "required": false,
       "default": false
     },
-    "subscription_type": {
-      "type": "relation",
-      "relation": "manyToMany",
-      "target": "api::subscription-type.subscription-type",
-      "mappedBy": "video_recording"
-    },
     "topic": {
       "type": "relation",
       "relation": "manyToMany",

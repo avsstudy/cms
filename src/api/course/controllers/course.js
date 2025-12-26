@@ -40,11 +40,6 @@ module.exports = createCoreController("api::course.course", ({ strapi }) => ({
       "api::course.course",
       {
         filters: {},
-        populate: {
-          subscription_type: {
-            fields: ["title", "documentId"],
-          },
-        },
         fields: ["title", "slug", "documentId", "course_type", "category"],
         pagination: { page, pageSize },
       }
@@ -127,9 +122,6 @@ module.exports = createCoreController("api::course.course", ({ strapi }) => ({
             banner_photo: { fields: ["url", "alternativeText"] },
             photo: { fields: ["url", "alternativeText"] },
           },
-        },
-        subscription_type: {
-          fields: ["title", "documentId"],
         },
         topic: { fields: ["title", "documentId"] },
         general_content: { populate: "*" },

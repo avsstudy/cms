@@ -174,7 +174,6 @@ module.exports = createCoreController("api::ipk.ipk", ({ strapi }) => ({
       documentId: hit.documentId,
       topic: Array.isArray(hit.topic) ? hit.topic : [],
       author: hit.author ?? null,
-      subscription_type: hit.subscription_type ?? null,
       topic_dps: hit.topic_dps ?? null,
       ipk_file: hit.ipk_file ?? null,
     }));

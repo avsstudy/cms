@@ -52,12 +52,6 @@
       "type": "integer",
       "default": 1
     },
-    "subscription_type": {
-      "type": "relation",
-      "relation": "manyToOne",
-      "target": "api::subscription-type.subscription-type",
-      "inversedBy": "ipks"
-    },
     "topic_dps": {
       "type": "relation",
       "relation": "manyToOne",

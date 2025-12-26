@@ -44,12 +44,6 @@
       "type": "integer",
       "default": 1
     },
-    "subscription_type": {
-      "type": "relation",
-      "relation": "manyToOne",
-      "target": "api::subscription-type.subscription-type",
-      "inversedBy": "expert_answer"
-    },
     "pinned": {
       "type": "boolean",
       "default": false

@@ -51,8 +51,6 @@ module.exports = ({ env }) => ({
             article_date: entry.article_date,
             publishedAt: entry.publishedAt,
             documentId: entry.documentId,
-
-            subscription_type: entry.subscription_type,
             pinned: entry.pinned,
 
             cover: entry.cover
@@ -94,12 +92,7 @@ module.exports = ({ env }) => ({
 
         settings: {
           searchableAttributes: ["title", "description", "content"],
-          filterableAttributes: [
-            "categoryIds",
-            "topicIds",
-            "subscription_type",
-            "pinned",
-          ],
+          filterableAttributes: ["categoryIds", "topicIds", "pinned"],
           sortableAttributes: ["article_date", "views"],
         },
       },
@@ -111,7 +104,6 @@ module.exports = ({ env }) => ({
           cover: { fields: ["id", "url", "alternativeText"] },
           category: { fields: ["id", "title"] },
           topic: { fields: ["id", "title"] },
-          subscription_type: { fields: ["id", "title"] },
         },
 
         transformEntry({ entry }) {
@@ -149,13 +141,6 @@ module.exports = ({ env }) => ({
                 }))
               : [],
 
-            subscription_type: entry.subscription_type
-              ? {
-                  id: entry.subscription_type.id,
-                  title: entry.subscription_type.title,
-                }
-              : null,
-
             categoryIds: Array.isArray(entry.category)
               ? entry.category.map((c) => c.id)
               : [],
@@ -169,12 +154,7 @@ module.exports = ({ env }) => ({
 
         settings: {
           searchableAttributes: ["title", "description", "content"],
-          filterableAttributes: [
-            "categoryIds",
-            "topicIds",
-            "pinned",
-            "subscription_type.id",
-          ],
+          filterableAttributes: ["categoryIds", "topicIds", "pinned"],
           sortableAttributes: ["publishedAt", "views"],
         },
       },
@@ -185,7 +165,6 @@ module.exports = ({ env }) => ({
         populate: {
           topic: { fields: ["id", "title"] },
           author: { fields: ["id", "name"] },
-          subscription_type: { fields: ["id", "title"] },
           topic_dps: { fields: ["id", "title"] },
           ipk_file: { fields: ["id", "url", "name"] },
         },
@@ -212,13 +191,6 @@ module.exports = ({ env }) => ({
               ? { id: entry.author.id, name: entry.author.name }
               : null,
 
-            subscription_type: entry.subscription_type
-              ? {
-                  id: entry.subscription_type.id,
-                  title: entry.subscription_type.title,
-                }
-              : null,
-
             topic_dps: entry.topic_dps
               ? {
                   id: entry.topic_dps.id,
@@ -242,7 +214,7 @@ module.exports = ({ env }) => ({
 
         settings: {
           searchableAttributes: ["ipk_title", "slug", "description", "content"],
-          filterableAttributes: ["topicDpsId", "subscription_type.id"],
+          filterableAttributes: ["topicDpsId"],
           sortableAttributes: ["ipk_date", "publishedAt", "views"],
         },
       },
@@ -252,14 +224,10 @@ module.exports = ({ env }) => ({
         populate: {
           topic: { fields: ["id", "title"] },
           author: { fields: ["id", "name"] },
-          subscription_type: { fields: ["id"] },
         },
         transformEntry({ entry }) {
           const topics = Array.isArray(entry.topic) ? entry.topic : [];
           const authors = Array.isArray(entry.author) ? entry.author : [];
-          const subs = Array.isArray(entry.subscription_type)
-            ? entry.subscription_type
-            : [];
 
           return {
             id: entry.id,
@@ -281,8 +249,6 @@ module.exports = ({ env }) => ({
               name: a.name,
             })),
 
-            subscriptionTypeIds: subs.map((s) => s.id),
-
             topicIds: topics.map((t) => t.id),
             authorIds: authors.map((a) => a.id),
 
@@ -291,12 +257,7 @@ module.exports = ({ env }) => ({
         },
         settings: {
           searchableAttributes: ["title", "description", "content"],
-          filterableAttributes: [
-            "topicIds",
-            "authorIds",
-            "subscriptionTypeIds",
-            "pinned",
-          ],
+          filterableAttributes: ["topicIds", "authorIds", "pinned"],
           sortableAttributes: ["publishedAt", "views"],
         },
       },
@@ -321,8 +282,6 @@ module.exports = ({ env }) => ({
             documentId: entry.documentId,
             pinned: entry.pinned,
 
-            subscription_type: entry.subscription_type,
-
             topic: topics.map((t) => ({
               id: t.id,
               title: t.title,
@@ -341,12 +300,7 @@ module.exports = ({ env }) => ({
         },
         settings: {
           searchableAttributes: ["title", "description", "content"],
-          filterableAttributes: [
-            "topicIds",
-            "authorIds",
-            "subscription_type",
-            "pinned",
-          ],
+          filterableAttributes: ["topicIds", "authorIds", "pinned"],
           sortableAttributes: ["publishedAt", "views"],
         },
       },
@@ -355,12 +309,10 @@ module.exports = ({ env }) => ({
         populate: {
           topic: { fields: ["id", "title"] },
           author: { fields: ["id", "name"] },
-          subscription_type: { fields: ["id"] },
         },
         transformEntry({ entry }) {
           const topics = Array.isArray(entry.topic) ? entry.topic : [];
           const author = entry.author || null;
-          const subscription = entry.subscription_type || null;
 
           return {
             id: entry.id,
@@ -384,8 +336,6 @@ module.exports = ({ env }) => ({
                 }
               : null,
 
-            subscriptionTypeId: subscription ? subscription.id : null,
-
             topicIds: topics.map((t) => t.id),
 
             content: [entry.short_title ?? "", entry.question_title ?? ""].join(
@@ -395,7 +345,7 @@ module.exports = ({ env }) => ({
         },
         settings: {
           searchableAttributes: ["short_title", "question_title", "content"],
-          filterableAttributes: ["topicIds", "subscriptionTypeId", "pinned"],
+          filterableAttributes: ["topicIds", "pinned"],
           sortableAttributes: ["publishedAt", "views"],
         },
       },
@@ -405,14 +355,10 @@ module.exports = ({ env }) => ({
           card_cover: { fields: ["id", "url", "alternativeText"] },
           topic: { fields: ["id", "title"] },
           speaker: { fields: ["id", "first_name", "last_name"] },
-          subscription_type: { fields: ["id"] },
         },
         transformEntry({ entry }) {
           const topics = Array.isArray(entry.topic) ? entry.topic : [];
           const speakers = Array.isArray(entry.speaker) ? entry.speaker : [];
-          const subs = Array.isArray(entry.subscription_type)
-            ? entry.subscription_type
-            : [];
 
           return {
             id: entry.id,
@@ -446,8 +392,6 @@ module.exports = ({ env }) => ({
             })),
             speakerIds: speakers.map((s) => s.id),
 
-            subscriptionTypeIds: subs.map((s) => s.id),
-
             content: [
               entry.title ?? "",
               entry.description ?? "",
@@ -459,13 +403,7 @@ module.exports = ({ env }) => ({
         },
         settings: {
           searchableAttributes: ["title", "description", "content"],
-          filterableAttributes: [
-            "topicIds",
-            "speakerIds",
-            "subscriptionTypeIds",
-            "video_type",
-            "top",
-          ],
+          filterableAttributes: ["topicIds", "speakerIds", "video_type", "top"],
           sortableAttributes: ["publishedAt", "stream_date", "top"],
         },
       },
@@ -549,14 +487,10 @@ module.exports = ({ env }) => ({
           speaker: {
             fields: ["id", "first_name", "last_name"],
           },
-          subscription_type: { fields: ["id"] },
         },
         transformEntry({ entry }) {
           const topics = Array.isArray(entry.topic) ? entry.topic : [];
           const speakers = Array.isArray(entry.speaker) ? entry.speaker : [];
-          const subs = Array.isArray(entry.subscription_type)
-            ? entry.subscription_type
-            : [];
 
           return {
             id: entry.id,
@@ -588,8 +522,6 @@ module.exports = ({ env }) => ({
             })),
             speakerIds: speakers.map((s) => s.id),
 
-            subscriptionTypeIds: subs.map((s) => s.id),
-
             content: [
               entry.title ?? "",
               entry.description ?? "",
@@ -601,11 +533,7 @@ module.exports = ({ env }) => ({
         },
         settings: {
           searchableAttributes: ["title", "description", "content"],
-          filterableAttributes: [
-            "topicIds",
-            "speakerIds",
-            "subscriptionTypeIds",
-          ],
+          filterableAttributes: ["topicIds", "speakerIds"],
           sortableAttributes: ["publishedAt"],
         },
       },

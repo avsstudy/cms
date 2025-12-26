@@ -141,7 +141,6 @@ module.exports = createCoreController("api::article.article", ({ strapi }) => ({
 
       description: hit.description,
       article_date: hit.article_date,
-      subscription_type: hit.subscription_type,
       pinned: hit.pinned,
       documentId: hit.documentId,
       author: hit.author ?? null,

@@ -74,15 +74,6 @@
       ],
       "required": false
     },
-    "subscription_type": {
-      "type": "enumeration",
-      "required": true,
-      "default": "free",
-      "enum": [
-        "free",
-        "paid"
-      ]
-    },
     "pinned": {
       "type": "boolean",
       "required": false,

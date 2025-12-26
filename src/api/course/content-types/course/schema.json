@@ -50,12 +50,6 @@
       "target": "api::speaker.speaker",
       "inversedBy": "courses"
     },
-    "subscription_type": {
-      "type": "relation",
-      "relation": "manyToMany",
-      "target": "api::subscription-type.subscription-type",
-      "inversedBy": "courses"
-    },
     "category": {
       "type": "enumeration",
       "required": true,

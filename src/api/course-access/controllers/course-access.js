@@ -26,9 +26,6 @@ module.exports = createCoreController(
         {
           filters: { documentId },
           fields: ["id", "title", "documentId"],
-          populate: {
-            subscription_type: true,
-          },
         }
       );
 
@@ -69,7 +66,7 @@ module.exports = createCoreController(
 
     async grantForSubscription(ctx) {
       const authUserId = ctx.state.user?.id;
-      const { userId: bodyUserId, subscriptionTypeId } = ctx.request.body;
+      const { userId: bodyUserId } = ctx.request.body;
 
       const userId = bodyUserId || authUserId;
 
@@ -77,18 +74,9 @@ module.exports = createCoreController(
         return ctx.unauthorized("User not authenticated");
       }
 
-      if (!subscriptionTypeId) {
-        return ctx.badRequest("subscriptionTypeId is required");
-      }
-
       const courses = await strapi.entityService.findMany(
         "api::course.course",
         {
-          filters: {
-            subscription_type: {
-              documentId: subscriptionTypeId,
-            },
-          },
           fields: ["id", "title", "documentId"],
         }
       );

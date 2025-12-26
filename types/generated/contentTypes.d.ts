@@ -536,9 +536,6 @@ export interface ApiArticleArticle extends Struct.CollectionTypeSchema {
     pinned: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<false>;
     publishedAt: Schema.Attribute.DateTime;
     slug: Schema.Attribute.UID<'title'> & Schema.Attribute.Required;
-    subscription_type: Schema.Attribute.Enumeration<['free', 'paid']> &
-      Schema.Attribute.Required &
-      Schema.Attribute.DefaultTo<'free'>;
     subscriptions: Schema.Attribute.Relation<
       'manyToMany',
       'api::subscription.subscription'
@@ -667,10 +664,6 @@ export interface ApiAvsDocumentAvsDocument extends Struct.CollectionTypeSchema {
       Schema.Attribute.DefaultTo<false>;
     publishedAt: Schema.Attribute.DateTime;
     slug: Schema.Attribute.UID<'title'> & Schema.Attribute.Required;
-    subscription_type: Schema.Attribute.Relation<
-      'manyToMany',
-      'api::subscription-type.subscription-type'
-    >;
     subscriptions: Schema.Attribute.Relation<
       'manyToMany',
       'api::subscription.subscription'
@@ -816,10 +809,6 @@ export interface ApiCourseCourse extends Struct.CollectionTypeSchema {
       'manyToMany',
       'api::study-session.study-session'
     >;
-    subscription_type: Schema.Attribute.Relation<
-      'manyToMany',
-      'api::subscription-type.subscription-type'
-    >;
     subscriptions: Schema.Attribute.Relation<
       'manyToMany',
       'api::subscription.subscription'
@@ -871,10 +860,6 @@ export interface ApiExpertAnswerExpertAnswer
     question_title: Schema.Attribute.Text & Schema.Attribute.Required;
     short_title: Schema.Attribute.String;
     slug: Schema.Attribute.UID<'question_title'>;
-    subscription_type: Schema.Attribute.Relation<
-      'manyToOne',
-      'api::subscription-type.subscription-type'
-    >;
     topic: Schema.Attribute.Relation<'manyToMany', 'api::topic.topic'>;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
@@ -1093,9 +1078,6 @@ export interface ApiHandbookHandbook extends Struct.CollectionTypeSchema {
       Schema.Attribute.DefaultTo<false>;
     publishedAt: Schema.Attribute.DateTime;
     slug: Schema.Attribute.UID<'title'> & Schema.Attribute.Required;
-    subscription_type: Schema.Attribute.Enumeration<['free', 'paid']> &
-      Schema.Attribute.Required &
-      Schema.Attribute.DefaultTo<'free'>;
     subscriptions: Schema.Attribute.Relation<
       'manyToMany',
       'api::subscription.subscription'
@@ -1210,10 +1192,6 @@ export interface ApiIpkIpk extends Struct.CollectionTypeSchema {
       Schema.Attribute.Private;
     publishedAt: Schema.Attribute.DateTime;
     slug: Schema.Attribute.UID<'ipk_title'> & Schema.Attribute.Required;
-    subscription_type: Schema.Attribute.Relation<
-      'manyToOne',
-      'api::subscription-type.subscription-type'
-    >;
     subscriptions: Schema.Attribute.Relation<
       'manyToMany',
       'api::subscription.subscription'
@@ -1275,10 +1253,6 @@ export interface ApiNewsArticleNewsArticle extends Struct.CollectionTypeSchema {
       Schema.Attribute.DefaultTo<false>;
     publishedAt: Schema.Attribute.DateTime;
     slug: Schema.Attribute.UID<'title'> & Schema.Attribute.Required;
-    subscription_type: Schema.Attribute.Relation<
-      'manyToOne',
-      'api::subscription-type.subscription-type'
-    >;
     subscriptions: Schema.Attribute.Relation<
       'manyToMany',
       'api::subscription.subscription'
@@ -1668,53 +1642,6 @@ export interface ApiStudySessionStudySession
   };
 }
 
-export interface ApiSubscriptionTypeSubscriptionType
-  extends Struct.CollectionTypeSchema {
-  collectionName: 'subscription_types';
-  info: {
-    displayName: 'Subscription_Type';
-    pluralName: 'subscription-types';
-    singularName: 'subscription-type';
-  };
-  options: {
-    draftAndPublish: true;
-  };
-  attributes: {
-    avs_documents: Schema.Attribute.Relation<
-      'manyToMany',
-      'api::avs-document.avs-document'
-    >;
-    courses: Schema.Attribute.Relation<'manyToMany', 'api::course.course'>;
-    createdAt: Schema.Attribute.DateTime;
-    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
-      Schema.Attribute.Private;
-    expert_answer: Schema.Attribute.Relation<
-      'oneToMany',
-      'api::expert-answer.expert-answer'
-    >;
-    ipks: Schema.Attribute.Relation<'oneToMany', 'api::ipk.ipk'>;
-    locale: Schema.Attribute.String & Schema.Attribute.Private;
-    localizations: Schema.Attribute.Relation<
-      'oneToMany',
-      'api::subscription-type.subscription-type'
-    > &
-      Schema.Attribute.Private;
-    news_articles: Schema.Attribute.Relation<
-      'oneToMany',
-      'api::news-article.news-article'
-    >;
-    publishedAt: Schema.Attribute.DateTime;
-    title: Schema.Attribute.String;
-    updatedAt: Schema.Attribute.DateTime;
-    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
-      Schema.Attribute.Private;
-    video_recording: Schema.Attribute.Relation<
-      'manyToMany',
-      'api::video-recording.video-recording'
-    >;
-  };
-}
-
 export interface ApiSubscriptionSubscription
   extends Struct.CollectionTypeSchema {
   collectionName: 'subscriptions';
@@ -2061,10 +1988,6 @@ export interface ApiVideoRecordingVideoRecording
     slug: Schema.Attribute.UID<'title'>;
     speaker: Schema.Attribute.Relation<'manyToMany', 'api::speaker.speaker'>;
     stream_date: Schema.Attribute.Date;
-    subscription_type: Schema.Attribute.Relation<
-      'manyToMany',
-      'api::subscription-type.subscription-type'
-    >;
     subscriptions: Schema.Attribute.Relation<
       'manyToMany',
       'api::subscription.subscription'
@@ -2660,7 +2583,6 @@ declare module '@strapi/strapi' {
       'api::site-page.site-page': ApiSitePageSitePage;
       'api::speaker.speaker': ApiSpeakerSpeaker;
       'api::study-session.study-session': ApiStudySessionStudySession;
-      'api::subscription-type.subscription-type': ApiSubscriptionTypeSubscriptionType;
       'api::subscription.subscription': ApiSubscriptionSubscription;
       'api::test-attempt.test-attempt': ApiTestAttemptTestAttempt;
       'api::top-banner.top-banner': ApiTopBannerTopBanner;
