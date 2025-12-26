@@ -284,11 +284,18 @@ module.exports = createCoreController(
         ];
       }
 
+      const pageNum =
+        Number(ctx.query.page ?? ctx.query.pagination?.page ?? 1) || 1;
+      const pageSizeNum =
+        Number(ctx.query.pageSize ?? ctx.query.pagination?.pageSize ?? 10) ||
+        10;
+
       const result = await strapi.entityService.findPage(
         "api::video-recording.video-recording",
         {
           sort: ["publishedAt:desc"],
           locale: "all",
+          publicationState: "live",
           fields: [
             "id",
             "documentId",
@@ -305,8 +312,13 @@ module.exports = createCoreController(
             general_content: { populate: "*" },
             subscriptions: { fields: ["id", "title", "documentId"] },
           },
-          filters,
-          pagination: { page: Number(page), pageSize: Number(pageSize) },
+          filters: {
+            ...filters,
+            publishedAt: { $notNull: true },
+          },
+
+          page: pageNum,
+          pageSize: pageSizeNum,
         }
       );
 
