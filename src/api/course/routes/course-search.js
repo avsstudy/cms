@@ -11,5 +11,14 @@ module.exports = {
         policies: [],
       },
     },
+    {
+      method: "GET",
+      path: "/courses/accessible",
+      handler: "course.accessible",
+      config: {
+        auth: false,
+        policies: [],
+      },
+    },
   ],
 };
