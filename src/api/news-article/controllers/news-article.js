@@ -260,7 +260,6 @@ module.exports = createCoreController(
         ];
       }
 
-      // 7) fetch
       const result = await strapi.entityService.findPage(
         "api::news-article.news-article",
         {

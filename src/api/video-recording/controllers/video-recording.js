@@ -481,7 +481,6 @@ module.exports = createCoreController(
 
       const filters = and.length === 1 ? and[0] : { $and: and };
 
-      // 5) query
       const result = await strapi.entityService.findPage(
         "api::video-recording.video-recording",
         {

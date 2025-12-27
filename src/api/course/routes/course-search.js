@@ -20,5 +20,14 @@ module.exports = {
         policies: [],
       },
     },
+    {
+      method: "GET",
+      path: "/course/profile",
+      handler: "course.profile",
+      config: {
+        auth: false,
+        policies: [],
+      },
+    },
   ],
 };

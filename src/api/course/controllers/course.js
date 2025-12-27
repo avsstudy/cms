@@ -608,4 +608,185 @@ module.exports = createCoreController("api::course.course", ({ strapi }) => ({
       access: { allowedCourseDocumentIds },
     };
   },
+  async profile(ctx) {
+    let user = ctx.state.user || null;
+    if (!user) user = await getUserFromAuthHeader(ctx);
+
+    if (!user?.id) {
+      ctx.body = {
+        data: [],
+        meta: {
+          pagination: { page: 1, pageSize: 10, pageCount: 1, total: 0 },
+        },
+      };
+      return;
+    }
+
+    let activePackageId = null;
+
+    const fullUser = await strapi.entityService.findOne(
+      "plugin::users-permissions.user",
+      user.id,
+      {
+        fields: ["id", "packageActiveUntil"],
+        populate: { package: { fields: ["id", "title"] } },
+      }
+    );
+
+    const activeUntil = fullUser?.packageActiveUntil
+      ? new Date(fullUser.packageActiveUntil).getTime()
+      : null;
+
+    const isActive = activeUntil ? activeUntil > Date.now() : false;
+    const packageId = fullUser?.package?.id ?? null;
+
+    if (isActive && packageId) activePackageId = packageId;
+
+    let allowedCourseDocumentIds = [];
+    const statusMap = new Map(); 
+
+    if (activePackageId) {
+      const pkgs = await strapi.entityService.findMany("api::package.package", {
+        filters: { id: activePackageId },
+        fields: ["id", "title"],
+        populate: {
+          course: { fields: ["id", "documentId"] },
+          subscriptions: {
+            fields: ["id"],
+            populate: { courses: { fields: ["id", "documentId"] } },
+          },
+        },
+        limit: 1,
+      });
+
+      const pkg = pkgs?.[0] || null;
+      const pkgCourses = Array.isArray(pkg?.course) ? pkg.course : [];
+      const subs = Array.isArray(pkg?.subscriptions) ? pkg.subscriptions : [];
+
+      const subCourses = subs.flatMap((s) =>
+        Array.isArray(s?.courses) ? s.courses : []
+      );
+
+      allowedCourseDocumentIds.push(
+        ...pkgCourses.map((c) => c?.documentId).filter(Boolean),
+        ...subCourses.map((c) => c?.documentId).filter(Boolean)
+      );
+    }
+
+    const accesses = await strapi.entityService.findMany(
+      "api::course-access.course-access",
+      {
+        filters: { user: { id: { $eq: user.id } } },
+        fields: ["id", "course_status"],
+        populate: { course: { fields: ["id", "documentId"] } },
+        limit: 1000,
+      }
+    );
+
+    for (const a of accesses || []) {
+      const docId = a?.course?.documentId ? String(a.course.documentId) : null;
+      if (!docId) continue;
+
+      allowedCourseDocumentIds.push(docId);
+
+      const st = a?.course_status ? String(a.course_status).trim() : null;
+      if (st && !statusMap.has(docId)) statusMap.set(docId, st);
+    }
+
+    allowedCourseDocumentIds = Array.from(
+      new Set(allowedCourseDocumentIds.map(String))
+    );
+
+    if (!allowedCourseDocumentIds.length) {
+      ctx.body = {
+        data: [],
+        meta: {
+          pagination: { page: 1, pageSize: 10, pageCount: 1, total: 0 },
+        },
+      };
+      return;
+    }
+
+    const {
+      topics,
+      q,
+      page = "1",
+      pageSize = "10",
+      courseTypes, 
+    } = ctx.query;
+
+    const topicIds = topics
+      ? String(topics).split(",").map(Number).filter(Boolean)
+      : [];
+
+    const types = courseTypes
+      ? String(courseTypes)
+          .split(",")
+          .map((s) => s.trim())
+          .filter(Boolean)
+      : [];
+
+    const filters = {
+      publishedAt: { $notNull: true },
+      documentId: { $in: allowedCourseDocumentIds },
+    };
+
+    if (types.length) {
+      filters.course_type = { $in: types };
+    } else {
+      filters.course_type = { $ne: "course_online" };
+    }
+
+    if (topicIds.length) filters.topic = { id: { $in: topicIds } };
+
+    if (q && String(q).trim()) {
+      const qq = String(q).trim();
+      filters.$or = [
+        { title: { $containsi: qq } },
+        { description: { $containsi: qq } },
+      ];
+    }
+
+    const result = await strapi.entityService.findPage("api::course.course", {
+      sort: ["publishedAt:desc"],
+      locale: "all",
+      publicationState: "live",
+      fields: [
+        "id",
+        "publishedAt",
+        "documentId",
+        "title",
+        "description",
+        "slug",
+        "course_type",
+        "category",
+      ],
+      populate: {
+        card_cover: { fields: ["url", "alternativeText"] },
+        speaker: { populate: "*" },
+        topic: { populate: "*" },
+        general_content: { populate: "*" },
+      },
+      filters,
+      page: Number(page) || 1,
+      pageSize: Number(pageSize) || 10,
+    });
+
+    const data = (result.results || []).map((item) => {
+      const docId = item?.documentId ? String(item.documentId) : "";
+      return {
+        ...item,
+        access: {
+          canWatch: true,
+          course_status: docId ? statusMap.get(docId) || null : null,
+        },
+      };
+    });
+
+    ctx.body = {
+      data,
+      meta: { pagination: result.pagination },
+      access: { allowedCourseDocumentIds },
+    };
+  },
 }));
