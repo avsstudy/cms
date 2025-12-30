@@ -647,12 +647,9 @@ export interface ApiAvsDocumentAvsDocument extends Struct.CollectionTypeSchema {
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
     description: Schema.Attribute.Text & Schema.Attribute.Required;
-    general_content_blank: Schema.Attribute.DynamicZone<['shared.blank']> &
-      Schema.Attribute.Required;
-    general_content_useful_files: Schema.Attribute.DynamicZone<
-      ['shared.useful-files']
+    general_content: Schema.Attribute.DynamicZone<
+      ['shared.custom-document', 'shared.npa']
     >;
-    general_content_zrazok: Schema.Attribute.DynamicZone<['shared.zrazok']>;
     locale: Schema.Attribute.String & Schema.Attribute.Private;
     localizations: Schema.Attribute.Relation<
       'oneToMany',

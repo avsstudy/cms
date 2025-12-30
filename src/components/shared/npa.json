@@ -1,0 +1,15 @@
+{
+  "collectionName": "components_shared_npas",
+  "info": {
+    "displayName": "npa"
+  },
+  "options": {},
+  "attributes": {
+    "text_content": {
+      "type": "component",
+      "component": "shared.ck-editor-text",
+      "repeatable": false
+    }
+  },
+  "config": {}
+}

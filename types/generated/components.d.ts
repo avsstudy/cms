@@ -116,6 +116,19 @@ export interface SharedCourseSubscriptionLanding
   };
 }
 
+export interface SharedCustomDocument extends Struct.ComponentSchema {
+  collectionName: 'components_shared_custom_documents';
+  info: {
+    displayName: 'custom_document';
+  };
+  attributes: {
+    doc_cover: Schema.Attribute.Media<'images'>;
+    doc_file: Schema.Attribute.Media<'files'>;
+    doc_title: Schema.Attribute.String;
+    doc_type: Schema.Attribute.Enumeration<['blank', 'zrazok', 'useful_file']>;
+  };
+}
+
 export interface SharedCustomQuote extends Struct.ComponentSchema {
   collectionName: 'components_shared_custom_quotes';
   info: {
@@ -266,6 +279,16 @@ export interface SharedMiniCourseLesson extends Struct.ComponentSchema {
       true
     >;
     topics: Schema.Attribute.Relation<'oneToMany', 'api::topic.topic'>;
+  };
+}
+
+export interface SharedNpa extends Struct.ComponentSchema {
+  collectionName: 'components_shared_npas';
+  info: {
+    displayName: 'npa';
+  };
+  attributes: {
+    text_content: Schema.Attribute.Component<'shared.ck-editor-text', false>;
   };
 }
 
@@ -447,6 +470,7 @@ declare module '@strapi/strapi' {
       'shared.course-online-landing': SharedCourseOnlineLanding;
       'shared.course-recording-landing': SharedCourseRecordingLanding;
       'shared.course-subscription-landing': SharedCourseSubscriptionLanding;
+      'shared.custom-document': SharedCustomDocument;
       'shared.custom-quote': SharedCustomQuote;
       'shared.custom-table': SharedCustomTable;
       'shared.custom-video': SharedCustomVideo;
@@ -458,6 +482,7 @@ declare module '@strapi/strapi' {
       'shared.materials': SharedMaterials;
       'shared.mini-course-landing': SharedMiniCourseLanding;
       'shared.mini-course-lesson': SharedMiniCourseLesson;
+      'shared.npa': SharedNpa;
       'shared.program-content': SharedProgramContent;
       'shared.seo': SharedSeo;
       'shared.target-banner': SharedTargetBanner;

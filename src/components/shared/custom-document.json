@@ -1,0 +1,35 @@
+{
+  "collectionName": "components_shared_custom_documents",
+  "info": {
+    "displayName": "custom_document"
+  },
+  "options": {},
+  "attributes": {
+    "doc_type": {
+      "type": "enumeration",
+      "enum": [
+        "blank",
+        "zrazok",
+        "useful_file"
+      ]
+    },
+    "doc_title": {
+      "type": "string"
+    },
+    "doc_file": {
+      "type": "media",
+      "multiple": false,
+      "allowedTypes": [
+        "files"
+      ]
+    },
+    "doc_cover": {
+      "type": "media",
+      "multiple": false,
+      "allowedTypes": [
+        "images"
+      ]
+    }
+  },
+  "config": {}
+}

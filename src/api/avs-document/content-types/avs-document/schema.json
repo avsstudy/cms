@@ -46,30 +46,18 @@
       "required": true,
       "default": false
     },
-    "general_content_blank": {
-      "type": "dynamiczone",
-      "components": [
-        "shared.blank"
-      ],
-      "required": true
-    },
-    "general_content_zrazok": {
-      "type": "dynamiczone",
-      "components": [
-        "shared.zrazok"
-      ]
-    },
-    "general_content_useful_files": {
-      "type": "dynamiczone",
-      "components": [
-        "shared.useful-files"
-      ]
-    },
     "subscriptions": {
       "type": "relation",
       "relation": "manyToMany",
       "target": "api::subscription.subscription",
       "inversedBy": "avs_documents"
+    },
+    "general_content": {
+      "type": "dynamiczone",
+      "components": [
+        "shared.custom-document",
+        "shared.npa"
+      ]
     }
   }
 }
