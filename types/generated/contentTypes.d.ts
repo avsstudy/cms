@@ -1179,19 +1179,51 @@ export interface ApiInnerBannerInnerBanner extends Struct.CollectionTypeSchema {
     draftAndPublish: true;
   };
   attributes: {
+    article_list: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<false>;
+    article_page: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<false>;
+    banner_status: Schema.Attribute.Enumeration<['active', 'inactive']> &
+      Schema.Attribute.Required &
+      Schema.Attribute.DefaultTo<'active'>;
+    banner_url: Schema.Attribute.String;
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
+    document_list: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<false>;
+    document_page: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<false>;
+    expertqa_list: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<false>;
+    expertqa_page: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<false>;
+    handbook_list: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<false>;
+    handbook_page: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<false>;
+    ipk_list: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<false>;
+    ipk_page: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<false>;
+    large_343px: Schema.Attribute.Media<'images'>;
+    large_736px: Schema.Attribute.Media<'images'>;
+    large_936px: Schema.Attribute.Media<'images'>;
     locale: Schema.Attribute.String & Schema.Attribute.Private;
     localizations: Schema.Attribute.Relation<
       'oneToMany',
       'api::inner-banner.inner-banner'
     > &
       Schema.Attribute.Private;
+    news_list: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<false>;
+    news_page: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<false>;
+    priority: Schema.Attribute.Integer &
+      Schema.Attribute.SetMinMax<
+        {
+          min: 1;
+        },
+        number
+      > &
+      Schema.Attribute.DefaultTo<1>;
     publishedAt: Schema.Attribute.DateTime;
+    small_343px: Schema.Attribute.Media<'images'>;
+    small_736px: Schema.Attribute.Media<'images'>;
+    small_936px: Schema.Attribute.Media<'images'>;
+    title: Schema.Attribute.String & Schema.Attribute.Required;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
+    video_list: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<false>;
   };
 }
 

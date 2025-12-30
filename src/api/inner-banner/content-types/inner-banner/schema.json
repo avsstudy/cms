@@ -10,5 +10,121 @@
     "draftAndPublish": true
   },
   "pluginOptions": {},
-  "attributes": {}
+  "attributes": {
+    "title": {
+      "type": "string",
+      "required": true
+    },
+    "banner_url": {
+      "type": "string"
+    },
+    "large_936px": {
+      "type": "media",
+      "multiple": false,
+      "allowedTypes": [
+        "images"
+      ]
+    },
+    "large_736px": {
+      "type": "media",
+      "multiple": false,
+      "allowedTypes": [
+        "images"
+      ]
+    },
+    "large_343px": {
+      "type": "media",
+      "multiple": false,
+      "allowedTypes": [
+        "images"
+      ]
+    },
+    "small_936px": {
+      "type": "media",
+      "multiple": false,
+      "allowedTypes": [
+        "images"
+      ]
+    },
+    "small_736px": {
+      "type": "media",
+      "multiple": false,
+      "allowedTypes": [
+        "images"
+      ]
+    },
+    "small_343px": {
+      "type": "media",
+      "multiple": false,
+      "allowedTypes": [
+        "images"
+      ]
+    },
+    "priority": {
+      "type": "integer",
+      "default": 1,
+      "min": 1
+    },
+    "banner_status": {
+      "type": "enumeration",
+      "required": true,
+      "default": "active",
+      "enum": [
+        "active",
+        "inactive"
+      ]
+    },
+    "article_list": {
+      "type": "boolean",
+      "default": false
+    },
+    "news_list": {
+      "type": "boolean",
+      "default": false
+    },
+    "ipk_list": {
+      "type": "boolean",
+      "default": false
+    },
+    "expertqa_list": {
+      "type": "boolean",
+      "default": false
+    },
+    "video_list": {
+      "type": "boolean",
+      "default": false
+    },
+    "document_list": {
+      "type": "boolean",
+      "default": false
+    },
+    "handbook_list": {
+      "type": "boolean",
+      "default": false
+    },
+    "article_page": {
+      "type": "boolean",
+      "default": false
+    },
+    "news_page": {
+      "type": "boolean",
+      "default": false
+    },
+    "ipk_page": {
+      "type": "boolean",
+      "default": false
+    },
+    "expertqa_page": {
+      "type": "boolean",
+      "default": false
+    },
+    "document_page": {
+      "type": "boolean",
+      "default": false
+    },
+    "handbook_page": {
+      "type": "boolean",
+      "default": false
+    }
+  }
 }
