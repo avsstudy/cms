@@ -217,7 +217,13 @@ module.exports = createCoreController("api::article.article", ({ strapi }) => ({
       }
     }
 
-    const { topics, categories, q, page = "1", pageSize = "10" } = ctx.query;
+    const { topics, categories, q } = ctx.query;
+    const pageRaw = ctx.query.page ?? "1";
+    const pageSizeRaw = ctx.query.pageSize ?? "10";
+
+    const page = Math.max(1, Number(pageRaw) || 1);
+    const pageSize = Math.max(1, Number(pageSizeRaw) || 10);
+    const offset = (page - 1) * pageSize;
 
     const topicIds = topics
       ? String(topics).split(",").map(Number).filter(Boolean)
@@ -227,48 +233,60 @@ module.exports = createCoreController("api::article.article", ({ strapi }) => ({
       ? String(categories).split(",").map(Number).filter(Boolean)
       : [];
 
-    const filters = {
+    const where = {
       publishedAt: { $notNull: true },
       subscriptions: { id: { $in: allowedSubscriptionIds } },
     };
 
-    if (topicIds.length) filters.topic = { id: { $in: topicIds } };
-    if (categoryIds.length) filters.category = { id: { $in: categoryIds } };
+    if (topicIds.length) where.topic = { id: { $in: topicIds } };
+    if (categoryIds.length) where.category = { id: { $in: categoryIds } };
 
     if (q && String(q).trim()) {
       const qq = String(q).trim();
-      filters.$or = [
+      where.$or = [
         { title: { $containsi: qq } },
         { description: { $containsi: qq } },
       ];
     }
 
-    const result = await strapi.entityService.findPage("api::article.article", {
-      sort: ["article_date:desc", "publishedAt:desc"],
-      locale: "all",
-      fields: [
-        "title",
-        "slug",
-        "description",
-        "publishedAt",
-        "documentId",
-        "views",
-        "article_date",
-      ],
-      populate: {
-        category: { fields: ["title", "id"] },
-        cover: { fields: ["url", "alternativeText"] },
-        author: { fields: ["name"] },
-        topic: { fields: ["title", "id"] },
-        subscriptions: { fields: ["id", "title", "documentId"] },
-      },
-      filters,
-      pagination: { page: Number(page), pageSize: Number(pageSize) },
-    });
+    const [entries, total] = await strapi.db
+      .query("api::article.article")
+      .findWithCount({
+        where,
+        orderBy: [
+          { article_date: "desc" },
+          { views: "desc" },
+          { publishedAt: "desc" },
+          { id: "desc" },
+        ],
+        offset,
+        limit: pageSize,
+        select: [
+          "id",
+          "documentId",
+          "title",
+          "slug",
+          "description",
+          "publishedAt",
+          "views",
+          "article_date",
+        ],
+        populate: {
+          category: { select: ["id", "title"] },
+          cover: { select: ["id", "documentId", "url", "alternativeText"] },
+          author: { select: ["id", "name"] },
+          topic: { select: ["id", "title", "documentId"] },
+          subscriptions: { select: ["id", "title", "documentId"] },
+        },
+      });
+
+    const pageCount = Math.max(1, Math.ceil(total / pageSize));
 
     ctx.body = {
-      data: result.results,
-      meta: { pagination: result.pagination },
+      data: entries,
+      meta: {
+        pagination: { page, pageSize, pageCount, total },
+      },
       access: { allowedSubscriptionIds },
     };
   },
