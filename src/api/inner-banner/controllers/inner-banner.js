@@ -51,7 +51,7 @@ module.exports = createCoreController(
 
       const filters = {
         banner_status: "active",
-        publishedAt: { $notNull: true },
+        // publishedAt: { $notNull: true },
         [placement]: true,
       };
 
