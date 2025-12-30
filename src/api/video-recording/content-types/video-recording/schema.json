@@ -67,7 +67,6 @@
     "general_content": {
       "type": "dynamiczone",
       "components": [
-        "shared.video-review",
         "shared.mini-course-lesson",
         "shared.mini-course-landing",
         "shared.custom-video-recording",

@@ -390,6 +390,7 @@ export interface SharedVideoContent extends Struct.ComponentSchema {
     hours: Schema.Attribute.Integer;
     minutes: Schema.Attribute.Integer;
     seconds: Schema.Attribute.Integer;
+    topic: Schema.Attribute.Relation<'oneToMany', 'api::topic.topic'>;
     url: Schema.Attribute.String & Schema.Attribute.Required;
   };
 }

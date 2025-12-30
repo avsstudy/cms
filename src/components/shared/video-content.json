@@ -21,6 +21,11 @@
     },
     "seconds": {
       "type": "integer"
+    },
+    "topic": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::topic.topic"
     }
   },
   "config": {}

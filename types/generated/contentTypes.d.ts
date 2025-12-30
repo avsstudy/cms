@@ -2029,7 +2029,6 @@ export interface ApiVideoRecordingVideoRecording
     description: Schema.Attribute.Text & Schema.Attribute.Required;
     general_content: Schema.Attribute.DynamicZone<
       [
-        'shared.video-review',
         'shared.mini-course-lesson',
         'shared.mini-course-landing',
         'shared.custom-video-recording',
