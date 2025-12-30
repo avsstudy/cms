@@ -1,0 +1,14 @@
+{
+  "kind": "collectionType",
+  "collectionName": "inner_banners",
+  "info": {
+    "singularName": "inner-banner",
+    "pluralName": "inner-banners",
+    "displayName": "Inner_banner"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {}
+}

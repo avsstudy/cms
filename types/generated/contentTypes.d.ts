@@ -1168,6 +1168,33 @@ export interface ApiHomeworkHomework extends Struct.CollectionTypeSchema {
   };
 }
 
+export interface ApiInnerBannerInnerBanner extends Struct.CollectionTypeSchema {
+  collectionName: 'inner_banners';
+  info: {
+    displayName: 'Inner_banner';
+    pluralName: 'inner-banners';
+    singularName: 'inner-banner';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::inner-banner.inner-banner'
+    > &
+      Schema.Attribute.Private;
+    publishedAt: Schema.Attribute.DateTime;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
 export interface ApiIpkIpk extends Struct.CollectionTypeSchema {
   collectionName: 'ipks';
   info: {
@@ -2572,6 +2599,7 @@ declare module '@strapi/strapi' {
       'api::handbook.handbook': ApiHandbookHandbook;
       'api::homework-progress.homework-progress': ApiHomeworkProgressHomeworkProgress;
       'api::homework.homework': ApiHomeworkHomework;
+      'api::inner-banner.inner-banner': ApiInnerBannerInnerBanner;
       'api::ipk.ipk': ApiIpkIpk;
       'api::news-article.news-article': ApiNewsArticleNewsArticle;
       'api::package.package': ApiPackagePackage;
