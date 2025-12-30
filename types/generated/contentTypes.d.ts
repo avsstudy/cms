@@ -647,6 +647,10 @@ export interface ApiAvsDocumentAvsDocument extends Struct.CollectionTypeSchema {
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
     description: Schema.Attribute.Text & Schema.Attribute.Required;
+    document_category: Schema.Attribute.Relation<
+      'manyToOne',
+      'api::document-category.document-category'
+    >;
     general_content: Schema.Attribute.DynamicZone<
       ['shared.custom-document', 'shared.npa']
     >;
@@ -812,6 +816,39 @@ export interface ApiCourseCourse extends Struct.CollectionTypeSchema {
     >;
     title: Schema.Attribute.String & Schema.Attribute.Required;
     topic: Schema.Attribute.Relation<'manyToMany', 'api::topic.topic'>;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
+export interface ApiDocumentCategoryDocumentCategory
+  extends Struct.CollectionTypeSchema {
+  collectionName: 'document_categories';
+  info: {
+    displayName: 'Document_category';
+    pluralName: 'document-categories';
+    singularName: 'document-category';
+  };
+  options: {
+    draftAndPublish: false;
+  };
+  attributes: {
+    avs_document: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::avs-document.avs-document'
+    >;
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::document-category.document-category'
+    > &
+      Schema.Attribute.Private;
+    publishedAt: Schema.Attribute.DateTime;
+    title: Schema.Attribute.String & Schema.Attribute.Required;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
@@ -2619,6 +2656,7 @@ declare module '@strapi/strapi' {
       'api::category.category': ApiCategoryCategory;
       'api::course-access.course-access': ApiCourseAccessCourseAccess;
       'api::course.course': ApiCourseCourse;
+      'api::document-category.document-category': ApiDocumentCategoryDocumentCategory;
       'api::expert-answer.expert-answer': ApiExpertAnswerExpertAnswer;
       'api::favorite.favorite': ApiFavoriteFavorite;
       'api::free-webinar-reason.free-webinar-reason': ApiFreeWebinarReasonFreeWebinarReason;

@@ -11,6 +11,12 @@
   },
   "pluginOptions": {},
   "attributes": {
+    "document_category": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::document-category.document-category",
+      "inversedBy": "avs_document"
+    },
     "title": {
       "type": "string",
       "required": true
