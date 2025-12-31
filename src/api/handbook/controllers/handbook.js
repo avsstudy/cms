@@ -159,7 +159,7 @@ module.exports = createCoreController(
         }
       );
 
-      const freeSubId = freeSubs && freeSubs[0] && freeSubs[0].id;
+      const freeSubId = freeSubs?.[0]?.id;
 
       if (!freeSubId) {
         ctx.throw(
@@ -168,12 +168,12 @@ module.exports = createCoreController(
         );
       }
 
-      let user = (ctx.state && ctx.state.user) || null;
+      let user = ctx.state?.user || null;
       if (!user) user = await getUserFromAuthHeader(ctx);
 
       let allowedSubscriptionIds = [freeSubId];
 
-      if (user && user.id) {
+      if (user?.id) {
         const fullUser = await strapi.entityService.findOne(
           "plugin::users-permissions.user",
           user.id,
@@ -190,32 +190,33 @@ module.exports = createCoreController(
           }
         );
 
-        const activeUntil =
-          fullUser && fullUser.packageActiveUntil
-            ? new Date(fullUser.packageActiveUntil).getTime()
-            : null;
+        const activeUntil = fullUser?.packageActiveUntil
+          ? new Date(fullUser.packageActiveUntil).getTime()
+          : null;
 
         const isActive = activeUntil ? activeUntil > Date.now() : false;
 
         if (
           isActive &&
-          fullUser &&
-          fullUser.package &&
+          fullUser?.package?.subscriptions &&
           Array.isArray(fullUser.package.subscriptions) &&
           fullUser.package.subscriptions.length
         ) {
           const packageSubIds = fullUser.package.subscriptions.map((s) => s.id);
           allowedSubscriptionIds = Array.from(
-            new Set([freeSubId].concat(packageSubIds))
+            new Set([freeSubId, ...packageSubIds])
           );
         }
       }
 
-      const query = ctx.query || {};
-      const topics = query.topics;
-      const q = query.q;
-      const page = query.page || "1";
-      const pageSize = query.pageSize || "10";
+      // query params (як у ipk)
+      const { topics, q } = ctx.query;
+      const pageRaw = ctx.query.page ?? "1";
+      const pageSizeRaw = ctx.query.pageSize ?? "10";
+
+      const page = Math.max(1, Number(pageRaw) || 1);
+      const pageSize = Math.max(1, Number(pageSizeRaw) || 10);
+      const offset = (page - 1) * pageSize;
 
       const topicIds = topics
         ? String(topics)
@@ -224,29 +225,44 @@ module.exports = createCoreController(
             .filter((n) => Number.isFinite(n) && n > 0)
         : [];
 
-      const filters = {
-        publishedAt: { $notNull: true },
-        subscriptions: { id: { $in: allowedSubscriptionIds } },
-      };
+      // filters: доступні по підписці + без підписки
+      const where = [
+        {
+          $or: [
+            { subscriptions: { id: { $in: allowedSubscriptionIds } } },
+            // важливо: елементи, які НЕ входять в жодну підписку
+            { subscriptions: { id: { $null: true } } },
+          ],
+        },
+      ];
 
       if (topicIds.length) {
-        filters.topic = { id: { $in: topicIds } };
+        where.push({ topic: { id: { $in: topicIds } } });
       }
 
       if (q && String(q).trim()) {
         const qq = String(q).trim();
-        filters.$or = [
-          { title: { $containsi: qq } },
-          { description: { $containsi: qq } },
-        ];
+        where.push({
+          $or: [
+            { title: { $containsi: qq } },
+            { description: { $containsi: qq } },
+          ],
+        });
       }
 
-      const result = await strapi.entityService.findPage(
-        "api::handbook.handbook",
-        {
-          sort: ["pinned:desc", "publishedAt:desc", "views:desc"],
-          locale: "all",
-          fields: [
+      const filters = {
+        publishedAt: { $notNull: true },
+        $and: where,
+      };
+
+      const [entries, total] = await strapi.db
+        .query("api::handbook.handbook")
+        .findWithCount({
+          orderBy: [{ pinned: "desc", publishedAt: "desc", views: "desc" }],
+          where: filters,
+          offset,
+          limit: pageSize,
+          select: [
             "id",
             "documentId",
             "description",
@@ -257,18 +273,19 @@ module.exports = createCoreController(
             "pinned",
           ],
           populate: {
-            topic: { fields: ["title", "id"] },
-            general_content: { populate: "*" },
-            subscriptions: { fields: ["id", "title", "documentId"] },
+            topic: { select: ["title", "id"] },
+            general_content: true,
+            subscriptions: { select: ["id", "title", "documentId"] },
           },
-          filters,
-          pagination: { page: Number(page), pageSize: Number(pageSize) },
-        }
-      );
+        });
+
+      const pageCount = Math.max(1, Math.ceil(total / pageSize));
 
       ctx.body = {
-        data: result.results,
-        meta: { pagination: result.pagination },
+        data: entries,
+        meta: {
+          pagination: { page, pageSize, pageCount, total },
+        },
         access: { allowedSubscriptionIds },
       };
     },
