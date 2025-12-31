@@ -272,7 +272,10 @@ module.exports = createCoreController("api::ipk.ipk", ({ strapi }) => ({
 
     const filters = {
       publishedAt: { $notNull: true },
-      subscriptions: { id: { $in: allowedSubscriptionIds } },
+      $or: [
+        { subscriptions: { id: { $in: allowedSubscriptionIds } } },
+        { subscriptions: { id: { $null: true } } },
+      ],
     };
 
     if (topicIds.length) {
@@ -287,9 +290,13 @@ module.exports = createCoreController("api::ipk.ipk", ({ strapi }) => ({
 
     if (q && String(q).trim()) {
       const qq = String(q).trim();
-      filters.$or = [
-        { ipk_title: { $containsi: qq } },
-        { description: { $containsi: qq } },
+      filters.$and = [
+        {
+          $or: [
+            { ipk_title: { $containsi: qq } },
+            { description: { $containsi: qq } },
+          ],
+        },
       ];
     }
 
