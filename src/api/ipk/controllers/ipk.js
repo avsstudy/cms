@@ -203,7 +203,7 @@ module.exports = createCoreController("api::ipk.ipk", ({ strapi }) => ({
       }
     );
 
-    const freeSubId = freeSubs && freeSubs[0] && freeSubs[0].id;
+    const freeSubId = freeSubs?.[0]?.id;
 
     if (!freeSubId) {
       ctx.throw(
@@ -212,12 +212,12 @@ module.exports = createCoreController("api::ipk.ipk", ({ strapi }) => ({
       );
     }
 
-    let user = (ctx.state && ctx.state.user) || null;
+    let user = ctx.state?.user || null;
     if (!user) user = await getUserFromAuthHeader(ctx);
 
     let allowedSubscriptionIds = [freeSubId];
 
-    if (user && user.id) {
+    if (user?.id) {
       const fullUser = await strapi.entityService.findOne(
         "plugin::users-permissions.user",
         user.id,
@@ -234,34 +234,35 @@ module.exports = createCoreController("api::ipk.ipk", ({ strapi }) => ({
         }
       );
 
-      const activeUntil =
-        fullUser && fullUser.packageActiveUntil
-          ? new Date(fullUser.packageActiveUntil).getTime()
-          : null;
+      const activeUntil = fullUser?.packageActiveUntil
+        ? new Date(fullUser.packageActiveUntil).getTime()
+        : null;
 
       const isActive = activeUntil ? activeUntil > Date.now() : false;
 
       if (
         isActive &&
-        fullUser &&
-        fullUser.package &&
+        fullUser?.package?.subscriptions &&
         Array.isArray(fullUser.package.subscriptions) &&
         fullUser.package.subscriptions.length
       ) {
         const packageSubIds = fullUser.package.subscriptions.map((s) => s.id);
         allowedSubscriptionIds = Array.from(
-          new Set([freeSubId].concat(packageSubIds))
+          new Set([freeSubId, ...packageSubIds])
         );
       }
     }
 
-    const query = ctx.query || {};
-    const topics = query.topics;
-    const q = query.q;
-    const page = query.page || "1";
-    const pageSize = query.pageSize || "10";
-    const from = query.from;
-    const to = query.to;
+    const { topics, q } = ctx.query;
+    const pageRaw = ctx.query.page ?? "1";
+    const pageSizeRaw = ctx.query.pageSize ?? "10";
+
+    const page = Math.max(1, Number(pageRaw) || 1);
+    const pageSize = Math.max(1, Number(pageSizeRaw) || 10);
+    const offset = (page - 1) * pageSize;
+
+    const from = ctx.query.from;
+    const to = ctx.query.to;
 
     const topicIds = topics
       ? String(topics)
@@ -270,27 +271,27 @@ module.exports = createCoreController("api::ipk.ipk", ({ strapi }) => ({
           .filter((n) => Number.isFinite(n) && n > 0)
       : [];
 
-    const filters = {
+    const where = {
       publishedAt: { $notNull: true },
       $or: [
-        { subscriptions: { id: { $in: allowedSubscriptionIds } } },
-        { subscriptions: { id: { $null: true } } },
+        { subscriptions: { $in: allowedSubscriptionIds } },
+        { subscriptions: { $null: true } },
       ],
     };
 
     if (topicIds.length) {
-      filters.topic_dps = { id: { $in: topicIds } };
+      where.topic_dps = { $in: topicIds };
     }
 
     if (from || to) {
-      filters.ipk_date = {};
-      if (from) filters.ipk_date.$gte = String(from);
-      if (to) filters.ipk_date.$lte = String(to);
+      where.ipk_date = {};
+      if (from) where.ipk_date.$gte = String(from);
+      if (to) where.ipk_date.$lte = String(to);
     }
 
     if (q && String(q).trim()) {
       const qq = String(q).trim();
-      filters.$and = [
+      where.$and = [
         {
           $or: [
             { ipk_title: { $containsi: qq } },
@@ -300,33 +301,39 @@ module.exports = createCoreController("api::ipk.ipk", ({ strapi }) => ({
       ];
     }
 
-    const result = await strapi.entityService.findPage("api::ipk.ipk", {
-      sort: ["publishedAt:desc"],
-      locale: "all",
-      fields: [
-        "id",
-        "documentId",
-        "ipk_title",
-        "slug",
-        "ipk_date",
-        "views",
-        "publishedAt",
-        "description",
-      ],
-      populate: {
-        topic: { fields: ["title", "id"] },
-        author: { populate: "*" },
-        topic_dps: { populate: "*" },
-        ipk_file: { populate: "*" },
-        subscriptions: { fields: ["id", "title", "documentId"] },
-      },
-      filters,
-      pagination: { page: Number(page), pageSize: Number(pageSize) },
-    });
+    const [entries, total] = await strapi.db
+      .query("api::ipk.ipk")
+      .findWithCount({
+        where,
+        orderBy: [{ publishedAt: "desc" }],
+        offset,
+        limit: pageSize,
+        select: [
+          "id",
+          "documentId",
+          "ipk_title",
+          "slug",
+          "ipk_date",
+          "views",
+          "publishedAt",
+          "description",
+        ],
+        populate: {
+          topic: { select: ["id", "title"] },
+          author: true,
+          topic_dps: true,
+          ipk_file: true,
+          subscriptions: { select: ["id", "title", "documentId"] },
+        },
+      });
+
+    const pageCount = Math.max(1, Math.ceil(total / pageSize));
 
     ctx.body = {
-      data: result.results,
-      meta: { pagination: result.pagination },
+      data: entries,
+      meta: {
+        pagination: { page, pageSize, pageCount, total },
+      },
       access: { allowedSubscriptionIds },
     };
   },
