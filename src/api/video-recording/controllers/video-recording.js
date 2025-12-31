@@ -239,16 +239,15 @@ module.exports = createCoreController(
         }
       }
 
-      const { topics, speakers, q, videoTypes, slug, limit } = ctx.query;
-
-      const limitNum =
-        limit !== undefined && limit !== null && String(limit).trim().length
-          ? Number(limit)
-          : null;
-
-      if (limitNum !== null && (!Number.isFinite(limitNum) || limitNum <= 0)) {
-        return ctx.badRequest("limit must be a positive number");
-      }
+      const {
+        topics,
+        speakers,
+        q,
+        page = "1",
+        pageSize = "10",
+        videoTypes,
+        slug,
+      } = ctx.query;
 
       const topicIds = topics
         ? String(topics).split(",").map(Number).filter(Boolean)
@@ -285,91 +284,47 @@ module.exports = createCoreController(
         ];
       }
 
-      let rows = [];
-      let pagination = null;
+      const pageNum =
+        Number(ctx.query.page ?? ctx.query.pagination?.page ?? 1) || 1;
+      const pageSizeNum =
+        Number(ctx.query.pageSize ?? ctx.query.pagination?.pageSize ?? 10) ||
+        10;
 
-      if (limitNum) {
-        rows = await strapi.entityService.findMany(
-          "api::video-recording.video-recording",
-          {
-            sort: ["publishedAt:desc"],
-            locale: "all",
-            publicationState: "live",
-            fields: [
-              "id",
-              "documentId",
-              "slug",
-              "title",
-              "publishedAt",
-              "video_type",
-              "stream_date",
-              "top",
-            ],
-            populate: {
-              card_cover: { fields: ["url", "alternativeText"] },
-              speaker: { populate: "*" },
-              general_content: { populate: "*" },
-              subscriptions: { fields: ["id", "title", "documentId"] },
-            },
-            filters: {
-              ...filters,
-              publishedAt: { $notNull: true },
-            },
-            limit: limitNum,
-          }
-        );
+      const result = await strapi.entityService.findPage(
+        "api::video-recording.video-recording",
+        {
+          sort: ["publishedAt:desc"],
+          locale: "all",
+          publicationState: "live",
+          fields: [
+            "id",
+            "documentId",
+            "slug",
+            "title",
+            "publishedAt",
+            "video_type",
+            "stream_date",
+            "top",
+          ],
+          populate: {
+            card_cover: { fields: ["url", "alternativeText"] },
+            speaker: { populate: "*" },
+            general_content: { populate: "*" },
+            subscriptions: { fields: ["id", "title", "documentId"] },
+          },
+          filters: {
+            ...filters,
+            publishedAt: { $notNull: true },
+          },
 
-        pagination = {
-          page: 1,
-          pageSize: limitNum,
-          pageCount: 1,
-          total: Array.isArray(rows) ? rows.length : 0,
-        };
-      } else {
-        const pageNum =
-          Number(ctx.query.page ?? ctx.query.pagination?.page ?? 1) || 1;
-        const pageSizeNum =
-          Number(ctx.query.pageSize ?? ctx.query.pagination?.pageSize ?? 10) ||
-          10;
-
-        const result = await strapi.entityService.findPage(
-          "api::video-recording.video-recording",
-          {
-            sort: ["publishedAt:desc"],
-            locale: "all",
-            publicationState: "live",
-            fields: [
-              "id",
-              "documentId",
-              "slug",
-              "title",
-              "publishedAt",
-              "video_type",
-              "stream_date",
-              "top",
-            ],
-            populate: {
-              card_cover: { fields: ["url", "alternativeText"] },
-              speaker: { populate: "*" },
-              general_content: { populate: "*" },
-              subscriptions: { fields: ["id", "title", "documentId"] },
-            },
-            filters: {
-              ...filters,
-              publishedAt: { $notNull: true },
-            },
-            page: pageNum,
-            pageSize: pageSizeNum,
-          }
-        );
-
-        rows = result.results || [];
-        pagination = result.pagination;
-      }
+          page: pageNum,
+          pageSize: pageSizeNum,
+        }
+      );
 
       const allowedSet = new Set(allowedSubscriptionIds);
 
-      const withAccess = (rows || []).map((item) => {
+      const withAccess = (result.results || []).map((item) => {
         const subs = Array.isArray(item.subscriptions)
           ? item.subscriptions
           : [];
@@ -387,7 +342,7 @@ module.exports = createCoreController(
 
       ctx.body = {
         data: withAccess,
-        meta: { pagination },
+        meta: { pagination: result.pagination },
         access: { allowedSubscriptionIds },
       };
     },
