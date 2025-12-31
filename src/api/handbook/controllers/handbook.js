@@ -209,7 +209,6 @@ module.exports = createCoreController(
         }
       }
 
-      // query params (як у ipk)
       const { topics, q } = ctx.query;
       const pageRaw = ctx.query.page ?? "1";
       const pageSizeRaw = ctx.query.pageSize ?? "10";
@@ -225,12 +224,10 @@ module.exports = createCoreController(
             .filter((n) => Number.isFinite(n) && n > 0)
         : [];
 
-      // filters: доступні по підписці + без підписки
       const where = [
         {
           $or: [
             { subscriptions: { id: { $in: allowedSubscriptionIds } } },
-            // важливо: елементи, які НЕ входять в жодну підписку
             { subscriptions: { id: { $null: true } } },
           ],
         },
