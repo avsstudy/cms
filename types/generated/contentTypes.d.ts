@@ -1219,6 +1219,8 @@ export interface ApiInnerBannerInnerBanner extends Struct.CollectionTypeSchema {
       Schema.Attribute.Required &
       Schema.Attribute.DefaultTo<'active'>;
     banner_url: Schema.Attribute.String;
+    course_list: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<false>;
+    course_page: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<false>;
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;

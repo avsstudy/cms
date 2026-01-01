@@ -19,12 +19,14 @@ const PLACEMENTS = [
   "video_list",
   "document_list",
   "handbook_list",
+  "course_list",
   "article_page",
   "news_page",
   "ipk_page",
   "expertqa_page",
   "document_page",
   "handbook_page",
+  "course_page",
 ];
 
 module.exports = createCoreController(

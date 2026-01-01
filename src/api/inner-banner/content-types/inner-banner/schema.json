@@ -102,6 +102,10 @@
       "type": "boolean",
       "default": false
     },
+    "course_list": {
+      "type": "boolean",
+      "default": false
+    },
     "article_page": {
       "type": "boolean",
       "default": false
@@ -123,6 +127,10 @@
       "default": false
     },
     "handbook_page": {
+      "type": "boolean",
+      "default": false
+    },
+    "course_page": {
       "type": "boolean",
       "default": false
     }
