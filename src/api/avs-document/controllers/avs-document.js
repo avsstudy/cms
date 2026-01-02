@@ -210,11 +210,13 @@ module.exports = createCoreController(
         }
       }
 
-      const query = ctx.query || {};
-      const topics = query.topics;
-      const q = query.q;
-      const page = query.page || "1";
-      const pageSize = query.pageSize || "10";
+      const { topics, q } = ctx.query;
+      const pageRaw = ctx.query.page ?? "1";
+      const pageSizeRaw = ctx.query.pageSize ?? "10";
+
+      const page = Math.max(1, Number(pageRaw) || 1);
+      const pageSize = Math.max(1, Number(pageSizeRaw) || 10);
+      const offset = (page - 1) * pageSize;
 
       const topicIds = topics
         ? String(topics)
@@ -223,29 +225,35 @@ module.exports = createCoreController(
             .filter((n) => Number.isFinite(n) && n > 0)
         : [];
 
-      const filters = {
+      const where = {
         publishedAt: { $notNull: true },
         subscriptions: { id: { $in: allowedSubscriptionIds } },
       };
 
       if (topicIds.length) {
-        filters.topic = { id: { $in: topicIds } };
+        where.topic = { id: { $in: topicIds } };
       }
 
       if (q && String(q).trim()) {
         const qq = String(q).trim();
-        filters.$or = [
+        where.$or = [
           { title: { $containsi: qq } },
           { description: { $containsi: qq } },
         ];
       }
 
-      const result = await strapi.entityService.findPage(
-        "api::avs-document.avs-document",
-        {
-          sort: ["pinned:desc", "publishedAt:desc", "views:desc"],
-          locale: "all",
-          fields: [
+      const [entries, total] = await strapi.db
+        .query("api::avs-document.avs-document")
+        .findWithCount({
+          orderBy: [
+            { pinned: "desc" },
+            { publishedAt: "desc" },
+            { views: "desc" },
+          ],
+          where,
+          offset,
+          limit: pageSize,
+          select: [
             "id",
             "documentId",
             "title",
@@ -256,21 +264,20 @@ module.exports = createCoreController(
             "publishedAt",
           ],
           populate: {
-            topic: { fields: ["title", "id"] },
-            author: { populate: "*" },
-            general_content_blank: { populate: "*" },
-            general_content_zrazok: { populate: "*" },
-            general_content_useful_files: { populate: "*" },
-            subscriptions: { fields: ["id", "title", "documentId"] },
+            topic: { select: ["title", "id"] },
+            author: true,
+            general_content: true,
+            subscriptions: { select: ["id", "title", "documentId"] },
           },
-          filters,
-          pagination: { page: Number(page), pageSize: Number(pageSize) },
-        }
-      );
+        });
+
+      const pageCount = Math.max(1, Math.ceil(total / pageSize));
 
       ctx.body = {
-        data: result.results,
-        meta: { pagination: result.pagination },
+        data: entries,
+        meta: {
+          pagination: { page, pageSize, pageCount, total },
+        },
         access: { allowedSubscriptionIds },
       };
     },
