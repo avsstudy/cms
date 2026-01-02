@@ -234,7 +234,13 @@ module.exports = createCoreController(
         }
       }
 
-      const { topics, categories, q, page = "1", pageSize = "10" } = ctx.query;
+      const { topics, categories, q } = ctx.query;
+      const pageRaw = ctx.query.page ?? "1";
+      const pageSizeRaw = ctx.query.pageSize ?? "10";
+
+      const page = Math.max(1, Number(pageRaw) || 1);
+      const pageSize = Math.max(1, Number(pageSizeRaw) || 10);
+      const offset = (page - 1) * pageSize;
 
       const topicIds = topics
         ? String(topics).split(",").map(Number).filter(Boolean)
@@ -244,28 +250,30 @@ module.exports = createCoreController(
         ? String(categories).split(",").map(Number).filter(Boolean)
         : [];
 
-      const filters = {
+      const where = {
         publishedAt: { $notNull: true },
         subscriptions: { id: { $in: allowedSubscriptionIds } },
       };
 
-      if (topicIds.length) filters.topic = { id: { $in: topicIds } };
-      if (categoryIds.length) filters.category = { id: { $in: categoryIds } };
+      if (topicIds.length) where.topic = { id: { $in: topicIds } };
+      if (categoryIds.length) where.category = { id: { $in: categoryIds } };
 
       if (q && String(q).trim()) {
         const qq = String(q).trim();
-        filters.$or = [
+        where.$or = [
           { title: { $containsi: qq } },
           { description: { $containsi: qq } },
         ];
       }
 
-      const result = await strapi.entityService.findPage(
-        "api::news-article.news-article",
-        {
-          sort: ["pinned:desc", "publishedAt:desc"],
-          locale: "all",
-          fields: [
+      const [entries, total] = await strapi.db
+        .query("api::news-article.news-article")
+        .findWithCount({
+          where,
+          orderBy: [{ pinned: "desc" }, { publishedAt: "desc" }],
+          offset,
+          limit: pageSize,
+          select: [
             "title",
             "slug",
             "description",
@@ -276,19 +284,19 @@ module.exports = createCoreController(
             "comments_enabled",
           ],
           populate: {
-            category: { fields: ["title", "id"] },
-            cover: { fields: ["url", "alternativeText"] },
-            topic: { fields: ["title", "id"] },
-            subscriptions: { fields: ["id", "title", "documentId"] },
+            category: { select: ["title", "id"] },
+            cover: { select: ["url", "alternativeText"] },
+            topic: { select: ["title", "id"] },
+            subscriptions: { select: ["id", "title", "documentId"] },
           },
-          filters,
-          pagination: { page: Number(page), pageSize: Number(pageSize) },
-        }
-      );
+        });
+      const pageCount = Math.max(1, Math.ceil(total / pageSize));
 
       ctx.body = {
-        data: result.results,
-        meta: { pagination: result.pagination },
+        data: entries,
+        meta: {
+          pagination: { page, pageSize, pageCount, total },
+        },
         access: { allowedSubscriptionIds },
       };
     },
