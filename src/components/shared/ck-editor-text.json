@@ -17,6 +17,9 @@
     },
     "anchor_title": {
       "type": "string"
+    },
+    "redaction_date": {
+      "type": "date"
     }
   },
   "config": {}

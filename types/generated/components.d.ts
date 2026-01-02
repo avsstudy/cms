@@ -51,6 +51,7 @@ export interface SharedCkEditorText extends Struct.ComponentSchema {
   attributes: {
     anchor: Schema.Attribute.String;
     anchor_title: Schema.Attribute.String;
+    redaction_date: Schema.Attribute.Date;
     text_content: Schema.Attribute.RichText &
       Schema.Attribute.CustomField<
         'plugin::ckeditor5.CKEditor',
