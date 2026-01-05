@@ -1,0 +1,34 @@
+{
+  "kind": "collectionType",
+  "collectionName": "about_pages",
+  "info": {
+    "singularName": "about-page",
+    "pluralName": "about-pages",
+    "displayName": "About_page"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "title": {
+      "type": "string",
+      "required": true
+    },
+    "page_type": {
+      "type": "enumeration",
+      "required": true,
+      "enum": [
+        "privacy_policy",
+        "public_offer",
+        "returns_policy",
+        "partial_purchase"
+      ]
+    },
+    "content": {
+      "type": "component",
+      "component": "shared.ck-editor-text",
+      "repeatable": false
+    }
+  }
+}
