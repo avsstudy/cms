@@ -103,7 +103,7 @@ module.exports = {
     },
 
     options: {
-      rule: "0 5 0 * * *",
+      rule: "*/30 * * * * *",
       tz: "Europe/Kyiv",
     },
   },
