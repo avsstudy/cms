@@ -17,6 +17,105 @@ module.exports = (plugin) => {
     );
   }
 
+  plugin.contentTypes.user.lifecycles = {
+    async beforeUpdate(event) {
+      try {
+        const id = event.params?.where?.id;
+        if (!id) return;
+
+        const prev = await strapi.entityService.findOne(
+          "plugin::users-permissions.user",
+          id,
+          {
+            fields: ["id", "packageActiveUntil"],
+            populate: { package: { fields: ["id"] } },
+          }
+        );
+
+        event.state = event.state || {};
+        event.state.prevUser = prev;
+      } catch (e) {
+        strapi.log.warn(
+          "[user.lifecycle.beforeUpdate] failed: " + (e?.message || e)
+        );
+      }
+    },
+
+    async afterUpdate(event) {
+      try {
+        const id = event.result?.id;
+        const prev = event.state?.prevUser;
+        if (!id || !prev) return;
+
+        const current = await strapi.entityService.findOne(
+          "plugin::users-permissions.user",
+          id,
+          {
+            fields: ["id", "packageActiveUntil"],
+            populate: { package: { fields: ["id"] } },
+          }
+        );
+
+        const now = new Date();
+
+        const prevUntil = prev.packageActiveUntil
+          ? new Date(prev.packageActiveUntil)
+          : null;
+        const newUntil = current.packageActiveUntil
+          ? new Date(current.packageActiveUntil)
+          : null;
+
+        const prevPkgId = prev.package?.id ?? null;
+        const newPkgId = current.package?.id ?? null;
+
+        const wasActive = !!(prevPkgId && prevUntil && prevUntil > now);
+        const isActive = !!(newPkgId && newUntil && newUntil > now);
+
+        if (!isActive) return;
+
+        const extended =
+          prevUntil && newUntil
+            ? newUntil.getTime() > prevUntil.getTime() + 1000
+            : false;
+
+        const changedPackage = prevPkgId !== newPkgId && !!newPkgId;
+
+        const becameActiveOrExtended = !wasActive || extended || changedPackage;
+        if (!becameActiveOrExtended) return;
+
+        const nService = strapi.service("api::notification.notification");
+
+        const untilIso = newUntil.toISOString();
+        const uniqueKey = `SUBSCRIPTION_ACTIVATED:${id}:${untilIso}:${newPkgId}`;
+
+        const created = await nService.createNotification({
+          userId: id,
+          code: "SUBSCRIPTION_ACTIVATED",
+          uniqueKey,
+          meta_data: {
+            source: "user.lifecycle",
+            packageId: newPkgId,
+            packageActiveUntil: untilIso,
+          },
+        });
+
+        if (created) {
+          strapi.log.info(
+            `[user.lifecycle] notification SUBSCRIPTION_ACTIVATED created user=${id} until=${untilIso}`
+          );
+        } else {
+          strapi.log.info(
+            `[user.lifecycle] notification SUBSCRIPTION_ACTIVATED skipped (exists) user=${id} until=${untilIso}`
+          );
+        }
+      } catch (e) {
+        strapi.log.error(
+          "[user.lifecycle.afterUpdate] failed: " + (e?.message || e)
+        );
+      }
+    },
+  };
+
   plugin.controllers.auth.register = async (ctx) => {
     strapi.log.info(
       "[auth.register] START, original body:",
@@ -208,9 +307,7 @@ module.exports = (plugin) => {
         "plugin::users-permissions.user",
         updatedUser.id,
         {
-          data: {
-            zoho_id: zohoId,
-          },
+          data: { zoho_id: zohoId },
         }
       );
 
@@ -219,11 +316,8 @@ module.exports = (plugin) => {
         JSON.stringify(finalUser)
       );
 
-      if (ctx.response?.body) {
-        ctx.response.body.zoho_id = finalUser.zoho_id;
-      } else if (ctx.body) {
-        ctx.body.zoho_id = finalUser.zoho_id;
-      }
+      if (ctx.response?.body) ctx.response.body.zoho_id = finalUser.zoho_id;
+      else if (ctx.body) ctx.body.zoho_id = finalUser.zoho_id;
 
       strapi.log.info(
         "[user.update] Response patched with zoho_id:",

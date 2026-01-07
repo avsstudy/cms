@@ -1394,6 +1394,54 @@ export interface ApiNewsArticleNewsArticle extends Struct.CollectionTypeSchema {
   };
 }
 
+export interface ApiNotificationNotification
+  extends Struct.CollectionTypeSchema {
+  collectionName: 'notifications';
+  info: {
+    displayName: 'Notification';
+    pluralName: 'notifications';
+    singularName: 'notification';
+  };
+  options: {
+    draftAndPublish: false;
+  };
+  attributes: {
+    code: Schema.Attribute.Enumeration<
+      [
+        'SUBSCRIPTION_ACTIVATED',
+        'SUBSCRIPTION_EXPIRING_3D',
+        'SUBSCRIPTION_EXPIRED',
+      ]
+    >;
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    ctaLabel: Schema.Attribute.String;
+    ctaUrl: Schema.Attribute.String;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::notification.notification'
+    > &
+      Schema.Attribute.Private;
+    meta_data: Schema.Attribute.JSON;
+    notification_text: Schema.Attribute.Text;
+    publishedAt: Schema.Attribute.DateTime;
+    readAt: Schema.Attribute.DateTime;
+    title: Schema.Attribute.String;
+    uniqueKey: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.Unique;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    user: Schema.Attribute.Relation<
+      'manyToOne',
+      'plugin::users-permissions.user'
+    >;
+  };
+}
+
 export interface ApiPackagePackage extends Struct.CollectionTypeSchema {
   collectionName: 'packages';
   info: {
@@ -2625,6 +2673,10 @@ export interface PluginUsersPermissionsUser
       'plugin::users-permissions.user'
     > &
       Schema.Attribute.Private;
+    notifications: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::notification.notification'
+    >;
     package: Schema.Attribute.Relation<'manyToOne', 'api::package.package'>;
     packageActiveUntil: Schema.Attribute.DateTime;
     password: Schema.Attribute.Password &
@@ -2704,6 +2756,7 @@ declare module '@strapi/strapi' {
       'api::inner-banner.inner-banner': ApiInnerBannerInnerBanner;
       'api::ipk.ipk': ApiIpkIpk;
       'api::news-article.news-article': ApiNewsArticleNewsArticle;
+      'api::notification.notification': ApiNotificationNotification;
       'api::package.package': ApiPackagePackage;
       'api::payment.payment': ApiPaymentPayment;
       'api::review.review': ApiReviewReview;

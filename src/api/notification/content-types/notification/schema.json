@@ -1,0 +1,52 @@
+{
+  "kind": "collectionType",
+  "collectionName": "notifications",
+  "info": {
+    "singularName": "notification",
+    "pluralName": "notifications",
+    "displayName": "Notification"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "title": {
+      "type": "string"
+    },
+    "user": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "plugin::users-permissions.user",
+      "inversedBy": "notifications"
+    },
+    "code": {
+      "type": "enumeration",
+      "enum": [
+        "SUBSCRIPTION_ACTIVATED",
+        "SUBSCRIPTION_EXPIRING_3D",
+        "SUBSCRIPTION_EXPIRED"
+      ]
+    },
+    "notification_text": {
+      "type": "text"
+    },
+    "ctaLabel": {
+      "type": "string"
+    },
+    "ctaUrl": {
+      "type": "string"
+    },
+    "readAt": {
+      "type": "datetime"
+    },
+    "meta_data": {
+      "type": "json"
+    },
+    "uniqueKey": {
+      "type": "string",
+      "required": true,
+      "unique": true
+    }
+  }
+}
