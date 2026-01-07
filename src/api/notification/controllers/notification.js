@@ -19,7 +19,7 @@ module.exports = createCoreController(
 
       const [results, total] = await Promise.all([
         strapi.entityService.findMany("api::notification.notification", {
-          filters: { user: user.id },
+          filters: { user: { id: { $eq: user.id } } },
           sort: { createdAt: "desc" },
           start,
           limit: pageSize,
@@ -34,7 +34,7 @@ module.exports = createCoreController(
           ],
         }),
         strapi.entityService.count("api::notification.notification", {
-          filters: { user: user.id },
+          filters: { user: { id: { $eq: user.id } } },
         }),
       ]);
 

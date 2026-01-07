@@ -4,7 +4,7 @@ module.exports = {
   routes: [
     {
       method: "GET",
-      path: "/notifications",
+      path: "/notifications/mine",
       handler: "notification.findMine",
       config: { policies: ["global::is-authenticated"] },
     },
