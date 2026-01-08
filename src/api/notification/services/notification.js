@@ -26,6 +26,12 @@ const TEMPLATES = {
     ctaLabel: "Оновити підписку",
     ctaUrl: "/subscription",
   },
+  EXPERT_ANSWER_READY: {
+    title: "Відповідь експерта готова",
+    notification_text: "Ви отримали відповідь експерта на ваше запитання",
+    ctaLabel: "Перейти до відповіді",
+    ctaUrl: "/answers/my",
+  },
 };
 
 function isUniqueViolation(err) {

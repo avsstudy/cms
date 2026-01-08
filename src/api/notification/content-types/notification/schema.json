@@ -25,7 +25,8 @@
       "enum": [
         "SUBSCRIPTION_ACTIVATED",
         "SUBSCRIPTION_EXPIRING_3D",
-        "SUBSCRIPTION_EXPIRED"
+        "SUBSCRIPTION_EXPIRED",
+        "EXPERT_ANSWER_READY"
       ]
     },
     "notification_text": {
