@@ -1412,6 +1412,8 @@ export interface ApiNotificationNotification
         'SUBSCRIPTION_EXPIRING_3D',
         'SUBSCRIPTION_EXPIRED',
         'EXPERT_ANSWER_READY',
+        'WEBINAR_UPCOMING_24H',
+        'WEBINAR_STARTED',
       ]
     >;
     createdAt: Schema.Attribute.DateTime;

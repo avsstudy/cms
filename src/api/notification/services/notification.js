@@ -32,6 +32,18 @@ const TEMPLATES = {
     ctaLabel: "Перейти до відповіді",
     ctaUrl: "/answers/my",
   },
+  WEBINAR_UPCOMING_24H: {
+    title: "Вебінар завтра",
+    notification_text: "Вже завтра відбудеться вебінар «{free_webinar_title}»",
+    ctaLabel: "Перейти до вебінару",
+    ctaUrl: "/webinars",
+  },
+  WEBINAR_STARTED: {
+    title: "Вебінар почався",
+    notification_text: "Вебінар «{free_webinar_title}» розпочався.",
+    ctaLabel: "Дивитися",
+    ctaUrl: "/webinars",
+  },
 };
 
 function isUniqueViolation(err) {
@@ -44,13 +56,16 @@ function isUniqueViolation(err) {
   );
 }
 
+function interpolate(str, vars) {
+  if (!str) return str;
+  return String(str)
+    .replaceAll("{free_webinar_title}", vars.free_webinar_title ?? "")
+    .replaceAll("{webinar_title}", vars.free_webinar_title ?? "");
+}
+
 module.exports = createCoreService(
   "api::notification.notification",
   ({ strapi }) => ({
-    templates() {
-      return TEMPLATES;
-    },
-
     async createNotification({
       userId,
       code,
@@ -65,14 +80,28 @@ module.exports = createCoreService(
       const tpl = TEMPLATES[code];
       if (!tpl) throw new Error(`Unknown notification code: ${code}`);
 
+      const vars = {
+        free_webinar_title:
+          override.free_webinar_title ??
+          meta_data.free_webinar_title ??
+          meta_data.webinarTitle ??
+          "",
+      };
+
+      const titleRaw = override.title ?? tpl.title;
+      const textRaw = override.notification_text ?? tpl.notification_text;
+
       const data = {
         user: userId,
         code,
         uniqueKey,
-        title: override.title ?? tpl.title,
-        notification_text: override.notification_text ?? tpl.notification_text,
+
+        title: interpolate(titleRaw, vars),
+        notification_text: interpolate(textRaw, vars),
+
         ctaLabel: override.ctaLabel ?? tpl.ctaLabel,
         ctaUrl: override.ctaUrl ?? tpl.ctaUrl,
+
         meta_data,
       };
 
